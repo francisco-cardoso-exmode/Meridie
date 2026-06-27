@@ -1,0 +1,64 @@
+import Link from "next/link";
+import { allEmpreendimentos, allRegioes } from "@/lib/store";
+import { getDb } from "@/lib/mongodb";
+
+export const dynamic = "force-dynamic";
+
+async function contarLeads() {
+  try {
+    const db = await getDb();
+    return await db.collection("contactos").countDocuments();
+  } catch {
+    return 0;
+  }
+}
+
+export default async function AdminDashboard() {
+  const [emp, reg, leads] = await Promise.all([
+    allEmpreendimentos(),
+    allRegioes(),
+    contarLeads(),
+  ]);
+  const reais = emp.filter((e) => e.construtora).length;
+
+  return (
+    <div className="admin-container">
+      <h1>Dashboard</h1>
+      <p className="admin-sub">Visão geral do conteúdo do site.</p>
+
+      <div className="admin-stats">
+        <div className="admin-stat">
+          <div className="n">{emp.length}</div>
+          <div className="l">Empreendimentos</div>
+        </div>
+        <div className="admin-stat">
+          <div className="n">{reais}</div>
+          <div className="l">Reais (com construtora)</div>
+        </div>
+        <div className="admin-stat">
+          <div className="n">{reg.length}</div>
+          <div className="l">Regiões / zonas</div>
+        </div>
+        <div className="admin-stat">
+          <div className="n">{leads}</div>
+          <div className="l">Leads recebidas</div>
+        </div>
+      </div>
+
+      <div className="admin-cards">
+        <Link href="/admin/empreendimentos" className="admin-card">
+          <h3>Empreendimentos →</h3>
+          <p>Criar, editar e remover imóveis. Cada card é um empreendimento.</p>
+        </Link>
+        <Link href="/admin/empreendimentos/novo" className="admin-card">
+          <h3>+ Novo empreendimento</h3>
+          <p>Adicionar um novo imóvel ao site.</p>
+        </Link>
+        <Link href="/admin/emails" className="admin-card">
+          <h3>Emails →</h3>
+          <p>Pré-visualizar os templates e ver como/quando são enviados.</p>
+        </Link>
+      </div>
+    </div>
+  );
+}
