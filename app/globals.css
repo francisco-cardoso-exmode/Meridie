@@ -1902,3 +1902,43 @@ body:has(.admin-page) .site-footer {
   background: var(--paper-soft) center/cover no-repeat;
   border: 1px solid var(--border);
 }
+
+/* Leads */
+.leads-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+}
+.lead-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 20px;
+}
+.lead-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.lead-top strong {
+  color: var(--navy);
+}
+.lead-date {
+  color: var(--muted);
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+.lead-assunto {
+  margin-top: 4px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--gold);
+}
+.lead-msg {
+  margin-top: 8px;
+  color: var(--ink);
+  font-size: 0.92rem;
+  white-space: pre-wrap;
+}
