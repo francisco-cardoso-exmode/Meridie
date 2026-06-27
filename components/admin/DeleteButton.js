@@ -3,14 +3,14 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-export default function DeleteButton({ slug, nome }) {
+export default function DeleteButton({ slug, nome, endpoint = "empreendimentos" }) {
   const router = useRouter();
   const [a, setA] = useState("idle");
 
   async function apagar() {
     if (!confirm(`Apagar "${nome}"? Esta ação não pode ser desfeita.`)) return;
     setA("loading");
-    await fetch(`/api/admin/empreendimentos/${slug}`, { method: "DELETE" });
+    await fetch(`/api/admin/${endpoint}/${slug}`, { method: "DELETE" });
     router.refresh();
   }
 

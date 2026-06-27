@@ -1802,3 +1802,50 @@ body:has(.admin-page) .site-footer {
     flex-wrap: wrap;
   }
 }
+
+/* Ajuda */
+.ajuda-bloco {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px 26px;
+  margin-bottom: 18px;
+}
+.ajuda-bloco h2 {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+}
+.ajuda-bloco p,
+.ajuda-bloco li {
+  color: var(--ink);
+  font-size: 0.92rem;
+  line-height: 1.7;
+}
+.ajuda-bloco ul {
+  margin: 8px 0 0 18px;
+}
+.ajuda-bloco code {
+  background: var(--paper-soft);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 0.85em;
+}
+.ajuda-bloco pre {
+  background: var(--navy-dark);
+  color: #e6ecf5;
+  padding: 14px 16px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  overflow-x: auto;
+  margin: 8px 0;
+  white-space: pre-wrap;
+}
+.ajuda-aviso {
+  background: #fff8e8;
+  border: 1px solid #e8d9a8;
+  border-radius: 8px;
+  padding: 14px 16px;
+  font-size: 0.9rem;
+  color: #6b551e;
+  margin-top: 10px;
+}

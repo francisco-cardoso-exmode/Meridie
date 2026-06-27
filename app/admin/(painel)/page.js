@@ -50,13 +50,17 @@ export default async function AdminDashboard() {
           <h3>Empreendimentos →</h3>
           <p>Criar, editar e remover imóveis. Cada card é um empreendimento.</p>
         </Link>
-        <Link href="/admin/empreendimentos/novo" className="admin-card">
-          <h3>+ Novo empreendimento</h3>
-          <p>Adicionar um novo imóvel ao site.</p>
+        <Link href="/admin/regioes" className="admin-card">
+          <h3>Regiões &amp; Zonas →</h3>
+          <p>Gerir regiões e zonas, mapas e o que liga aos imóveis.</p>
         </Link>
         <Link href="/admin/emails" className="admin-card">
           <h3>Emails →</h3>
           <p>Pré-visualizar os templates e ver como/quando são enviados.</p>
+        </Link>
+        <Link href="/admin/ajuda" className="admin-card">
+          <h3>Ajuda →</h3>
+          <p>Como pôr o conteúdo de tudo, passo a passo.</p>
         </Link>
       </div>
     </div>
