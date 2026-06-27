@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import ImageUploader from "@/components/admin/ImageUploader";
 
 const linhas = (s) =>
   (s || "").split("\n").map((x) => x.trim()).filter(Boolean);
@@ -129,8 +130,17 @@ export default function RegiaoForm({ initial = null, regioesExistentes = [] }) {
           </select>
         </label>
         <label className="full">
-          Imagem (URL)
-          <input value={f.imagem} onChange={set("imagem")} />
+          Imagem
+          <ImageUploader
+            multiple={false}
+            onUploaded={(urls) => urls[0] && setF((p) => ({ ...p, imagem: urls[0] }))}
+          />
+          {f.imagem && (
+            <div className="upload-thumbs">
+              <div className="upload-thumb" style={{ backgroundImage: `url(${f.imagem})` }} />
+            </div>
+          )}
+          <input value={f.imagem} onChange={set("imagem")} placeholder="Carrega acima ou cola um URL" />
         </label>
         <label className="full">
           Tagline (frase curta)

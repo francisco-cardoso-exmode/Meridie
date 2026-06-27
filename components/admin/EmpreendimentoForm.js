@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import ImageUploader from "@/components/admin/ImageUploader";
 
 const linhasParaArray = (s) =>
   (s || "")
@@ -202,9 +203,29 @@ export default function EmpreendimentoForm({ initial = null }) {
           Proximidades (uma por linha, opcional)
           <textarea rows={6} value={f.proximidades} onChange={set("proximidades")} />
         </label>
-        <label>
-          Imagens — URLs (uma por linha)
-          <textarea rows={6} value={f.imagens} onChange={set("imagens")} />
+        <label className="full">
+          Imagens (a 1.ª é a foto principal)
+          <ImageUploader
+            onUploaded={(urls) =>
+              setF((p) => ({
+                ...p,
+                imagens: [p.imagens, urls.join("\n")].filter(Boolean).join("\n"),
+              }))
+            }
+          />
+          {linhasParaArray(f.imagens).length > 0 && (
+            <div className="upload-thumbs">
+              {linhasParaArray(f.imagens).map((url, i) => (
+                <div className="upload-thumb" key={i} style={{ backgroundImage: `url(${url})` }} />
+              ))}
+            </div>
+          )}
+          <textarea
+            rows={4}
+            value={f.imagens}
+            onChange={set("imagens")}
+            placeholder="Carrega acima ou cola URLs aqui (uma por linha)"
+          />
         </label>
       </div>
 

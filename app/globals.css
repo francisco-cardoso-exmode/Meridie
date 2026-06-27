@@ -1849,3 +1849,56 @@ body:has(.admin-page) .site-footer {
   color: #6b551e;
   margin-top: 10px;
 }
+
+/* Upload de imagens (admin) */
+.uploader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 4px 0 8px;
+}
+.btn-upload {
+  background: var(--navy);
+  color: #fff;
+  border: none;
+  padding: 9px 16px;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+}
+.btn-upload:hover {
+  background: var(--navy-light);
+}
+.btn-upload:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.uploader-msg {
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+.uploader-msg.ok {
+  color: #1e6b3a;
+}
+.uploader-msg.erro {
+  color: #b3261e;
+}
+.uploader-msg.loading {
+  color: var(--muted);
+}
+.upload-thumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 6px 0 8px;
+}
+.upload-thumb {
+  width: 64px;
+  height: 48px;
+  border-radius: 6px;
+  background: var(--paper-soft) center/cover no-repeat;
+  border: 1px solid var(--border);
+}
