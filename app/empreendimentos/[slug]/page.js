@@ -73,6 +73,12 @@ export default async function PaginaEmpreendimento({ params }) {
               <p style={{ fontSize: "1.05rem", color: "var(--muted)", marginBottom: 4 }}>
                 {e.cidade} · {e.zona} · {paisLabel}
               </p>
+              {e.construtora && (
+                <p style={{ fontSize: "0.9rem", color: "var(--muted)" }}>
+                  Construtora: <strong>{e.construtora}</strong>
+                  {e.morada ? ` · ${e.morada}` : ""}
+                </p>
+              )}
 
               <div className="spec-row">
                 <div className="spec-box">
@@ -98,6 +104,20 @@ export default async function PaginaEmpreendimento({ params }) {
               <h2 style={{ fontSize: "1.4rem", margin: "8px 0 12px" }}>Descrição</h2>
               <p style={{ marginBottom: 28 }}>{e.descricao}</p>
 
+              {e.tipologias && (
+                <>
+                  <h2 style={{ fontSize: "1.4rem", marginBottom: 12 }}>Tipologias</h2>
+                  <ul className="feature-list" style={{ marginBottom: 28 }}>
+                    {e.tipologias.map((t) => (
+                      <li key={t}>
+                        <span className="check"><Icon name="layers" size={18} /></span>
+                        <span>{t}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
+
               <h2 style={{ fontSize: "1.4rem", marginBottom: 12 }}>Características</h2>
               <ul className="feature-list">
                 {e.caracteristicas.map((c) => (
@@ -107,6 +127,22 @@ export default async function PaginaEmpreendimento({ params }) {
                   </li>
                 ))}
               </ul>
+
+              {e.proximidades && (
+                <>
+                  <h2 style={{ fontSize: "1.4rem", margin: "28px 0 12px" }}>
+                    Localização & proximidades
+                  </h2>
+                  <ul className="feature-list">
+                    {e.proximidades.map((p) => (
+                      <li key={p}>
+                        <span className="check"><Icon name="pin" size={18} /></span>
+                        <span>{p}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
             </div>
 
             {/* Aside — preço + interesse */}
