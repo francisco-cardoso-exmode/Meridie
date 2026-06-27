@@ -27,6 +27,15 @@ const textoParaPontos = (s) =>
     return { nome: nome || "", tipo: tipo || "cidade", lat: Number(lat) || 0, lng: Number(lng) || 0 };
   });
 
+// distâncias: "local | km"
+const distanciasParaTexto = (d) =>
+  Array.isArray(d) ? d.map((x) => `${x.local} | ${x.km}`).join("\n") : "";
+const textoParaDistancias = (s) =>
+  linhas(s).map((l) => {
+    const [local, km] = l.split("|").map((x) => x.trim());
+    return { local: local || "", km: Number(km) || 0 };
+  });
+
 const slugify = (s) =>
   (s || "")
     .toLowerCase()
@@ -51,6 +60,10 @@ export default function RegiaoForm({ initial = null, regioesExistentes = [], pre
     descricao: initial?.descricao || "",
     sobre: initial?.sobre || "",
     crescimento: initial?.crescimento || "",
+    conhecidaPor: initial?.conhecidaPor || "",
+    oQueVer: arr(initial?.oQueVer),
+    transportes: arr(initial?.transportes),
+    distancias: distanciasParaTexto(initial?.distancias),
     cidades: arr(initial?.cidades) || pf?.cidade || "",
     zonas: arr(initial?.zonas) || pf?.zona || "",
     vantagens: arr(initial?.vantagens),
@@ -80,6 +93,10 @@ export default function RegiaoForm({ initial = null, regioesExistentes = [], pre
       descricao: f.descricao.trim(),
       sobre: f.sobre.trim(),
       crescimento: f.crescimento.trim(),
+      conhecidaPor: f.conhecidaPor.trim(),
+      oQueVer: linhas(f.oQueVer),
+      transportes: linhas(f.transportes),
+      distancias: textoParaDistancias(f.distancias),
       cidades: linhas(f.cidades),
       zonas: linhas(f.zonas),
       vantagens: linhas(f.vantagens),
@@ -166,6 +183,24 @@ export default function RegiaoForm({ initial = null, regioesExistentes = [], pre
         Crescimento & turismo
         <textarea rows={3} value={f.crescimento} onChange={set("crescimento")} />
       </label>
+      <label className="full">
+        Conhecida por (frase curta)
+        <input value={f.conhecidaPor} onChange={set("conhecidaPor")} placeholder="Pela Avenida Beira-Mar e pelas praias urbanas." />
+      </label>
+      <div className="admin-form-grid">
+        <label>
+          O que ver (um por linha)
+          <textarea rows={5} value={f.oQueVer} onChange={set("oQueVer")} placeholder={"Praia de Iracema\nMercado Central"} />
+        </label>
+        <label>
+          Transportes / acessos (um por linha)
+          <textarea rows={5} value={f.transportes} onChange={set("transportes")} placeholder={"Aeroporto a ~8 km\nVLT e autocarros"} />
+        </label>
+        <label className="full">
+          Distâncias — <code>local | km</code> (um por linha)
+          <textarea rows={4} value={f.distancias} onChange={set("distancias")} placeholder={"Aeroporto | 8\nPraia | 1"} />
+        </label>
+      </div>
 
       <div className="admin-form-grid">
         <label>

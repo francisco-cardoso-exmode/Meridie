@@ -2193,3 +2193,54 @@ body:has(.admin-page) .site-footer {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+/* Conhecida por / distâncias / o que ver */
+.conhecida-por {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin-top: 18px;
+  padding: 12px 16px;
+  background: var(--paper-soft);
+  border-left: 3px solid var(--gold);
+  border-radius: 6px;
+  font-size: 0.95rem;
+  color: var(--ink);
+}
+.conhecida-por svg { color: var(--gold); flex: none; margin-top: 3px; }
+.distancias { display: flex; flex-direction: column; gap: 8px; }
+.dist-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--paper-soft);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 14px;
+}
+.dist-km {
+  background: var(--navy);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.8rem;
+  padding: 3px 10px;
+  border-radius: 999px;
+  min-width: 64px;
+  text-align: center;
+}
+.dist-local { color: var(--ink); font-weight: 500; }
+
+/* Distinção visual: zona vs região */
+.pagina-area.is-zona .market-hero::after {
+  background: linear-gradient(
+    180deg,
+    rgba(200, 155, 60, 0.18) 0%,
+    rgba(18, 44, 78, 0.5) 45%,
+    rgba(18, 44, 78, 0.92) 100%
+  );
+}
+.pagina-area.is-zona .market-hero h1 {
+  border-bottom: 3px solid var(--gold);
+  padding-bottom: 10px;
+  display: inline-block;
+}

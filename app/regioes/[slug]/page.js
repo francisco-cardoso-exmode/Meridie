@@ -50,12 +50,12 @@ export default async function PaginaRegiao({ params }) {
   const subZonas = await subRegioes(regiao.slug);
 
   return (
-    <>
+    <div className={`pagina-area ${regiao.parent ? "is-zona" : "is-regiao"}`}>
       <MarketHero
         img={regiao.imagem}
         alt={regiao.nome}
-        eyebrow={`${paisLabel} · Região`}
-        titulo={`Investir em ${regiao.nome}`}
+        eyebrow={regiaoMae ? `Zona de ${regiaoMae.nome} · ${paisLabel}` : `${paisLabel} · Região`}
+        titulo={regiaoMae ? regiao.nome : `Investir em ${regiao.nome}`}
       >
         {regiao.tagline}
       </MarketHero>
@@ -80,6 +80,12 @@ export default async function PaginaRegiao({ params }) {
                 Conhece {regiao.nome}
               </h2>
               <p>{regiao.sobre}</p>
+              {regiao.conhecidaPor && (
+                <p className="conhecida-por">
+                  <Icon name="sparkles" size={16} />
+                  <span><strong>Conhecida por:</strong> {regiao.conhecidaPor}</span>
+                </p>
+              )}
             </Reveal>
             <Reveal delay={0.1}>
               <span className="eyebrow">Porquê investir aqui</span>
@@ -131,6 +137,58 @@ export default async function PaginaRegiao({ params }) {
           </Reveal>
         </div>
       </section>
+
+      {/* O que ver + como chegar */}
+      {(regiao.oQueVer?.length || regiao.transportes?.length || regiao.distancias?.length) ? (
+        <section style={{ paddingTop: 0 }}>
+          <div className="container">
+            <div className="grid grid-2" style={{ alignItems: "start", gap: 48 }}>
+              {regiao.oQueVer?.length > 0 && (
+                <Reveal>
+                  <span className="eyebrow">O que ver</span>
+                  <h2 style={{ fontSize: "1.6rem", marginBottom: 14 }}>
+                    Atrações a não perder
+                  </h2>
+                  <ul className="value-list">
+                    {regiao.oQueVer.map((x) => (
+                      <li key={x}>
+                        <span className="check"><Icon name="pin" size={18} /></span>
+                        <span>{x}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </Reveal>
+              )}
+              {(regiao.transportes?.length > 0 || regiao.distancias?.length > 0) && (
+                <Reveal delay={0.1}>
+                  <span className="eyebrow">Como chegar & distâncias</span>
+                  <h2 style={{ fontSize: "1.6rem", marginBottom: 14 }}>Acessos</h2>
+                  {regiao.transportes?.length > 0 && (
+                    <ul className="value-list" style={{ marginBottom: 18 }}>
+                      {regiao.transportes.map((t) => (
+                        <li key={t}>
+                          <span className="check"><Icon name="check" size={18} /></span>
+                          <span>{t}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  {regiao.distancias?.length > 0 && (
+                    <div className="distancias">
+                      {regiao.distancias.map((d) => (
+                        <div className="dist-item" key={d.local}>
+                          <span className="dist-km">{d.km} km</span>
+                          <span className="dist-local">{d.local}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </Reveal>
+              )}
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       {/* Mapa */}
       <section style={{ paddingTop: 0 }}>
@@ -225,6 +283,6 @@ export default async function PaginaRegiao({ params }) {
           </Reveal>
         </div>
       </section>
-    </>
+    </div>
   );
 }
