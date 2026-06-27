@@ -38,6 +38,20 @@ const textoParaTipologias = (s) =>
       return o;
     });
 
+// Links: "etiqueta | url"
+const linksParaTexto = (a) =>
+  Array.isArray(a) ? a.map((x) => `${x.label} | ${x.url}`).join("\n") : "";
+const textoParaLinks = (s) =>
+  (s || "")
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean)
+    .map((l) => {
+      const [label, url] = l.split("|").map((x) => x.trim());
+      return { label: label || url || "", url: url || "" };
+    })
+    .filter((x) => x.url);
+
 export default function EmpreendimentoForm({ initial = null, regioesExistentes = [] }) {
   const editing = !!initial;
   const router = useRouter();
@@ -67,6 +81,10 @@ export default function EmpreendimentoForm({ initial = null, regioesExistentes =
     tipologias: tipologiasParaTexto(initial?.tipologias),
     proximidades: arrayParaLinhas(initial?.proximidades),
     imagens: initial?.imagens || [],
+    video: initial?.video || "",
+    siteUrl: initial?.siteUrl || "",
+    links: linksParaTexto(initial?.links),
+    precoTipo: initial?.precoTipo || "exato",
   });
 
   const set = (campo) => (e) => {
@@ -88,6 +106,7 @@ export default function EmpreendimentoForm({ initial = null, regioesExistentes =
       finalidade: f.finalidade,
       preco: Number(f.preco) || 0,
       moeda: f.moeda,
+      precoTipo: f.precoTipo,
       quartos: Number(f.quartos) || 0,
       casasBanho: Number(f.casasBanho) || 0,
       area: Number(f.area) || 0,
@@ -101,6 +120,10 @@ export default function EmpreendimentoForm({ initial = null, regioesExistentes =
     };
     if (f.construtora.trim()) doc.construtora = f.construtora.trim();
     if (f.morada.trim()) doc.morada = f.morada.trim();
+    if (f.video.trim()) doc.video = f.video.trim();
+    if (f.siteUrl.trim()) doc.siteUrl = f.siteUrl.trim();
+    const lnk = textoParaLinks(f.links);
+    if (lnk.length) doc.links = lnk;
     const tip = textoParaTipologias(f.tipologias);
     if (tip.length) doc.tipologias = tip;
     if (linhasParaArray(f.proximidades).length)
@@ -197,6 +220,14 @@ export default function EmpreendimentoForm({ initial = null, regioesExistentes =
           </select>
         </label>
         <label>
+          Apresentação do preço
+          <select value={f.precoTipo} onChange={set("precoTipo")}>
+            <option value="exato">Valor exato</option>
+            <option value="desde">Desde (a partir de)</option>
+            <option value="consulta">Sob consulta</option>
+          </select>
+        </label>
+        <label>
           Quartos
           <input type="number" value={f.quartos} onChange={set("quartos")} />
         </label>
@@ -253,6 +284,18 @@ export default function EmpreendimentoForm({ initial = null, regioesExistentes =
             value={f.imagens}
             onChange={(urls) => setF((p) => ({ ...p, imagens: urls }))}
           />
+        </label>
+        <label className="full">
+          Vídeo (link YouTube, Vimeo ou .mp4) — opcional
+          <input value={f.video} onChange={set("video")} placeholder="https://youtu.be/..." />
+        </label>
+        <label className="full">
+          Site oficial do empreendimento — opcional
+          <input value={f.siteUrl} onChange={set("siteUrl")} placeholder="https://vibemeireles.com.br" />
+        </label>
+        <label className="full">
+          Outros links (redes sociais, hotéis…) — <code>etiqueta | url</code> (um por linha)
+          <textarea rows={3} value={f.links} onChange={set("links")} placeholder={"Instagram | https://instagram.com/...\nHotel parceiro | https://..."} />
         </label>
       </div>
 

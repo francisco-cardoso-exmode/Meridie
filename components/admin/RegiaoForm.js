@@ -36,6 +36,19 @@ const textoParaDistancias = (s) =>
     return { local: local || "", km: Number(km) || 0 };
   });
 
+// publicidade: "título | texto | url | imagem"
+const publicidadeParaTexto = (a) =>
+  Array.isArray(a)
+    ? a.map((x) => [x.titulo, x.texto, x.url, x.imagem].map((v) => v || "").join(" | ")).join("\n")
+    : "";
+const textoParaPublicidade = (s) =>
+  linhas(s)
+    .map((l) => {
+      const [titulo, texto, url, imagem] = l.split("|").map((x) => x.trim());
+      return { titulo: titulo || "", texto: texto || "", url: url || "", imagem: imagem || "" };
+    })
+    .filter((x) => x.titulo || x.url);
+
 const slugify = (s) =>
   (s || "")
     .toLowerCase()
@@ -55,6 +68,8 @@ export default function RegiaoForm({ initial = null, regioesExistentes = [], pre
     nome: initial?.nome || pf?.nome || "",
     pais: initial?.pais || "portugal",
     parent: initial?.parent || "",
+    nivel: initial?.nivel || (initial?.parent ? "cidade" : "regiao"),
+    publicidade: publicidadeParaTexto(initial?.publicidade),
     imagem: initial?.imagem || "",
     tagline: initial?.tagline || "",
     descricao: initial?.descricao || "",
@@ -88,6 +103,8 @@ export default function RegiaoForm({ initial = null, regioesExistentes = [], pre
       slug: f.slug.trim(),
       nome: f.nome.trim(),
       pais: f.pais,
+      nivel: f.nivel,
+      publicidade: textoParaPublicidade(f.publicidade),
       imagem: f.imagem.trim(),
       tagline: f.tagline.trim(),
       descricao: f.descricao.trim(),
@@ -149,12 +166,21 @@ export default function RegiaoForm({ initial = null, regioesExistentes = [], pre
           </select>
         </label>
         <label>
-          Pertence a (deixa vazio = região de topo; escolhe = é uma zona)
+          Pertence a (vazio = região de topo)
           <select value={f.parent} onChange={set("parent")}>
             <option value="">— Região de topo —</option>
             {possiveisPais.map((r) => (
               <option key={r.slug} value={r.slug}>{r.nome}</option>
             ))}
+          </select>
+        </label>
+        <label>
+          Nível
+          <select value={f.nivel} onChange={set("nivel")}>
+            <option value="regiao">Região</option>
+            <option value="estado">Estado</option>
+            <option value="cidade">Cidade</option>
+            <option value="zona">Zona / bairro</option>
           </select>
         </label>
         <label className="full">
@@ -240,6 +266,11 @@ export default function RegiaoForm({ initial = null, regioesExistentes = [], pre
           <textarea rows={5} value={f.pontos} onChange={set("pontos")} placeholder="Meireles | cidade | -3.728 | -38.491" />
         </label>
       </div>
+
+      <label className="full">
+        Publicidade — cards de patrocínio/parceiros — <code>título | texto | url | imagem</code> (um por linha)
+        <textarea rows={4} value={f.publicidade} onChange={set("publicidade")} placeholder={"Hotel Meireles | Estadia com desconto | https://... | https://imagem.jpg"} />
+      </label>
 
       {estado.a === "erro" && <div className="form-msg erro">{estado.msg}</div>}
       <div className="admin-form-actions">

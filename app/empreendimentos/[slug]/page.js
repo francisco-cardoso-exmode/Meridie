@@ -6,6 +6,8 @@ import ContactForm from "@/components/ContactForm";
 import EmpreendimentoCard from "@/components/EmpreendimentoCard";
 import RegionBanner from "@/components/RegionBanner";
 import PrecoDual from "@/components/PrecoDual";
+import VideoEmbed from "@/components/VideoEmbed";
+import { textoComLinks } from "@/lib/format";
 import { PAIS_LABEL } from "@/lib/empreendimentos";
 import {
   empreendimentoBySlug,
@@ -108,7 +110,10 @@ export default async function PaginaEmpreendimento({ params }) {
               </div>
 
               <h2 style={{ fontSize: "1.4rem", margin: "8px 0 12px" }}>Descrição</h2>
-              <p style={{ marginBottom: 28 }}>{e.descricao}</p>
+              <p
+                style={{ marginBottom: 28 }}
+                dangerouslySetInnerHTML={{ __html: textoComLinks(e.descricao) }}
+              />
 
               {e.tipologias && e.tipologias.length > 0 && (
                 <>
@@ -164,15 +169,46 @@ export default async function PaginaEmpreendimento({ params }) {
 
             {/* Aside — preço + interesse */}
             <aside className="prop-aside">
-              <div className="price-big"><PrecoDual preco={e.preco} moeda={e.moeda} /></div>
+              <div className="price-big"><PrecoDual preco={e.preco} moeda={e.moeda} tipo={e.precoTipo} /></div>
               <div className="price-sub">
                 {e.finalidade} · {e.cidade}, {paisLabel}
               </div>
+              {(e.siteUrl || e.links?.length > 0) && (
+                <div className="prop-links">
+                  {e.siteUrl && (
+                    <a
+                      href={e.siteUrl}
+                      target="_blank"
+                      rel="noopener"
+                      className="btn btn-primary"
+                      style={{ display: "block", textAlign: "center", marginBottom: 8 }}
+                    >
+                      Ver site oficial ↗
+                    </a>
+                  )}
+                  {e.links?.map((l) => (
+                    <a key={l.url} href={l.url} target="_blank" rel="noopener" className="prop-link-item">
+                      {l.label} ↗
+                    </a>
+                  ))}
+                </div>
+              )}
               <ContactForm assuntoInicial={`Interesse: ${e.nome} (${e.cidade})`} />
             </aside>
           </div>
         </div>
       </section>
+
+      {e.video && (
+        <section style={{ paddingTop: 0 }}>
+          <div className="container">
+            <Reveal>
+              <h2 style={{ fontSize: "1.5rem", marginBottom: 18 }}>Vídeo</h2>
+              <VideoEmbed url={e.video} />
+            </Reveal>
+          </div>
+        </section>
+      )}
 
       {e.imagens && e.imagens.length > 3 && (
         <section style={{ paddingTop: 0 }}>

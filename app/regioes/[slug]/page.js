@@ -13,6 +13,9 @@ import {
   empreendimentosPorRegiao,
 } from "@/lib/store";
 import { PAIS_LABEL } from "@/lib/empreendimentos";
+import { textoComLinks } from "@/lib/format";
+
+const NIVEL_LABEL = { regiao: "Região", estado: "Estado", cidade: "Cidade", zona: "Zona" };
 
 export const revalidate = 60;
 export const dynamicParams = true;
@@ -48,13 +51,14 @@ export default async function PaginaRegiao({ params }) {
   const tiposNoMapa = [...new Set(regiao.pontos.map((p) => p.tipo))];
   const regiaoMae = regiao.parent ? await regiaoBySlug(regiao.parent) : null;
   const subZonas = await subRegioes(regiao.slug);
+  const nivelLabel = NIVEL_LABEL[regiao.nivel] || (regiaoMae ? "Zona" : "Região");
 
   return (
     <div className={`pagina-area ${regiao.parent ? "is-zona" : "is-regiao"}`}>
       <MarketHero
         img={regiao.imagem}
         alt={regiao.nome}
-        eyebrow={regiaoMae ? `Zona de ${regiaoMae.nome} · ${paisLabel}` : `${paisLabel} · Região`}
+        eyebrow={`${nivelLabel}${regiaoMae ? ` de ${regiaoMae.nome}` : ""} · ${paisLabel}`}
         titulo={regiaoMae ? regiao.nome : `Investir em ${regiao.nome}`}
       >
         {regiao.tagline}
@@ -79,7 +83,7 @@ export default async function PaginaRegiao({ params }) {
               <h2 style={{ fontSize: "2rem", marginBottom: 16 }}>
                 Conhece {regiao.nome}
               </h2>
-              <p>{regiao.sobre}</p>
+              <p dangerouslySetInnerHTML={{ __html: textoComLinks(regiao.sobre) }} />
               {regiao.conhecidaPor && (
                 <p className="conhecida-por">
                   <Icon name="sparkles" size={16} />
@@ -228,6 +232,38 @@ export default async function PaginaRegiao({ params }) {
               {subZonas.map((z, i) => (
                 <Reveal key={z.slug} delay={(i % 2) * 0.1}>
                   <RegionBanner regiao={z} compact />
+                </Reveal>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Publicidade / parceiros */}
+      {regiao.publicidade?.length > 0 && (
+        <section>
+          <div className="container">
+            <Reveal className="section-head">
+              <span className="eyebrow">Parceiros & destaques</span>
+              <h2>Em destaque em {regiao.nome}</h2>
+            </Reveal>
+            <div className="region-grid">
+              {regiao.publicidade.map((p, i) => (
+                <Reveal key={i}>
+                  <a
+                    href={p.url || "#"}
+                    target={p.url ? "_blank" : undefined}
+                    rel="noopener"
+                    className="pub-card"
+                  >
+                    {p.imagem && <img src={p.imagem} alt={p.titulo} loading="lazy" />}
+                    <div className="pub-body">
+                      <span className="rb-tag">Publicidade</span>
+                      <h3>{p.titulo}</h3>
+                      {p.texto && <p>{p.texto}</p>}
+                      {p.url && <span className="pub-cta">Saber mais ↗</span>}
+                    </div>
+                  </a>
                 </Reveal>
               ))}
             </div>
