@@ -6,6 +6,8 @@ import EmpreendimentoCard from "@/components/EmpreendimentoCard";
 import RegionBanner from "@/components/RegionBanner";
 import { empreendimentosDestaque, allRegioes } from "@/lib/store";
 import { getConteudo } from "@/lib/conteudo";
+import { allAnuncios } from "@/lib/anuncios";
+import AnuncioCard from "@/components/AnuncioCard";
 
 export const revalidate = 60;
 
@@ -13,6 +15,7 @@ export default async function Home() {
   const c = await getConteudo("home");
   const destaques = await empreendimentosDestaque(6);
   const regioes = await allRegioes();
+  const anuncios = await allAnuncios({ home: true });
   const pick = (s) => regioes.find((r) => r.slug === s);
   const regioesDestaque = ["lisboa", "algarve", "sao-paulo", "rio-de-janeiro"]
     .map(pick)
@@ -168,6 +171,25 @@ export default async function Home() {
             <Reveal>
               <RegionBanner regiao={regiaoFooter} />
             </Reveal>
+          </div>
+        </section>
+      )}
+
+      {/* Publicidade / parceiros */}
+      {anuncios.length > 0 && (
+        <section>
+          <div className="container">
+            <Reveal className="section-head">
+              <span className="eyebrow">Parceiros & destaques</span>
+              <h2>Em destaque</h2>
+            </Reveal>
+            <div className="region-grid">
+              {anuncios.map((a, i) => (
+                <Reveal key={a.slug} delay={(i % 2) * 0.1}>
+                  <AnuncioCard anuncio={a} />
+                </Reveal>
+              ))}
+            </div>
           </div>
         </section>
       )}

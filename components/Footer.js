@@ -59,6 +59,9 @@ export default async function Footer() {
                 <Link href="/parcerias">Parcerias</Link>
               </li>
               <li>
+                <Link href="/publicidade">Parceiros</Link>
+              </li>
+              <li>
                 <Link href="/contactos">Contactos</Link>
               </li>
             </ul>
