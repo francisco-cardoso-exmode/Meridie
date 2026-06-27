@@ -4,8 +4,13 @@ import Reveal from "@/components/Reveal";
 import Icon from "@/components/Icon";
 import ContactForm from "@/components/ContactForm";
 import EmpreendimentoCard from "@/components/EmpreendimentoCard";
+import RegionBanner from "@/components/RegionBanner";
 import { formatarPreco, PAIS_LABEL } from "@/lib/empreendimentos";
-import { empreendimentoBySlug, allEmpreendimentos } from "@/lib/store";
+import {
+  empreendimentoBySlug,
+  allEmpreendimentos,
+  regiaoDoEmpreendimento,
+} from "@/lib/store";
 
 export const revalidate = 60;
 export const dynamicParams = true;
@@ -31,6 +36,7 @@ export default async function PaginaEmpreendimento({ params }) {
   if (!e) notFound();
 
   const paisLabel = PAIS_LABEL[e.pais];
+  const regiao = await regiaoDoEmpreendimento(e);
   const semelhantes = (await allEmpreendimentos({ pais: e.pais }))
     .filter((x) => x.slug !== e.slug)
     .slice(0, 3);
@@ -155,6 +161,24 @@ export default async function PaginaEmpreendimento({ params }) {
           </div>
         </div>
       </section>
+
+      {regiao && (
+        <section>
+          <div className="container">
+            <Reveal className="section-head" style={{ marginBottom: 28 }}>
+              <span className="eyebrow">A zona</span>
+              <h2>Conhece {regiao.nome}</h2>
+              <p>
+                Este empreendimento fica em {regiao.nome}. Descobre as vantagens
+                da região, a sua história e os pontos de interesse.
+              </p>
+            </Reveal>
+            <Reveal>
+              <RegionBanner regiao={regiao} />
+            </Reveal>
+          </div>
+        </section>
+      )}
 
       {semelhantes.length > 0 && (
         <section className="bg-soft">

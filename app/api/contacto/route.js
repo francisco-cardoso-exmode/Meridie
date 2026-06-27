@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/mongodb";
-import { enviarEmailContacto } from "@/lib/mailer";
+import { enviarEmailContacto, enviarConfirmacaoCliente } from "@/lib/mailer";
 
 // O endpoint depende de serviços externos (MongoDB/SMTP) — nunca é pré-renderizado.
 export const dynamic = "force-dynamic";
@@ -46,8 +46,15 @@ export async function POST(request) {
       // Não bloqueamos o envio do email por causa da base de dados
     }
 
-    // 2. Enviar email via Nodemailer
+    // 2. Notificar a equipa
     await enviarEmailContacto({ nome, email, assunto, mensagem });
+
+    // 3. Enviar confirmação ao cliente (não bloqueia a resposta se falhar)
+    try {
+      await enviarConfirmacaoCliente({ nome, email, assunto });
+    } catch (confErro) {
+      console.error("Erro a enviar confirmação ao cliente:", confErro);
+    }
 
     return NextResponse.json({ ok: true, mensagem: "Mensagem enviada com sucesso." });
   } catch (erro) {

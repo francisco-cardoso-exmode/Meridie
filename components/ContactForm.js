@@ -28,7 +28,7 @@ export default function ContactForm({ assuntoInicial = "" }) {
       if (res.ok && json.ok) {
         setEstado({
           a: "ok",
-          msg: "Mensagem enviada com sucesso. Entraremos em contacto em breve.",
+          msg: "Mensagem enviada! Enviámos-te um email de confirmação e a nossa equipa entrará em contacto muito em breve.",
         });
         form.reset();
       } else {
