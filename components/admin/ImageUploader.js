@@ -14,6 +14,19 @@ export default function ImageUploader({ value = [], onChange, multiple = true })
   const inputRef = useRef(null);
   const [drag, setDrag] = useState(false);
   const [estado, setEstado] = useState({ a: "idle", msg: "" });
+  const [dragIdx, setDragIdx] = useState(null);
+
+  function reordenar(de, para) {
+    if (de === null || de === para) return;
+    const arr = [...value];
+    const [m] = arr.splice(de, 1);
+    arr.splice(para, 0, m);
+    onChange?.(arr);
+  }
+  function principal(i) {
+    if (i === 0) return;
+    reordenar(i, 0);
+  }
 
   async function enviar(fileList) {
     const files = Array.from(fileList || []).filter((f) =>
@@ -91,21 +104,48 @@ export default function ImageUploader({ value = [], onChange, multiple = true })
       {estado.a === "erro" && <div className="form-msg erro">{estado.msg}</div>}
 
       {value.length > 0 && (
-        <div className="gallery-thumbs">
-          {value.map((url, i) => (
-            <div className="gthumb" key={i} style={{ backgroundImage: `url(${url})` }}>
-              {multiple && i === 0 && <span className="gthumb-main">Principal</span>}
-              <button
-                type="button"
-                className="gthumb-x"
-                title="Remover"
-                onClick={() => remover(i)}
+        <>
+          {multiple && value.length > 1 && (
+            <p className="uploader-hint">Arrasta para reordenar · a 1.ª é a principal</p>
+          )}
+          <div className="gallery-thumbs">
+            {value.map((url, i) => (
+              <div
+                className={`gthumb${dragIdx === i ? " dragging" : ""}`}
+                key={url + i}
+                style={{ backgroundImage: `url(${url})` }}
+                draggable={multiple}
+                onDragStart={() => setDragIdx(i)}
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={() => {
+                  reordenar(dragIdx, i);
+                  setDragIdx(null);
+                }}
+                onDragEnd={() => setDragIdx(null)}
               >
-                ✕
-              </button>
-            </div>
-          ))}
-        </div>
+                {multiple && i === 0 && <span className="gthumb-main">Principal</span>}
+                {multiple && i !== 0 && (
+                  <button
+                    type="button"
+                    className="gthumb-star"
+                    title="Tornar principal"
+                    onClick={() => principal(i)}
+                  >
+                    ★
+                  </button>
+                )}
+                <button
+                  type="button"
+                  className="gthumb-x"
+                  title="Remover"
+                  onClick={() => remover(i)}
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+          </div>
+        </>
       )}
     </div>
   );

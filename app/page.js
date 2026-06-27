@@ -5,10 +5,12 @@ import Icon from "@/components/Icon";
 import EmpreendimentoCard from "@/components/EmpreendimentoCard";
 import RegionBanner from "@/components/RegionBanner";
 import { empreendimentosDestaque, allRegioes } from "@/lib/store";
+import { getConteudo } from "@/lib/conteudo";
 
 export const revalidate = 60;
 
 export default async function Home() {
+  const c = await getConteudo("home");
   const destaques = await empreendimentosDestaque(6);
   const regioes = await allRegioes();
   const pick = (s) => regioes.find((r) => r.slug === s);
@@ -20,19 +22,15 @@ export default async function Home() {
   return (
     <>
       {/* Hero split 100vh — escolha Portugal / Brasil */}
-      <HeroSplit />
+      <HeroSplit slogan={c.heroSlogan} />
 
       {/* Diferenciais */}
       <section>
         <div className="container">
           <Reveal className="section-head">
             <span className="eyebrow">Dois mercados, uma plataforma</span>
-            <h2>Não somos uma agência. Somos o teu parceiro de investimento.</h2>
-            <p>
-              Portugal e o Brasil partilham língua e cultura, mas têm mercados,
-              legislações e oportunidades distintas. Existimos precisamente
-              nessa diferença — para a transformar em vantagem competitiva.
-            </p>
+            <h2>{c.difTitulo}</h2>
+            <p>{c.difTexto}</p>
           </Reveal>
           <div className="grid grid-3">
             {[
@@ -178,11 +176,8 @@ export default async function Home() {
       <section>
         <div className="container">
           <Reveal className="cta-band">
-            <h2>Onde queres que o teu capital chegue?</h2>
-            <p>
-              Conta-nos os teus objetivos. Respondemos com uma primeira
-              perspetiva e os próximos passos — sem compromisso.
-            </p>
+            <h2>{c.ctaTitulo}</h2>
+            <p>{c.ctaTexto}</p>
             <Link href="/contactos" className="btn btn-primary">
               Falar com um especialista
             </Link>

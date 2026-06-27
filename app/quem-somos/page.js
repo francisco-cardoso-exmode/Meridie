@@ -1,5 +1,8 @@
 import Link from "next/link";
 import Reveal from "@/components/Reveal";
+import { getConteudo } from "@/lib/conteudo";
+
+export const revalidate = 60;
 
 export const metadata = {
   title: "Quem Somos",
@@ -22,18 +25,15 @@ const diferenciais = [
   ["Transparência de custos", "Sabes exatamente quanto custa cada serviço antes de avançar. Sem custos escondidos."],
 ];
 
-export default function QuemSomos() {
+export default async function QuemSomos() {
+  const c = await getConteudo("quem-somos");
   return (
     <>
       <section className="page-hero">
         <div className="container">
           <span className="eyebrow">Quem Somos</span>
-          <h1>Convergimos dois mundos num só processo.</h1>
-          <p>
-            O nome Meridie vem do latim <em>meridies</em> — convergência, sul,
-            ponto de encontro. É exatamente o que fazemos: fazer convergir dois
-            mercados, dois sistemas jurídicos e duas realidades fiscais.
-          </p>
+          <h1>{c.heroTitulo}</h1>
+          <p>{c.heroTexto}</p>
         </div>
       </section>
 
@@ -43,28 +43,15 @@ export default function QuemSomos() {
             <Reveal>
               <span className="eyebrow">A nossa missão</span>
               <h2 style={{ fontSize: "1.9rem", marginBottom: 16 }}>
-                O investidor que olha além-fronteiras merece um parceiro que
-                domine os dois lados.
+                {c.missaoTitulo}
               </h2>
-              <p style={{ marginBottom: 14 }}>
-                Conectar investidores portugueses e brasileiros às melhores
-                oportunidades imobiliárias em ambos os países, com um serviço
-                integrado de intermediação, assessoria jurídica e fiscal que
-                torna o investimento transfronteiriço simples, seguro e rentável.
-              </p>
-              <p>
-                Não vendemos imóveis. Coordenamos os melhores profissionais
-                locais, gerimos o processo de ponta a ponta e garantimos que cada
-                decisão é tomada com informação completa e segurança jurídica.
-              </p>
+              <p style={{ marginBottom: 14 }}>{c.missaoTexto1}</p>
+              <p>{c.missaoTexto2}</p>
             </Reveal>
             <Reveal delay={0.1}>
               <span className="eyebrow">A nossa visão</span>
               <p style={{ fontSize: "1.15rem", color: "var(--ink)", marginTop: 8 }}>
-                Ser a referência de confiança no investimento imobiliário entre
-                Portugal e o Brasil — reconhecida pela qualidade dos parceiros,
-                pela transparência do processo e pelo impacto real na vida
-                financeira dos nossos clientes.
+                {c.visaoTexto}
               </p>
             </Reveal>
           </div>

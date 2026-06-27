@@ -1,6 +1,9 @@
 import ContactForm from "@/components/ContactForm";
 import Reveal from "@/components/Reveal";
 import Icon from "@/components/Icon";
+import { getConteudo } from "@/lib/conteudo";
+
+export const revalidate = 60;
 
 export const metadata = {
   title: "Contactos",
@@ -8,17 +11,15 @@ export const metadata = {
     "Fala com a Meridie Investments sobre o teu investimento imobiliário entre Portugal e o Brasil. Respondemos em 24 horas úteis.",
 };
 
-export default function Contactos() {
+export default async function Contactos() {
+  const c = await getConteudo("contactos");
   return (
     <>
       <section className="page-hero">
         <div className="container">
           <span className="eyebrow">Contactos</span>
-          <h1>Vamos construir o teu próximo passo.</h1>
-          <p>
-            Conta-nos os teus objetivos de investimento. Respondemos a todas as
-            mensagens em 24 horas úteis.
-          </p>
+          <h1>{c.heroTitulo}</h1>
+          <p>{c.heroTexto}</p>
         </div>
       </section>
 
@@ -36,7 +37,7 @@ export default function Contactos() {
                   <span>
                     <strong>Email</strong>
                     <br />
-                    geral@meridie.pt
+                    {c.email}
                   </span>
                 </li>
                 <li>
@@ -44,7 +45,7 @@ export default function Contactos() {
                   <span>
                     <strong>Telefone</strong>
                     <br />
-                    +351 210 000 000
+                    {c.telefone}
                   </span>
                 </li>
                 <li>
@@ -52,11 +53,11 @@ export default function Contactos() {
                   <span>
                     <strong>Presença</strong>
                     <br />
-                    Lisboa, Portugal · São Paulo, Brasil
+                    {c.presenca}
                   </span>
                 </li>
               </ul>
-              <p>Horário: Segunda a sexta, das 9h às 18h (WET / BRT).</p>
+              <p>Horário: {c.horario}</p>
             </Reveal>
 
             <Reveal delay={0.1}>

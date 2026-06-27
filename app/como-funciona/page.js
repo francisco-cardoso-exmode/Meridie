@@ -1,6 +1,9 @@
 import Link from "next/link";
 import Reveal from "@/components/Reveal";
 import Icon from "@/components/Icon";
+import { getConteudo } from "@/lib/conteudo";
+
+export const revalidate = 60;
 
 export const metadata = {
   title: "Como Funciona",
@@ -54,18 +57,15 @@ const pilares = [
   },
 ];
 
-export default function ComoFunciona() {
+export default async function ComoFunciona() {
+  const c = await getConteudo("como-funciona");
   return (
     <>
       <section className="page-hero">
         <div className="container">
           <span className="eyebrow">Como Funciona</span>
-          <h1>Simples, previsível e seguro.</h1>
-          <p>
-            Investir noutro país pode parecer complexo. O nosso processo foi
-            desenhado para que saibas sempre em que fase estás, o que acontece a
-            seguir e quem está a trabalhar por ti.
-          </p>
+          <h1>{c.heroTitulo}</h1>
+          <p>{c.heroTexto}</p>
         </div>
       </section>
 

@@ -7,13 +7,13 @@ import Icon from "@/components/Icon";
  * painel estica e revela o texto completo + CTA, enquanto o outro encolhe.
  * Interação 100% CSS (ver .hero-split em globals.css). Em mobile empilha.
  */
-export default function HeroSplit() {
+export default function HeroSplit({
+  slogan = "Capital sem fronteiras. Investimento com precisão.",
+}) {
   return (
     <section className="hero-split" aria-label="Escolhe o teu mercado">
       <div className="hs-overlay-center">
-        <span className="hs-brand">
-          Capital sem fronteiras. Investimento com precisão.
-        </span>
+        <span className="hs-brand">{slogan}</span>
       </div>
 
       <Link href="/portugal" className="split-panel panel-pt">

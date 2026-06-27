@@ -2244,3 +2244,24 @@ body:has(.admin-page) .site-footer {
   padding-bottom: 10px;
   display: inline-block;
 }
+
+/* Reordenar fotos */
+.uploader-hint { font-size: 0.78rem; color: var(--muted); margin: 8px 0 4px; }
+.gthumb { cursor: grab; }
+.gthumb.dragging { opacity: 0.45; }
+.gthumb-star {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.6);
+  color: var(--gold-light);
+  cursor: pointer;
+  font-size: 0.7rem;
+  display: grid;
+  place-items: center;
+}
+.gthumb-star:hover { background: var(--gold); color: var(--navy-dark); }
