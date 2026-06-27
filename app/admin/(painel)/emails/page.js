@@ -1,11 +1,18 @@
+import { headers } from "next/headers";
 import { htmlConfirmacao, htmlNotificacao } from "@/lib/mailer";
 
 export const metadata = { title: "Emails" };
+export const dynamic = "force-dynamic";
 
-export default function AdminEmails() {
+export default async function AdminEmails() {
+  const h = await headers();
+  const origin = `${h.get("x-forwarded-proto") || "http"}://${h.get("host")}`;
+  const logoSrc = `${origin}/meridie_logo.png`;
+
   const confirmacao = htmlConfirmacao({
     nome: "João Silva",
     assunto: "Interesse: VIBE Meireles (Fortaleza)",
+    logoSrc,
   });
   const notificacao = htmlNotificacao({
     nome: "João Silva",
@@ -13,6 +20,7 @@ export default function AdminEmails() {
     assunto: "Interesse: VIBE Meireles (Fortaleza)",
     mensagem:
       "Olá, gostava de saber mais sobre este empreendimento e as condições de pagamento.",
+    logoSrc,
   });
 
   return (
