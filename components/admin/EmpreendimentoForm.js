@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import ImageUploader from "@/components/admin/ImageUploader";
+import VideoUploader from "@/components/admin/VideoUploader";
 import { precoDual } from "@/lib/empreendimentos";
 
 const linhasParaArray = (s) =>
@@ -286,8 +287,9 @@ export default function EmpreendimentoForm({ initial = null, regioesExistentes =
           />
         </label>
         <label className="full">
-          Vídeo (link YouTube, Vimeo ou .mp4) — opcional
-          <input value={f.video} onChange={set("video")} placeholder="https://youtu.be/..." />
+          Vídeo — link (YouTube/Vimeo) ou carregar ficheiro
+          <input value={f.video} onChange={set("video")} placeholder="https://youtu.be/... ou carrega abaixo" />
+          <VideoUploader onUploaded={(url) => setF((p) => ({ ...p, video: url }))} />
         </label>
         <label className="full">
           Site oficial do empreendimento — opcional

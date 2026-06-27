@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { allEmpreendimentos } from "@/lib/store";
 import { formatarPreco } from "@/lib/empreendimentos";
+import { thumbUrl } from "@/lib/format";
 import DeleteButton from "@/components/admin/DeleteButton";
 
 export const dynamic = "force-dynamic";
@@ -26,7 +27,7 @@ export default async function AdminEmpreendimentos() {
           <div className="admin-row" key={e.slug}>
             <div
               className="admin-thumb"
-              style={{ backgroundImage: `url(${e.imagens?.[0] || ""})` }}
+              style={{ backgroundImage: `url(${thumbUrl(e.imagens?.[0]) || ""})` }}
             />
             <div className="admin-row-main">
               <div className="admin-row-title">

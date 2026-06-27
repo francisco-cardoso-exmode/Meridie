@@ -1,8 +1,11 @@
 import Link from "next/link";
 import Logo from "@/components/Logo";
+import Icon from "@/components/Icon";
+import { getRedes } from "@/lib/config";
 
-export default function Footer() {
+export default async function Footer() {
   const ano = new Date().getFullYear();
+  const redes = await getRedes();
   return (
     <footer className="site-footer">
       <div className="container">
@@ -14,6 +17,20 @@ export default function Footer() {
               Intermediação, assessoria jurídica e fiscal num único processo
               coordenado.
             </p>
+            {(redes.instagram || redes.linkedin) && (
+              <div className="footer-social">
+                {redes.instagram && (
+                  <a href={redes.instagram} target="_blank" rel="noopener" aria-label="Instagram">
+                    <Icon name="instagram" size={20} />
+                  </a>
+                )}
+                {redes.linkedin && (
+                  <a href={redes.linkedin} target="_blank" rel="noopener" aria-label="LinkedIn">
+                    <Icon name="linkedin" size={20} />
+                  </a>
+                )}
+              </div>
+            )}
           </div>
           <div>
             <h4>Mercados</h4>

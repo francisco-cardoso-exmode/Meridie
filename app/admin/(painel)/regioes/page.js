@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { allRegioes } from "@/lib/store";
 import { PAIS_LABEL } from "@/lib/empreendimentos";
+import { thumbUrl } from "@/lib/format";
 import DeleteButton from "@/components/admin/DeleteButton";
 
 export const dynamic = "force-dynamic";
@@ -26,7 +27,7 @@ export default async function AdminRegioes() {
       <div className="admin-list">
         {lista.map((r) => (
           <div className="admin-row" key={r.slug}>
-            <div className="admin-thumb" style={{ backgroundImage: `url(${r.imagem || ""})` }} />
+            <div className="admin-thumb" style={{ backgroundImage: `url(${thumbUrl(r.imagem) || ""})` }} />
             <div className="admin-row-main">
               <div className="admin-row-title">
                 {r.nome}

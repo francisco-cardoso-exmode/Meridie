@@ -22,9 +22,12 @@ export async function POST(request) {
             "image/png",
             "image/webp",
             "image/avif",
+            "video/mp4",
+            "video/webm",
+            "video/quicktime",
           ],
           addRandomSuffix: true,
-          maximumSizeInBytes: 15 * 1024 * 1024,
+          maximumSizeInBytes: 300 * 1024 * 1024,
         };
       },
       onUploadCompleted: async () => {},
