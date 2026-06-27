@@ -9,6 +9,7 @@ const LINKS = [
   { href: "/admin/regioes", label: "Regiões & Zonas" },
   { href: "/admin/leads", label: "Leads" },
   { href: "/admin/emails", label: "Emails" },
+  { href: "/admin/definicoes", label: "Definições" },
   { href: "/admin/ajuda", label: "Ajuda" },
 ];
 

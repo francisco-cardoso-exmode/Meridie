@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import ImageUploader from "@/components/admin/ImageUploader";
 
@@ -225,6 +226,11 @@ export default function RegiaoForm({ initial = null, regioesExistentes = [], pre
         <p className="email-note" style={{ marginTop: 10 }}>
           {f.parent ? "É uma zona (pertence a uma região)." : "É uma região de topo (pode ser banner)."}
         </p>
+        {editing && (
+          <Link href={`/regioes/${initial.slug}`} target="_blank" className="btn-ver-site">
+            Ver página completa no site ↗
+          </Link>
+        )}
       </aside>
     </div>
   );

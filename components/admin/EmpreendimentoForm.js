@@ -317,6 +317,15 @@ export default function EmpreendimentoForm({ initial = null, regioesExistentes =
             ))}
           </div>
         )}
+        {editing ? (
+          <Link href={`/empreendimentos/${initial.slug}`} target="_blank" className="btn-ver-site">
+            Ver página completa no site ↗
+          </Link>
+        ) : (
+          <p className="email-note" style={{ marginTop: 12 }}>
+            Guarda primeiro para abrires a página completa no site.
+          </p>
+        )}
       </aside>
     </div>
   );
