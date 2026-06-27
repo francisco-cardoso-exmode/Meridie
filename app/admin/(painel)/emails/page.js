@@ -1,5 +1,7 @@
 import { headers } from "next/headers";
 import { htmlConfirmacao, htmlNotificacao } from "@/lib/mailer";
+import { cardsHTML } from "@/lib/emailcards";
+import { empreendimentosDestaque } from "@/lib/store";
 
 export const metadata = { title: "Emails" };
 export const dynamic = "force-dynamic";
@@ -8,11 +10,13 @@ export default async function AdminEmails() {
   const h = await headers();
   const origin = `${h.get("x-forwarded-proto") || "http"}://${h.get("host")}`;
   const logoSrc = `${origin}/meridie_logo.png`;
+  const cardsBloco = cardsHTML(await empreendimentosDestaque(3), origin);
 
   const confirmacao = htmlConfirmacao({
     nome: "João Silva",
     assunto: "Interesse: VIBE Meireles (Fortaleza)",
     logoSrc,
+    cardsBloco,
   });
   const notificacao = htmlNotificacao({
     nome: "João Silva",
