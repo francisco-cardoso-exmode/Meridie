@@ -630,6 +630,21 @@ section {
   margin-bottom: 8px;
 }
 
+/* ============ Barra de sub-zona (zona → região) ============ */
+.subzone-bar {
+  background: var(--paper-soft);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 0;
+}
+.subzone-bar a {
+  color: var(--navy);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.subzone-bar a:hover {
+  color: var(--gold);
+}
+
 /* ============ Mapa da região ============ */
 .region-map {
   height: 440px;

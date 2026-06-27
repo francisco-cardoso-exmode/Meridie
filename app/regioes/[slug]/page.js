@@ -4,10 +4,12 @@ import Reveal from "@/components/Reveal";
 import Icon from "@/components/Icon";
 import MarketHero from "@/components/MarketHero";
 import EmpreendimentoCard from "@/components/EmpreendimentoCard";
+import RegionBanner from "@/components/RegionBanner";
 import RegionMap, { CORES_PONTO } from "@/components/RegionMap";
 import {
   REGIOES,
   getRegiaoBySlug,
+  getSubRegioes,
   getEmpreendimentosPorRegiao,
 } from "@/lib/regioes";
 import { PAIS_LABEL } from "@/lib/empreendimentos";
@@ -40,6 +42,8 @@ export default async function PaginaRegiao({ params }) {
   const empreendimentos = getEmpreendimentosPorRegiao(regiao);
   const paisLabel = PAIS_LABEL[regiao.pais];
   const tiposNoMapa = [...new Set(regiao.pontos.map((p) => p.tipo))];
+  const regiaoMae = regiao.parent ? getRegiaoBySlug(regiao.parent) : null;
+  const subZonas = getSubRegioes(regiao.slug);
 
   return (
     <>
@@ -51,6 +55,16 @@ export default async function PaginaRegiao({ params }) {
       >
         {regiao.tagline}
       </MarketHero>
+
+      {regiaoMae && (
+        <div className="subzone-bar">
+          <div className="container">
+            <Link href={`/regioes/${regiaoMae.slug}`}>
+              ← Faz parte da região {regiaoMae.nome}
+            </Link>
+          </div>
+        </div>
+      )}
 
       {/* Sobre a região */}
       <section>
@@ -138,6 +152,26 @@ export default async function PaginaRegiao({ params }) {
           </Reveal>
         </div>
       </section>
+
+      {/* Sub-zonas em destaque */}
+      {subZonas.length > 0 && (
+        <section>
+          <div className="container">
+            <Reveal className="section-head">
+              <span className="eyebrow">Zonas em destaque</span>
+              <h2>Explorar zonas de {regiao.nome}</h2>
+              <p>Áreas específicas dentro da região, com os seus próprios empreendimentos.</p>
+            </Reveal>
+            <div className="region-grid">
+              {subZonas.map((z, i) => (
+                <Reveal key={z.slug} delay={(i % 2) * 0.1}>
+                  <RegionBanner regiao={z} compact />
+                </Reveal>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Empreendimentos da região */}
       <section className="bg-soft">
