@@ -166,8 +166,8 @@ export default function EmpreendimentoForm({ initial = null, regioesExistentes =
           <input value={f.zona} onChange={set("zona")} required />
         </label>
         <label>
-          Tipo
-          <input value={f.tipo} onChange={set("tipo")} placeholder="Apartamento, Moradia, Estúdio…" />
+          Tipologia
+          <input value={f.tipo} onChange={set("tipo")} placeholder="ex.: T2, Studio, Moradia V4…" />
         </label>
         <label>
           Finalidade

@@ -14,7 +14,6 @@ const ESTADO_INICIAL = {
   zona: "",
   tipo: "",
   finalidade: "",
-  quartos: "",
   ordenacao: "destaque",
 };
 
@@ -29,7 +28,6 @@ export default function ListingsExplorer({ empreendimentos, zonas, tipos, finali
       if (f.zona && e.zona !== f.zona) return false;
       if (f.tipo && e.tipo !== f.tipo) return false;
       if (f.finalidade && e.finalidade !== f.finalidade) return false;
-      if (f.quartos && e.quartos < Number(f.quartos)) return false;
       return true;
     });
 
@@ -44,7 +42,7 @@ export default function ListingsExplorer({ empreendimentos, zonas, tipos, finali
   }, [empreendimentos, f]);
 
   const ativo =
-    f.zona || f.tipo || f.finalidade || f.quartos || f.ordenacao !== "destaque";
+    f.zona || f.tipo || f.finalidade || f.ordenacao !== "destaque";
 
   return (
     <>
@@ -59,9 +57,9 @@ export default function ListingsExplorer({ empreendimentos, zonas, tipos, finali
           </select>
         </div>
         <div className="filter">
-          <label htmlFor="f-tipo">Tipo</label>
+          <label htmlFor="f-tipo">Tipologia</label>
           <select id="f-tipo" value={f.tipo} onChange={set("tipo")}>
-            <option value="">Todos os tipos</option>
+            <option value="">Todas as tipologias</option>
             {tipos.map((t) => (
               <option key={t} value={t}>{t}</option>
             ))}
@@ -74,16 +72,6 @@ export default function ListingsExplorer({ empreendimentos, zonas, tipos, finali
             {finalidades.map((x) => (
               <option key={x} value={x}>{x}</option>
             ))}
-          </select>
-        </div>
-        <div className="filter">
-          <label htmlFor="f-quartos">Quartos (mín.)</label>
-          <select id="f-quartos" value={f.quartos} onChange={set("quartos")}>
-            <option value="">Indiferente</option>
-            <option value="1">1+</option>
-            <option value="2">2+</option>
-            <option value="3">3+</option>
-            <option value="4">4+</option>
           </select>
         </div>
         <div className="filter">
