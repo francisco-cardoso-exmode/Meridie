@@ -7,12 +7,15 @@ import EmpreendimentoCard from "@/components/EmpreendimentoCard";
 import RegionBanner from "@/components/RegionBanner";
 import RegionMap, { CORES_PONTO } from "@/components/RegionMap";
 import {
-  REGIOES,
-  getRegiaoBySlug,
-  getSubRegioes,
-  getEmpreendimentosPorRegiao,
-} from "@/lib/regioes";
+  allRegioes,
+  regiaoBySlug,
+  subRegioes,
+  empreendimentosPorRegiao,
+} from "@/lib/store";
 import { PAIS_LABEL } from "@/lib/empreendimentos";
+
+export const revalidate = 60;
+export const dynamicParams = true;
 
 const TIPO_LABEL = {
   historico: "Histórico",
@@ -23,27 +26,28 @@ const TIPO_LABEL = {
   gastronomia: "Gastronomia",
 };
 
-export function generateStaticParams() {
-  return REGIOES.map((r) => ({ slug: r.slug }));
+export async function generateStaticParams() {
+  const list = await allRegioes();
+  return list.map((r) => ({ slug: r.slug }));
 }
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
-  const r = getRegiaoBySlug(slug);
+  const r = await regiaoBySlug(slug);
   if (!r) return { title: "Região não encontrada" };
   return { title: `Investir em ${r.nome}`, description: r.descricao };
 }
 
 export default async function PaginaRegiao({ params }) {
   const { slug } = await params;
-  const regiao = getRegiaoBySlug(slug);
+  const regiao = await regiaoBySlug(slug);
   if (!regiao) notFound();
 
-  const empreendimentos = getEmpreendimentosPorRegiao(regiao);
+  const empreendimentos = await empreendimentosPorRegiao(regiao);
   const paisLabel = PAIS_LABEL[regiao.pais];
   const tiposNoMapa = [...new Set(regiao.pontos.map((p) => p.tipo))];
-  const regiaoMae = regiao.parent ? getRegiaoBySlug(regiao.parent) : null;
-  const subZonas = getSubRegioes(regiao.slug);
+  const regiaoMae = regiao.parent ? await regiaoBySlug(regiao.parent) : null;
+  const subZonas = await subRegioes(regiao.slug);
 
   return (
     <>

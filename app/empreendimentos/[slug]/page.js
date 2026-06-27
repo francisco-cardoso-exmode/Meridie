@@ -4,21 +4,20 @@ import Reveal from "@/components/Reveal";
 import Icon from "@/components/Icon";
 import ContactForm from "@/components/ContactForm";
 import EmpreendimentoCard from "@/components/EmpreendimentoCard";
-import {
-  EMPREENDIMENTOS,
-  getEmpreendimentoBySlug,
-  getEmpreendimentos,
-  formatarPreco,
-  PAIS_LABEL,
-} from "@/lib/empreendimentos";
+import { formatarPreco, PAIS_LABEL } from "@/lib/empreendimentos";
+import { empreendimentoBySlug, allEmpreendimentos } from "@/lib/store";
 
-export function generateStaticParams() {
-  return EMPREENDIMENTOS.map((e) => ({ slug: e.slug }));
+export const revalidate = 60;
+export const dynamicParams = true;
+
+export async function generateStaticParams() {
+  const list = await allEmpreendimentos();
+  return list.map((e) => ({ slug: e.slug }));
 }
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
-  const e = getEmpreendimentoBySlug(slug);
+  const e = await empreendimentoBySlug(slug);
   if (!e) return { title: "Empreendimento não encontrado" };
   return {
     title: `${e.nome} — ${e.cidade}`,
@@ -28,11 +27,11 @@ export async function generateMetadata({ params }) {
 
 export default async function PaginaEmpreendimento({ params }) {
   const { slug } = await params;
-  const e = getEmpreendimentoBySlug(slug);
+  const e = await empreendimentoBySlug(slug);
   if (!e) notFound();
 
   const paisLabel = PAIS_LABEL[e.pais];
-  const semelhantes = getEmpreendimentos({ pais: e.pais })
+  const semelhantes = (await allEmpreendimentos({ pais: e.pais }))
     .filter((x) => x.slug !== e.slug)
     .slice(0, 3);
 

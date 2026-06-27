@@ -3,12 +3,12 @@ import Reveal from "@/components/Reveal";
 import RegionBanner from "@/components/RegionBanner";
 import ListingsExplorer from "@/components/ListingsExplorer";
 import {
-  getEmpreendimentos,
-  getZonas,
-  getTipos,
-  getFinalidades,
-} from "@/lib/empreendimentos";
-import { getRegioes } from "@/lib/regioes";
+  allEmpreendimentos,
+  allRegioes,
+  zonasDe,
+  tiposDe,
+  finalidadesDe,
+} from "@/lib/store";
 
 export const metadata = {
   title: "Investir em Portugal",
@@ -16,9 +16,11 @@ export const metadata = {
     "Empreendimentos selecionados em Portugal — Lisboa, Porto, Algarve e Cascais. Segurança jurídica europeia e valorização consistente. Filtra por zona, tipo e finalidade.",
 };
 
-export default function PaginaPortugal() {
-  const empreendimentos = getEmpreendimentos({ pais: "portugal" });
-  const regioes = getRegioes({ pais: "portugal" });
+export const revalidate = 60;
+
+export default async function PaginaPortugal() {
+  const empreendimentos = await allEmpreendimentos({ pais: "portugal" });
+  const regioes = await allRegioes({ pais: "portugal", topo: true });
 
   return (
     <>
@@ -57,9 +59,9 @@ export default function PaginaPortugal() {
           <Reveal>
             <ListingsExplorer
               empreendimentos={empreendimentos}
-              zonas={getZonas("portugal")}
-              tipos={getTipos("portugal")}
-              finalidades={getFinalidades("portugal")}
+              zonas={zonasDe(empreendimentos)}
+              tipos={tiposDe(empreendimentos)}
+              finalidades={finalidadesDe(empreendimentos)}
             />
           </Reveal>
         </div>

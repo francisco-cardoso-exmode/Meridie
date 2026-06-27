@@ -3,12 +3,12 @@ import Reveal from "@/components/Reveal";
 import RegionBanner from "@/components/RegionBanner";
 import ListingsExplorer from "@/components/ListingsExplorer";
 import {
-  getEmpreendimentos,
-  getZonas,
-  getTipos,
-  getFinalidades,
-} from "@/lib/empreendimentos";
-import { getRegioes } from "@/lib/regioes";
+  allEmpreendimentos,
+  allRegioes,
+  zonasDe,
+  tiposDe,
+  finalidadesDe,
+} from "@/lib/store";
 
 export const metadata = {
   title: "Investir no Brasil",
@@ -16,9 +16,11 @@ export const metadata = {
     "Empreendimentos selecionados no Brasil — São Paulo, Rio de Janeiro, Nordeste e Sul. Yields superiores à média europeia e mercado em expansão. Filtra por zona, tipo e finalidade.",
 };
 
-export default function PaginaBrasil() {
-  const empreendimentos = getEmpreendimentos({ pais: "brasil" });
-  const regioes = getRegioes({ pais: "brasil" });
+export const revalidate = 60;
+
+export default async function PaginaBrasil() {
+  const empreendimentos = await allEmpreendimentos({ pais: "brasil" });
+  const regioes = await allRegioes({ pais: "brasil", topo: true });
 
   return (
     <>
@@ -57,9 +59,9 @@ export default function PaginaBrasil() {
           <Reveal>
             <ListingsExplorer
               empreendimentos={empreendimentos}
-              zonas={getZonas("brasil")}
-              tipos={getTipos("brasil")}
-              finalidades={getFinalidades("brasil")}
+              zonas={zonasDe(empreendimentos)}
+              tipos={tiposDe(empreendimentos)}
+              finalidades={finalidadesDe(empreendimentos)}
             />
           </Reveal>
         </div>

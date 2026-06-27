@@ -4,18 +4,18 @@ import Reveal from "@/components/Reveal";
 import Icon from "@/components/Icon";
 import EmpreendimentoCard from "@/components/EmpreendimentoCard";
 import RegionBanner from "@/components/RegionBanner";
-import { getEmpreendimentosDestaque } from "@/lib/empreendimentos";
-import { getRegiaoBySlug } from "@/lib/regioes";
+import { empreendimentosDestaque, allRegioes } from "@/lib/store";
 
-export default function Home() {
-  const destaques = getEmpreendimentosDestaque(6);
-  const regioesDestaque = [
-    "lisboa",
-    "algarve",
-    "sao-paulo",
-    "rio-de-janeiro",
-  ].map(getRegiaoBySlug);
-  const regiaoFooter = getRegiaoBySlug("nordeste");
+export const revalidate = 60;
+
+export default async function Home() {
+  const destaques = await empreendimentosDestaque(6);
+  const regioes = await allRegioes();
+  const pick = (s) => regioes.find((r) => r.slug === s);
+  const regioesDestaque = ["lisboa", "algarve", "sao-paulo", "rio-de-janeiro"]
+    .map(pick)
+    .filter(Boolean);
+  const regiaoFooter = pick("nordeste");
 
   return (
     <>
@@ -164,13 +164,15 @@ export default function Home() {
       </section>
 
       {/* Banner regional pré-footer */}
-      <section className="bg-soft">
-        <div className="container">
-          <Reveal>
-            <RegionBanner regiao={regiaoFooter} />
-          </Reveal>
-        </div>
-      </section>
+      {regiaoFooter && (
+        <section className="bg-soft">
+          <div className="container">
+            <Reveal>
+              <RegionBanner regiao={regiaoFooter} />
+            </Reveal>
+          </div>
+        </section>
+      )}
 
       {/* CTA final */}
       <section>
