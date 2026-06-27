@@ -174,6 +174,23 @@ export default async function PaginaEmpreendimento({ params }) {
         </div>
       </section>
 
+      {e.imagens && e.imagens.length > 3 && (
+        <section style={{ paddingTop: 0 }}>
+          <div className="container">
+            <Reveal>
+              <h2 style={{ fontSize: "1.5rem", marginBottom: 18 }}>Galeria</h2>
+              <div className="galeria-grid">
+                {e.imagens.slice(3).map((img, i) => (
+                  <div className="galeria-item" key={i}>
+                    <img src={img} alt={`${e.nome} — foto ${i + 4}`} loading="lazy" />
+                  </div>
+                ))}
+              </div>
+            </Reveal>
+          </div>
+        </section>
+      )}
+
       {regiao && (
         <section>
           <div className="container">
