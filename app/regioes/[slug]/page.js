@@ -27,8 +27,8 @@ const TIPO_LABEL = {
 };
 
 export async function generateStaticParams() {
-  const list = await allRegioes();
-  return list.map((r) => ({ slug: r.slug }));
+  // Render a pedido (ISR) — não consulta o Mongo durante o build.
+  return [];
 }
 
 export async function generateMetadata({ params }) {

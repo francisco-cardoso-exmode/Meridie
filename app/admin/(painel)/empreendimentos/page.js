@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 export const metadata = { title: "Empreendimentos" };
 
 export default async function AdminEmpreendimentos() {
-  const lista = await allEmpreendimentos();
+  const lista = await allEmpreendimentos({ todos: true });
 
   return (
     <div className="admin-container">
@@ -33,6 +33,7 @@ export default async function AdminEmpreendimentos() {
                 {e.nome}
                 {e.construtora && <span className="tag-real">REAL</span>}
                 {e.destaque && <span className="tag-dest">DESTAQUE</span>}
+                {e.publicado === false && <span className="tag-oculto">OCULTO</span>}
               </div>
               <div className="admin-row-sub">
                 {e.cidade} · {e.zona} · {e.tipo} · {formatarPreco(e.preco, e.moeda)}

@@ -15,7 +15,7 @@ async function contarLeads() {
 
 export default async function AdminDashboard() {
   const [emp, reg, leads] = await Promise.all([
-    allEmpreendimentos(),
+    allEmpreendimentos({ todos: true }),
     allRegioes(),
     contarLeads(),
   ]);

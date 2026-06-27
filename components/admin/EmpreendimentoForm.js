@@ -58,6 +58,7 @@ export default function EmpreendimentoForm({ initial = null, regioesExistentes =
     area: initial?.area ?? "",
     estado: initial?.estado || "Em construção",
     destaque: initial?.destaque ?? false,
+    publicado: initial?.publicado !== false,
     construtora: initial?.construtora || "",
     morada: initial?.morada || "",
     resumo: initial?.resumo || "",
@@ -92,6 +93,7 @@ export default function EmpreendimentoForm({ initial = null, regioesExistentes =
       area: Number(f.area) || 0,
       estado: f.estado,
       destaque: !!f.destaque,
+      publicado: !!f.publicado,
       resumo: f.resumo.trim(),
       descricao: f.descricao.trim(),
       caracteristicas: linhasParaArray(f.caracteristicas),
@@ -217,6 +219,10 @@ export default function EmpreendimentoForm({ initial = null, regioesExistentes =
         <label className="check-inline">
           <input type="checkbox" checked={f.destaque} onChange={set("destaque")} />
           Em destaque (aparece na Home)
+        </label>
+        <label className="check-inline">
+          <input type="checkbox" checked={f.publicado} onChange={set("publicado")} />
+          Visível no site (se desmarcado, fica oculto)
         </label>
       </div>
 

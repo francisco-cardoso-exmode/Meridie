@@ -17,8 +17,8 @@ export const revalidate = 60;
 export const dynamicParams = true;
 
 export async function generateStaticParams() {
-  const list = await allEmpreendimentos();
-  return list.map((e) => ({ slug: e.slug }));
+  // Render a pedido (ISR) — não consulta o Mongo durante o build.
+  return [];
 }
 
 export async function generateMetadata({ params }) {
@@ -34,7 +34,7 @@ export async function generateMetadata({ params }) {
 export default async function PaginaEmpreendimento({ params }) {
   const { slug } = await params;
   const e = await empreendimentoBySlug(slug);
-  if (!e) notFound();
+  if (!e || e.publicado === false) notFound();
 
   const paisLabel = PAIS_LABEL[e.pais];
   const regiao = await regiaoDoEmpreendimento(e);

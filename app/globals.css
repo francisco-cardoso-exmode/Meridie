@@ -2298,3 +2298,12 @@ body:has(.admin-page) .site-footer {
 /* Menu admin com muitos itens: permitir quebra/scroll */
 .admin-nav-inner { height: auto; min-height: 60px; flex-wrap: wrap; gap: 10px 0; }
 .admin-nav nav { flex-wrap: wrap; gap: 8px 16px; }
+
+.tag-oculto {
+  background: #6b7280;
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 999px;
+}
