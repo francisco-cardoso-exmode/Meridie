@@ -5,7 +5,8 @@ import Icon from "@/components/Icon";
 import ContactForm from "@/components/ContactForm";
 import EmpreendimentoCard from "@/components/EmpreendimentoCard";
 import RegionBanner from "@/components/RegionBanner";
-import { formatarPreco, PAIS_LABEL } from "@/lib/empreendimentos";
+import PrecoDual from "@/components/PrecoDual";
+import { PAIS_LABEL } from "@/lib/empreendimentos";
 import {
   empreendimentoBySlug,
   allEmpreendimentos,
@@ -109,17 +110,28 @@ export default async function PaginaEmpreendimento({ params }) {
               <h2 style={{ fontSize: "1.4rem", margin: "8px 0 12px" }}>Descrição</h2>
               <p style={{ marginBottom: 28 }}>{e.descricao}</p>
 
-              {e.tipologias && (
+              {e.tipologias && e.tipologias.length > 0 && (
                 <>
-                  <h2 style={{ fontSize: "1.4rem", marginBottom: 12 }}>Tipologias</h2>
-                  <ul className="feature-list" style={{ marginBottom: 28 }}>
-                    {e.tipologias.map((t) => (
-                      <li key={t}>
-                        <span className="check"><Icon name="layers" size={18} /></span>
-                        <span>{t}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  <h2 style={{ fontSize: "1.4rem", marginBottom: 12 }}>Tipologias e preços</h2>
+                  <div className="tipologias" style={{ marginBottom: 28 }}>
+                    {e.tipologias.map((t, i) => {
+                      const o = typeof t === "string" ? { nome: t } : t;
+                      return (
+                        <div className="tip-row" key={i}>
+                          <span className="tip-icon"><Icon name="layers" size={18} /></span>
+                          <span className="tip-nome">{o.nome}</span>
+                          {o.area && <span className="tip-area">{o.area}</span>}
+                          <span className="tip-preco">
+                            {o.preco ? (
+                              <PrecoDual preco={o.preco} moeda={e.moeda} />
+                            ) : (
+                              "Sob consulta"
+                            )}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </>
               )}
 
@@ -152,7 +164,7 @@ export default async function PaginaEmpreendimento({ params }) {
 
             {/* Aside — preço + interesse */}
             <aside className="prop-aside">
-              <div className="price-big">{formatarPreco(e.preco, e.moeda)}</div>
+              <div className="price-big"><PrecoDual preco={e.preco} moeda={e.moeda} /></div>
               <div className="price-sub">
                 {e.finalidade} · {e.cidade}, {paisLabel}
               </div>

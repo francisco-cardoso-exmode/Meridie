@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Icon from "@/components/Icon";
-import { formatarPreco } from "@/lib/empreendimentos";
+import PrecoDual from "@/components/PrecoDual";
 
 export default function EmpreendimentoCard({ e }) {
   return (
@@ -25,7 +25,7 @@ export default function EmpreendimentoCard({ e }) {
         </div>
         <div className="prop-foot">
           <div className="prop-price">
-            {formatarPreco(e.preco, e.moeda)}
+            <PrecoDual preco={e.preco} moeda={e.moeda} />
             <small>{e.finalidade}</small>
           </div>
           <span className="badge navy">Ver →</span>

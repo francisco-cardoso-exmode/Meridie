@@ -4,61 +4,108 @@ import { useRef, useState } from "react";
 import { upload } from "@vercel/blob/client";
 
 /**
- * Carrega imagens para o Vercel Blob e devolve os URLs via onUploaded(urls[]).
- * O upload é direto do browser para o storage (suporta ficheiros grandes).
+ * Galeria de imagens controlada — arrastar/largar OU clicar para abrir a pasta
+ * do computador. Faz upload para o Vercel Blob e devolve os URLs via onChange.
+ * Não mostra os links: só miniaturas, com remover. A 1.ª é a principal.
+ *
+ * Props: value (string[]), onChange(string[]), multiple (default true)
  */
-export default function ImageUploader({ onUploaded, multiple = true }) {
+export default function ImageUploader({ value = [], onChange, multiple = true }) {
   const inputRef = useRef(null);
+  const [drag, setDrag] = useState(false);
   const [estado, setEstado] = useState({ a: "idle", msg: "" });
 
-  async function onChange(e) {
-    const files = Array.from(e.target.files || []);
+  async function enviar(fileList) {
+    const files = Array.from(fileList || []).filter((f) =>
+      f.type.startsWith("image/")
+    );
     if (!files.length) return;
-    setEstado({ a: "loading", msg: `A enviar ${files.length} ficheiro(s)...` });
-
+    setEstado({ a: "loading", msg: `A enviar ${files.length} imagem(ns)...` });
     try {
-      const urls = [];
+      const novas = [];
       for (const file of files) {
         const blob = await upload(file.name, file, {
           access: "public",
           handleUploadUrl: "/api/admin/upload",
         });
-        urls.push(blob.url);
+        novas.push(blob.url);
       }
-      onUploaded?.(urls);
-      setEstado({ a: "ok", msg: `${urls.length} imagem(ns) carregada(s).` });
+      onChange?.(multiple ? [...value, ...novas] : [novas[novas.length - 1]]);
+      setEstado({ a: "idle", msg: "" });
     } catch (err) {
+      const m = err?.message || "";
       setEstado({
         a: "erro",
-        msg: err?.message?.includes("token")
-          ? "Falta configurar o Vercel Blob (BLOB_READ_WRITE_TOKEN)."
-          : err?.message || "Falha no upload.",
+        msg:
+          /token|blob/i.test(m)
+            ? "Falta configurar o Vercel Blob (BLOB_READ_WRITE_TOKEN)."
+            : m || "Falha no upload.",
       });
     } finally {
       if (inputRef.current) inputRef.current.value = "";
     }
   }
 
+  function remover(i) {
+    onChange?.(value.filter((_, idx) => idx !== i));
+  }
+
   return (
-    <div className="uploader">
-      <input
-        ref={inputRef}
-        type="file"
-        accept="image/*"
-        multiple={multiple}
-        onChange={onChange}
-        hidden
-      />
-      <button
-        type="button"
-        className="btn-upload"
+    <div className="uploader2">
+      <div
+        className={`dropzone${drag ? " drag" : ""}`}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setDrag(true);
+        }}
+        onDragLeave={() => setDrag(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setDrag(false);
+          enviar(e.dataTransfer.files);
+        }}
         onClick={() => inputRef.current?.click()}
-        disabled={estado.a === "loading"}
       >
-        {estado.a === "loading" ? "A enviar..." : "⬆ Carregar imagens"}
-      </button>
-      {estado.msg && (
-        <span className={`uploader-msg ${estado.a}`}>{estado.msg}</span>
+        <input
+          ref={inputRef}
+          type="file"
+          accept="image/*"
+          multiple={multiple}
+          hidden
+          onChange={(e) => enviar(e.target.files)}
+        />
+        <div className="dz-icon">⬆</div>
+        <div className="dz-text">
+          {estado.a === "loading" ? (
+            estado.msg
+          ) : (
+            <>
+              <strong>Clica para escolher</strong> do computador
+              <br />
+              ou arrasta as imagens para aqui
+            </>
+          )}
+        </div>
+      </div>
+
+      {estado.a === "erro" && <div className="form-msg erro">{estado.msg}</div>}
+
+      {value.length > 0 && (
+        <div className="gallery-thumbs">
+          {value.map((url, i) => (
+            <div className="gthumb" key={i} style={{ backgroundImage: `url(${url})` }}>
+              {multiple && i === 0 && <span className="gthumb-main">Principal</span>}
+              <button
+                type="button"
+                className="gthumb-x"
+                title="Remover"
+                onClick={() => remover(i)}
+              >
+                ✕
+              </button>
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );

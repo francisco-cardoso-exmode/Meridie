@@ -26,14 +26,23 @@ const textoParaPontos = (s) =>
     return { nome: nome || "", tipo: tipo || "cidade", lat: Number(lat) || 0, lng: Number(lng) || 0 };
   });
 
-export default function RegiaoForm({ initial = null, regioesExistentes = [] }) {
+const slugify = (s) =>
+  (s || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+
+export default function RegiaoForm({ initial = null, regioesExistentes = [], prefill = null }) {
   const editing = !!initial;
+  const pf = editing ? null : prefill;
   const router = useRouter();
   const [estado, setEstado] = useState({ a: "idle", msg: "" });
 
   const [f, setF] = useState({
-    slug: initial?.slug || "",
-    nome: initial?.nome || "",
+    slug: initial?.slug || (pf?.nome ? slugify(pf.nome) : ""),
+    nome: initial?.nome || pf?.nome || "",
     pais: initial?.pais || "portugal",
     parent: initial?.parent || "",
     imagem: initial?.imagem || "",
@@ -41,8 +50,8 @@ export default function RegiaoForm({ initial = null, regioesExistentes = [] }) {
     descricao: initial?.descricao || "",
     sobre: initial?.sobre || "",
     crescimento: initial?.crescimento || "",
-    cidades: arr(initial?.cidades),
-    zonas: arr(initial?.zonas),
+    cidades: arr(initial?.cidades) || pf?.cidade || "",
+    zonas: arr(initial?.zonas) || pf?.zona || "",
     vantagens: arr(initial?.vantagens),
     destaques: destaquesParaTexto(initial?.destaques),
     mapaLat: initial?.mapa?.lat ?? "",
@@ -103,7 +112,8 @@ export default function RegiaoForm({ initial = null, regioesExistentes = [] }) {
   }
 
   return (
-    <form className="admin-form" onSubmit={onSubmit}>
+    <div className="form-layout">
+      <form className="admin-form" onSubmit={onSubmit}>
       <div className="admin-form-grid">
         <label>
           Slug (URL) {editing && <small>— não editável</small>}
@@ -133,14 +143,9 @@ export default function RegiaoForm({ initial = null, regioesExistentes = [] }) {
           Imagem
           <ImageUploader
             multiple={false}
-            onUploaded={(urls) => urls[0] && setF((p) => ({ ...p, imagem: urls[0] }))}
+            value={f.imagem ? [f.imagem] : []}
+            onChange={(urls) => setF((p) => ({ ...p, imagem: urls[0] || "" }))}
           />
-          {f.imagem && (
-            <div className="upload-thumbs">
-              <div className="upload-thumb" style={{ backgroundImage: `url(${f.imagem})` }} />
-            </div>
-          )}
-          <input value={f.imagem} onChange={set("imagem")} placeholder="Carrega acima ou cola um URL" />
         </label>
         <label className="full">
           Tagline (frase curta)
@@ -206,6 +211,21 @@ export default function RegiaoForm({ initial = null, regioesExistentes = [] }) {
           {estado.a === "loading" ? "A guardar..." : editing ? "Guardar alterações" : "Criar"}
         </button>
       </div>
-    </form>
+      </form>
+
+      <aside className="form-preview">
+        <div className="fp-label">Pré-visualização</div>
+        <div className="fp-region">
+          {f.imagem && <img src={f.imagem} alt="" />}
+          <div className="fpr-body">
+            <h3>{f.nome || "Nome da região/zona"}</h3>
+            <p>{f.tagline || "Tagline..."}</p>
+          </div>
+        </div>
+        <p className="email-note" style={{ marginTop: 10 }}>
+          {f.parent ? "É uma zona (pertence a uma região)." : "É uma região de topo (pode ser banner)."}
+        </p>
+      </aside>
+    </div>
   );
 }
