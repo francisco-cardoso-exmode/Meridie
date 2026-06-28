@@ -2720,3 +2720,50 @@ body:has(.admin-page) .site-footer {
   border-color: var(--gold);
   background: var(--paper-soft);
 }
+
+/* Editor de publicidade por região (admin) */
+.pub-editor { display: flex; flex-direction: column; gap: 12px; margin-top: 6px; }
+.pub-edit-card {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+  background: var(--paper-soft);
+}
+.pub-edit-fields { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+.pub-edit-fields input {
+  width: 100%;
+  padding: 9px 11px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.9rem;
+}
+.pub-edit-x {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--border);
+  background: #fff;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--muted);
+}
+.pub-edit-x:hover { border-color: #b4564b; color: #b4564b; }
+.btn-ghost {
+  align-self: flex-start;
+  background: transparent;
+  border: 1px dashed var(--border);
+  color: var(--navy);
+  padding: 9px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.88rem;
+  font-family: inherit;
+}
+.btn-ghost:hover { border-color: var(--gold); color: var(--gold); }

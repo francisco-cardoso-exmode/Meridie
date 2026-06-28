@@ -35,18 +35,7 @@ const textoParaDistancias = (s) =>
     return { local: local || "", km: Number(km) || 0 };
   });
 
-// publicidade: "título | texto | url | imagem"
-const publicidadeParaTexto = (a) =>
-  Array.isArray(a)
-    ? a.map((x) => [x.titulo, x.texto, x.url, x.imagem].map((v) => v || "").join(" | ")).join("\n")
-    : "";
-const textoParaPublicidade = (s) =>
-  linhas(s)
-    .map((l) => {
-      const [titulo, texto, url, imagem] = l.split("|").map((x) => x.trim());
-      return { titulo: titulo || "", texto: texto || "", url: url || "", imagem: imagem || "" };
-    })
-    .filter((x) => x.titulo || x.url);
+const PUB_VAZIO = { titulo: "", texto: "", url: "", imagem: "" };
 
 const slugify = (s) =>
   (s || "")
@@ -67,7 +56,7 @@ export default function RegiaoForm({ initial = null, regioesExistentes = [], pre
     pais: initial?.pais || "portugal",
     parent: initial?.parent || "",
     nivel: initial?.nivel || (initial?.parent ? "cidade" : "regiao"),
-    publicidade: publicidadeParaTexto(initial?.publicidade),
+    publicidade: Array.isArray(initial?.publicidade) ? initial.publicidade : [],
     imagem: initial?.imagem || "",
     tagline: initial?.tagline || "",
     descricao: initial?.descricao || "",
@@ -89,6 +78,18 @@ export default function RegiaoForm({ initial = null, regioesExistentes = [], pre
 
   const set = (c) => (e) => setF((p) => ({ ...p, [c]: e.target.value }));
 
+  // Editor de cards de publicidade (com upload de imagem).
+  const setPub = (i, campo, val) =>
+    setF((p) => {
+      const arr = [...p.publicidade];
+      arr[i] = { ...arr[i], [campo]: val };
+      return { ...p, publicidade: arr };
+    });
+  const addPub = () =>
+    setF((p) => ({ ...p, publicidade: [...p.publicidade, { ...PUB_VAZIO }] }));
+  const removePub = (i) =>
+    setF((p) => ({ ...p, publicidade: p.publicidade.filter((_, j) => j !== i) }));
+
   const possiveisPais = regioesExistentes.filter(
     (r) => !r.parent && r.slug !== f.slug
   );
@@ -102,7 +103,7 @@ export default function RegiaoForm({ initial = null, regioesExistentes = [], pre
       nome: f.nome.trim(),
       pais: f.pais,
       nivel: f.nivel,
-      publicidade: textoParaPublicidade(f.publicidade),
+      publicidade: f.publicidade.filter((x) => x.titulo || x.url || x.imagem),
       imagem: f.imagem.trim(),
       tagline: f.tagline.trim(),
       descricao: f.descricao.trim(),
@@ -264,10 +265,51 @@ export default function RegiaoForm({ initial = null, regioesExistentes = [], pre
         </label>
       </div>
 
-      <label className="full">
-        Publicidade — cards de patrocínio/parceiros — <code>título | texto | url | imagem</code> (um por linha)
-        <textarea rows={4} value={f.publicidade} onChange={set("publicidade")} placeholder={"Hotel Meireles | Estadia com desconto | https://... | https://imagem.jpg"} />
-      </label>
+      <div className="full">
+        <span className="uf-label">Publicidade — cards de patrocínio / parceiros</span>
+        <div className="pub-editor">
+          {f.publicidade.map((p, i) => (
+            <div className="pub-edit-card" key={i}>
+              <div className="pub-edit-fields">
+                <input
+                  value={p.titulo || ""}
+                  onChange={(e) => setPub(i, "titulo", e.target.value)}
+                  placeholder="Título (ex.: Hotel Meireles)"
+                />
+                <input
+                  value={p.texto || ""}
+                  onChange={(e) => setPub(i, "texto", e.target.value)}
+                  placeholder="Texto curto (ex.: Estadia com desconto)"
+                />
+                <input
+                  value={p.url || ""}
+                  onChange={(e) => setPub(i, "url", e.target.value)}
+                  placeholder="Link (https://...)"
+                />
+                <div className="uploader-field">
+                  <span className="uf-label">Imagem</span>
+                  <ImageUploader
+                    multiple={false}
+                    value={p.imagem ? [p.imagem] : []}
+                    onChange={(urls) => setPub(i, "imagem", urls[0] || "")}
+                  />
+                </div>
+              </div>
+              <button
+                type="button"
+                className="pub-edit-x"
+                onClick={() => removePub(i)}
+                aria-label="Remover card"
+              >
+                ×
+              </button>
+            </div>
+          ))}
+          <button type="button" className="btn btn-ghost" onClick={addPub}>
+            + Adicionar card de publicidade
+          </button>
+        </div>
+      </div>
 
       {estado.a === "erro" && <div className="form-msg erro">{estado.msg}</div>}
       <div className="admin-form-actions">
