@@ -89,6 +89,14 @@ export default function ImageUploader({ value = [], onChange, multiple = true })
 
   return (
     <div className="uploader2">
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        multiple={multiple}
+        hidden
+        onChange={(e) => enviar(e.target.files)}
+      />
       <div
         className={`dropzone${drag ? " drag" : ""}`}
         onDragOver={(e) => {
@@ -103,14 +111,6 @@ export default function ImageUploader({ value = [], onChange, multiple = true })
         }}
         onClick={() => inputRef.current?.click()}
       >
-        <input
-          ref={inputRef}
-          type="file"
-          accept="image/*"
-          multiple={multiple}
-          hidden
-          onChange={(e) => enviar(e.target.files)}
-        />
         <div className="dz-icon">⬆</div>
         <div className="dz-text">
           {estado.a === "loading" ? (

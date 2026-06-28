@@ -278,18 +278,18 @@ export default function EmpreendimentoForm({ initial = null, regioesExistentes =
           Proximidades (uma por linha, opcional)
           <textarea rows={6} value={f.proximidades} onChange={set("proximidades")} />
         </label>
-        <label className="full">
-          Imagens (a 1.ª é a principal)
+        <div className="uploader-field">
+          <span className="uf-label">Imagens (a 1.ª é a principal)</span>
           <ImageUploader
             value={f.imagens}
             onChange={(urls) => setF((p) => ({ ...p, imagens: urls }))}
           />
-        </label>
-        <label className="full">
-          Vídeo — link (YouTube/Vimeo) ou carregar ficheiro
+        </div>
+        <div className="uploader-field">
+          <span className="uf-label">Vídeo — link (YouTube/Vimeo) ou carregar ficheiro</span>
           <input value={f.video} onChange={set("video")} placeholder="https://youtu.be/... ou carrega abaixo" />
           <VideoUploader onUploaded={(url) => setF((p) => ({ ...p, video: url }))} />
-        </label>
+        </div>
         <label className="full">
           Site oficial do empreendimento — opcional
           <input value={f.siteUrl} onChange={set("siteUrl")} placeholder="https://vibemeireles.com.br" />

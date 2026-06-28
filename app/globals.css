@@ -2355,3 +2355,16 @@ body:has(.admin-page) .site-footer {
   transition: background 0.15s ease, color 0.15s ease;
 }
 .footer-social a:hover { background: var(--gold); color: var(--navy-dark); }
+
+/* Campo de upload (fora de <label> para não abrir o seletor em loop) */
+.admin-form .uploader-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 22px;
+}
+.admin-form .uf-label {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--ink);
+}

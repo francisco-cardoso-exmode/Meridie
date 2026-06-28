@@ -182,14 +182,14 @@ export default function RegiaoForm({ initial = null, regioesExistentes = [], pre
             <option value="zona">Zona / bairro</option>
           </select>
         </label>
-        <label className="full">
-          Imagem
+        <div className="uploader-field">
+          <span className="uf-label">Imagem</span>
           <ImageUploader
             multiple={false}
             value={f.imagem ? [f.imagem] : []}
             onChange={(urls) => setF((p) => ({ ...p, imagem: urls[0] || "" }))}
           />
-        </label>
+        </div>
         <label className="full">
           Tagline (frase curta)
           <input value={f.tagline} onChange={set("tagline")} />

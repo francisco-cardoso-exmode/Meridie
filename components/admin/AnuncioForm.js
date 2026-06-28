@@ -71,14 +71,14 @@ export default function AnuncioForm({ initial = null }) {
         Link (site do hotel/restaurante, ou /regioes/fortaleza para uma região)
         <input value={f.url} onChange={set("url")} placeholder="https://... ou /regioes/fortaleza" />
       </label>
-      <label className="full">
-        Imagem
+      <div className="uploader-field">
+        <span className="uf-label">Imagem</span>
         <ImageUploader
           multiple={false}
           value={f.imagem ? [f.imagem] : []}
           onChange={(urls) => setF((p) => ({ ...p, imagem: urls[0] || "" }))}
         />
-      </label>
+      </div>
       <label className="check-inline">
         <input type="checkbox" checked={f.mostrarHome} onChange={set("mostrarHome")} />
         Mostrar na Home (antes do footer)
