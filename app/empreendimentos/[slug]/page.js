@@ -194,7 +194,9 @@ export default async function PaginaEmpreendimento({ params }) {
                   ))}
                 </div>
               )}
-              <ContactForm assuntoInicial={`Interesse: ${e.nome} (${e.cidade})`} />
+              <ContactForm
+                assuntoInicial={`Interesse: ${e.nome} · Ref. ${referenciaDe(e)} · ${e.cidade}, ${paisLabel}`}
+              />
             </aside>
           </div>
         </div>
