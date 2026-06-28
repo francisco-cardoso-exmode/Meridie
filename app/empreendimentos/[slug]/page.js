@@ -194,8 +194,12 @@ export default async function PaginaEmpreendimento({ params }) {
                   ))}
                 </div>
               )}
+              <h3 className="aside-form-titulo">Tenho interesse</h3>
+              <p className="aside-form-ref">
+                <strong>[{referenciaDe(e)}]</strong> {e.nome}
+              </p>
               <ContactForm
-                assuntoInicial={`Interesse: ${e.nome} · Ref. ${referenciaDe(e)} · ${e.cidade}, ${paisLabel}`}
+                assuntoInicial={`[${referenciaDe(e)}] ${e.nome} — ${e.cidade}, ${paisLabel}`}
               />
             </aside>
           </div>
