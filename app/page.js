@@ -4,7 +4,15 @@ import Reveal from "@/components/Reveal";
 import Icon from "@/components/Icon";
 import EmpreendimentoCard from "@/components/EmpreendimentoCard";
 import RegionBanner from "@/components/RegionBanner";
-import { empreendimentosDestaque, allRegioes } from "@/lib/store";
+import ListingsExplorer from "@/components/ListingsExplorer";
+import {
+  empreendimentosDestaque,
+  allRegioes,
+  allEmpreendimentos,
+  zonasDe,
+  tiposDe,
+  finalidadesDe,
+} from "@/lib/store";
 import { getConteudo } from "@/lib/conteudo";
 import { allAnuncios } from "@/lib/anuncios";
 import AnuncioCard from "@/components/AnuncioCard";
@@ -14,6 +22,8 @@ export const revalidate = 60;
 export default async function Home() {
   const c = await getConteudo("home");
   const destaques = await empreendimentosDestaque(6);
+  const todos = await allEmpreendimentos();
+  const paises = [...new Set(todos.map((e) => e.pais))];
   const regioes = await allRegioes();
   const anuncios = await allAnuncios({ home: true });
   const pick = (s) => regioes.find((r) => r.slug === s);
@@ -76,6 +86,35 @@ export default async function Home() {
               style={{ background: "var(--navy)", color: "#fff" }}
             >
               Ver imóveis no Brasil
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Filtro geral — toda a oferta */}
+      <section>
+        <div className="container">
+          <Reveal className="section-head">
+            <span className="eyebrow">Toda a oferta</span>
+            <h2>Explora todos os empreendimentos</h2>
+            <p>
+              Pesquisa pelo nome, cidade, zona ou referência — ou clica em
+              Filtros para refinar por país, tipologia, finalidade e preço.
+            </p>
+          </Reveal>
+          <ListingsExplorer
+            empreendimentos={todos}
+            zonas={zonasDe(todos)}
+            tipos={tiposDe(todos)}
+            finalidades={finalidadesDe(todos)}
+            paises={paises}
+            comBusca
+            comPais
+            colapsavel
+          />
+          <div style={{ marginTop: 28 }}>
+            <Link href="/empreendimentos" className="btn btn-primary">
+              Ver página de toda a oferta
             </Link>
           </div>
         </div>

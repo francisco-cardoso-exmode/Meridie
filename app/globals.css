@@ -2668,3 +2668,55 @@ body:has(.admin-page) .site-footer {
   margin: 0 0 12px;
 }
 .aside-form-ref strong { color: var(--gold); letter-spacing: 0.03em; }
+
+/* ===== Explorador: barra de pesquisa + botão Filtros ===== */
+.explorer-bar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.explorer-search {
+  position: relative;
+  flex: 1 1 320px;
+  display: flex;
+  align-items: center;
+}
+.explorer-search .es-icon {
+  position: absolute;
+  left: 14px;
+  font-size: 1.1rem;
+  color: var(--muted);
+  pointer-events: none;
+}
+.explorer-search input {
+  width: 100%;
+  padding: 12px 14px 12px 40px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.explorer-search input:focus { border-color: var(--gold); }
+.btn-filtros {
+  flex: none;
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--navy);
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 11px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.15s, background 0.15s;
+}
+.btn-filtros:hover,
+.btn-filtros.is-open {
+  border-color: var(--gold);
+  background: var(--paper-soft);
+}

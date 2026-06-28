@@ -11,8 +11,12 @@ import {
   regiaoBySlug,
   subRegioes,
   empreendimentosPorRegiao,
+  zonasDe,
+  tiposDe,
+  finalidadesDe,
 } from "@/lib/store";
 import { PAIS_LABEL } from "@/lib/empreendimentos";
+import ListingsExplorer from "@/components/ListingsExplorer";
 import { textoComLinks } from "@/lib/format";
 
 const NIVEL_LABEL = { regiao: "Região", estado: "Estado", cidade: "Cidade", zona: "Zona" };
@@ -284,13 +288,13 @@ export default async function PaginaRegiao({ params }) {
             <p>O que podes fazer acontecer nesta região.</p>
           </Reveal>
           {empreendimentos.length > 0 ? (
-            <div className="listing-grid">
-              {empreendimentos.map((e, i) => (
-                <Reveal key={e.slug} delay={(i % 3) * 0.08}>
-                  <EmpreendimentoCard e={e} />
-                </Reveal>
-              ))}
-            </div>
+            <ListingsExplorer
+              empreendimentos={empreendimentos}
+              zonas={zonasDe(empreendimentos)}
+              tipos={tiposDe(empreendimentos)}
+              finalidades={finalidadesDe(empreendimentos)}
+              comBusca
+            />
           ) : (
             <div className="empty-state">
               <p>Em breve, novos empreendimentos nesta região.</p>
