@@ -31,10 +31,9 @@ function parse(texto) {
     }
     // Linha separadora de tabela markdown (|---|---|) — ignorar
     if (/^\|?[\s:|-]+\|[\s:|-]*$/.test(l)) continue;
-    // Separador ---
+    // Separador --- → ignorar (sem linhas no comparador)
     if (/^-{3,}$/.test(l)) {
       fecharLista();
-      blocos.push({ tipo: "hr" });
       continue;
     }
     // Subtítulo markdown (# / ## / ###)
