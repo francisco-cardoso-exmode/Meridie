@@ -10,6 +10,7 @@ import VideoEmbed from "@/components/VideoEmbed";
 import { textoComLinks } from "@/lib/format";
 import { PAIS_LABEL, referenciaDe } from "@/lib/empreendimentos";
 import { abs } from "@/lib/site";
+import Track from "@/components/Track";
 import {
   empreendimentoBySlug,
   allEmpreendimentos,
@@ -93,6 +94,7 @@ export default async function PaginaEmpreendimento({ params }) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }}
       />
+      <Track tipo="empreendimento_visto" valor={e.slug} />
       <div className="prop-hero">
         <div className="container">
           <nav className="breadcrumb">

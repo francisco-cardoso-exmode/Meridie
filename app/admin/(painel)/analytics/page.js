@@ -26,6 +26,53 @@ async function contagensDb() {
   }
 }
 
+async function eventosAgg() {
+  const vazio = { vistos: [], pesquisas: [], filtros: [], comparacoes: [], paises: [], total: 0 };
+  try {
+    const db = await getDb();
+    const col = db.collection("eventos");
+    const top = (tipo, limit = 8) =>
+      col
+        .aggregate([
+          { $match: { tipo } },
+          { $group: { _id: "$valor", n: { $sum: 1 } } },
+          { $sort: { n: -1 } },
+          { $limit: limit },
+        ])
+        .toArray();
+    const [vistos, pesquisas, filtros, comparacoes, paises, total] = await Promise.all([
+      top("empreendimento_visto"),
+      top("pesquisa"),
+      top("filtro"),
+      top("comparacao"),
+      col
+        .aggregate([
+          { $match: { pais: { $nin: [null, ""] } } },
+          { $group: { _id: "$pais", n: { $sum: 1 } } },
+          { $sort: { n: -1 } },
+          { $limit: 12 },
+        ])
+        .toArray(),
+      col.countDocuments(),
+    ]);
+    return { vistos, pesquisas, filtros, comparacoes, paises, total };
+  } catch {
+    return vazio;
+  }
+}
+
+const PAIS_COD = {
+  PT: "Portugal",
+  BR: "Brasil",
+  ES: "Espanha",
+  FR: "França",
+  GB: "Reino Unido",
+  US: "EUA",
+  DE: "Alemanha",
+  CH: "Suíça",
+  AO: "Angola",
+};
+
 function agrupar(lista, chave) {
   const m = {};
   for (const e of lista) {
@@ -71,11 +118,22 @@ function Breakdown({ titulo, dados, total }) {
 }
 
 export default async function AdminAnalytics() {
-  const [emp, reg, db] = await Promise.all([
+  const [emp, reg, db, ev] = await Promise.all([
     allEmpreendimentos({ todos: true }),
     allRegioes(),
     contagensDb(),
+    eventosAgg(),
   ]);
+
+  const nomePorSlug = Object.fromEntries(emp.map((e) => [e.slug, e.nome]));
+  const vistosD = ev.vistos.map((x) => [nomePorSlug[x._id] || x._id, x.n]);
+  const pesquisasD = ev.pesquisas.map((x) => [x._id, x.n]);
+  const filtrosD = ev.filtros.map((x) => [x._id, x.n]);
+  const comparacoesD = ev.comparacoes.map((x) => {
+    const [s1, s2] = String(x._id).split("|");
+    return [`${nomePorSlug[s1] || s1} vs ${nomePorSlug[s2] || s2}`, x.n];
+  });
+  const paisesD = ev.paises.map((x) => [PAIS_COD[x._id] || x._id, x.n]);
 
   const publicados = emp.filter((e) => e.publicado !== false);
   const ocultos = emp.length - publicados.length;
@@ -152,10 +210,34 @@ export default async function AdminAnalytics() {
         </div>
       </div>
 
+      <h2 style={{ marginTop: 36, fontSize: "1.3rem" }}>Atividade dos visitantes</h2>
+      <p className="admin-sub">
+        O que as pessoas mais vêem, pesquisam e filtram no site. Cresce à medida que recebes
+        visitas online{ev.total ? ` (${ev.total} ações registadas)` : ""}.
+      </p>
+      {ev.total === 0 ? (
+        <div className="an-bloco" style={{ marginTop: 8 }}>
+          <p className="muted">
+            Ainda sem dados de visitantes. Assim que o site estiver online e as pessoas
+            navegarem, aparecem aqui os empreendimentos mais vistos, as pesquisas e os filtros
+            mais usados, e de que países vêm.
+          </p>
+        </div>
+      ) : (
+        <div className="an-grid">
+          <Breakdown titulo="Empreendimentos mais vistos" dados={vistosD} />
+          <Breakdown titulo="Pesquisas mais feitas" dados={pesquisasD} />
+          <Breakdown titulo="Filtros mais usados" dados={filtrosD} />
+          <Breakdown titulo="Comparações mais feitas" dados={comparacoesD} />
+          <Breakdown titulo="Visitantes por país" dados={paisesD} />
+        </div>
+      )}
+
       <p className="email-note" style={{ marginTop: 24 }}>
-        Nota: estes números são do teu conteúdo e das leads/comparações guardadas. Para
-        estatísticas de visitas (utilizadores, páginas vistas, origem do tráfego), o passo
-        seguinte é ligar o Google Analytics / Vercel Analytics — diz se queres.
+        Nota: estes números são do teu conteúdo, das leads, e da atividade no site (vistos,
+        pesquisas, filtros, comparações). Para dados de tráfego mais detalhados (sessões,
+        origem, cidade exata, tempo real), liga o Google Analytics com o teu ID
+        <code> G-…</code> na Vercel.
       </p>
     </div>
   );

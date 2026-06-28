@@ -4,6 +4,7 @@ import { referenciaDe, PAIS_LABEL } from "@/lib/empreendimentos";
 import { comparaveis, zonaLabel, cidadeLabel } from "@/lib/compare";
 import PrecoDual from "@/components/PrecoDual";
 import CompareAnalysis from "@/components/compare/CompareAnalysis";
+import Track from "@/components/Track";
 
 export const revalidate = 60;
 
@@ -79,6 +80,7 @@ export default async function CompararPage({ searchParams }) {
 
   return (
     <div className="pagina-area">
+      <Track tipo="comparacao" valor={`${a.slug}|${b.slug}`} />
       <div className="container comparador">
         <nav className="breadcrumb" style={{ marginBottom: 8 }}>
           <Link href="/empreendimentos">Empreendimentos</Link> · Comparar

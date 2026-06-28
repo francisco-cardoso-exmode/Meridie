@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import EmpreendimentoCard from "@/components/EmpreendimentoCard";
 import { referenciaDe, PAIS_LABEL } from "@/lib/empreendimentos";
+import { enviarEvento } from "@/components/Track";
 
 const ORDENACOES = {
   destaque: "Em destaque",
@@ -55,7 +56,20 @@ export default function ListingsExplorer({
   );
 
   const set = (campo) => (ev) => setF((prev) => ({ ...prev, [campo]: ev.target.value }));
+  // Como `set`, mas regista o filtro usado (analytics).
+  const setFiltro = (campo) => (ev) => {
+    set(campo)(ev);
+    if (ev.target.value) enviarEvento("filtro", `${campo}: ${ev.target.value}`);
+  };
   const reset = () => setF(ESTADO_INICIAL);
+
+  // Regista a pesquisa (depois de o utilizador parar de escrever).
+  useEffect(() => {
+    const q = f.texto.trim().toLowerCase();
+    if (q.length < 2) return;
+    const t = setTimeout(() => enviarEvento("pesquisa", q), 900);
+    return () => clearTimeout(t);
+  }, [f.texto]);
 
   const resultados = useMemo(() => {
     const q = norm(f.texto);
@@ -135,7 +149,7 @@ export default function ListingsExplorer({
           {comPais && (
             <div className="filter">
               <label htmlFor="f-pais">País</label>
-              <select id="f-pais" value={f.pais} onChange={set("pais")}>
+              <select id="f-pais" value={f.pais} onChange={setFiltro("pais")}>
                 <option value="">Portugal e Brasil</option>
                 {paises.map((p) => (
                   <option key={p} value={p}>
@@ -147,7 +161,7 @@ export default function ListingsExplorer({
           )}
           <div className="filter">
             <label htmlFor="f-zona">Zona</label>
-            <select id="f-zona" value={f.zona} onChange={set("zona")}>
+            <select id="f-zona" value={f.zona} onChange={setFiltro("zona")}>
               <option value="">Todas as zonas</option>
               {zonas.map((z) => (
                 <option key={z} value={z}>{z}</option>
@@ -156,7 +170,7 @@ export default function ListingsExplorer({
           </div>
           <div className="filter">
             <label htmlFor="f-tipo">Tipologia</label>
-            <select id="f-tipo" value={f.tipo} onChange={set("tipo")}>
+            <select id="f-tipo" value={f.tipo} onChange={setFiltro("tipo")}>
               <option value="">Todas as tipologias</option>
               {tipos.map((t) => (
                 <option key={t} value={t}>{t}</option>
@@ -165,7 +179,7 @@ export default function ListingsExplorer({
           </div>
           <div className="filter">
             <label htmlFor="f-fin">Finalidade</label>
-            <select id="f-fin" value={f.finalidade} onChange={set("finalidade")}>
+            <select id="f-fin" value={f.finalidade} onChange={setFiltro("finalidade")}>
               <option value="">Qualquer</option>
               {finalidades.map((x) => (
                 <option key={x} value={x}>{x}</option>
@@ -175,7 +189,7 @@ export default function ListingsExplorer({
           {estados.length > 0 && (
             <div className="filter">
               <label htmlFor="f-estado">Estado</label>
-              <select id="f-estado" value={f.estado} onChange={set("estado")}>
+              <select id="f-estado" value={f.estado} onChange={setFiltro("estado")}>
                 <option value="">Qualquer estado</option>
                 {estados.map((x) => (
                   <option key={x} value={x}>{x}</option>
