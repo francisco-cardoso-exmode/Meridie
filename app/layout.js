@@ -4,7 +4,6 @@ import Footer from "@/components/Footer";
 import { CompareProvider } from "@/components/compare/CompareProvider";
 import CompareBar from "@/components/compare/CompareBar";
 import Analytics from "@/components/Analytics";
-import { Analytics as VercelAnalytics } from "@vercel/analytics/next";
 import { SITE_URL, SITE_NAME } from "@/lib/site";
 
 const DESC =
@@ -78,7 +77,6 @@ export default function RootLayout({ children }) {
           <Footer />
           <CompareBar />
         </CompareProvider>
-        <VercelAnalytics />
       </body>
     </html>
   );
