@@ -3,6 +3,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { CompareProvider } from "@/components/compare/CompareProvider";
 import CompareBar from "@/components/compare/CompareBar";
+import Analytics from "@/components/Analytics";
 import { SITE_URL, SITE_NAME } from "@/lib/site";
 
 const DESC =
@@ -65,6 +66,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="pt-PT">
       <body>
+        <Analytics />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
