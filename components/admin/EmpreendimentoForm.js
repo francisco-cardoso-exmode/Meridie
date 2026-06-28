@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import ImageUploader from "@/components/admin/ImageUploader";
 import VideoUploader from "@/components/admin/VideoUploader";
 import { precoDual } from "@/lib/empreendimentos";
@@ -55,7 +54,6 @@ const textoParaLinks = (s) =>
 
 export default function EmpreendimentoForm({ initial = null, regioesExistentes = [] }) {
   const editing = !!initial;
-  const router = useRouter();
   const [estado, setEstado] = useState({ a: "idle", msg: "" });
 
   const [f, setF] = useState({

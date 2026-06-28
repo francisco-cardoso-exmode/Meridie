@@ -19,6 +19,7 @@ export default function RegionMap({ mapa, pontos = [], nome }) {
 
   useEffect(() => {
     if (!elRef.current || mapRef.current) return;
+    if (!mapa || typeof mapa.lat !== "number") return;
     let cancelado = false;
 
     (async () => {

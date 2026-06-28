@@ -1,10 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 
 export default function AdminLogin() {
-  const router = useRouter();
   const [password, setPassword] = useState("");
   const [estado, setEstado] = useState({ a: "idle", msg: "" });
 

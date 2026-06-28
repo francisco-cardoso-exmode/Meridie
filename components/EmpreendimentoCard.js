@@ -6,7 +6,7 @@ export default function EmpreendimentoCard({ e }) {
   return (
     <Link href={`/empreendimentos/${e.slug}`} className="prop-card">
       <div className="prop-media">
-        <img src={e.imagens[0]} alt={e.nome} loading="lazy" />
+        <img src={e.imagens?.[0] || ""} alt={e.nome} loading="lazy" />
         <div className="prop-badges">
           <span className="badge gold">{e.tipo}</span>
           <span className="badge">{e.estado}</span>

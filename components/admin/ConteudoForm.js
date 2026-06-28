@@ -1,10 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 
 export default function ConteudoForm({ pagina, campos, valores }) {
-  const router = useRouter();
   const [f, setF] = useState(() => {
     const o = {};
     campos.forEach((c) => (o[c.k] = valores?.[c.k] ?? ""));
@@ -26,7 +24,6 @@ export default function ConteudoForm({ pagina, campos, valores }) {
       const json = await res.json();
       if (res.ok && json.ok) {
         setEstado({ a: "ok", msg: "Guardado. O site atualiza em ~1 minuto." });
-        router.refresh();
       } else {
         setEstado({ a: "erro", msg: "Não foi possível guardar." });
       }

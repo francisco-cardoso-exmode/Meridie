@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import ImageUploader from "@/components/admin/ImageUploader";
 
 const slugify = (s) =>
@@ -14,7 +13,6 @@ const slugify = (s) =>
 
 export default function AnuncioForm({ initial = null }) {
   const editing = !!initial;
-  const router = useRouter();
   const [estado, setEstado] = useState({ a: "idle", msg: "" });
   const [f, setF] = useState({
     titulo: initial?.titulo || "",

@@ -48,7 +48,7 @@ export default async function PaginaRegiao({ params }) {
 
   const empreendimentos = await empreendimentosPorRegiao(regiao);
   const paisLabel = PAIS_LABEL[regiao.pais];
-  const tiposNoMapa = [...new Set(regiao.pontos.map((p) => p.tipo))];
+  const tiposNoMapa = [...new Set((regiao.pontos || []).map((p) => p.tipo))];
   const regiaoMae = regiao.parent ? await regiaoBySlug(regiao.parent) : null;
   const subZonas = await subRegioes(regiao.slug);
   const nivelLabel = NIVEL_LABEL[regiao.nivel] || (regiaoMae ? "Zona" : "Região");
@@ -94,7 +94,7 @@ export default async function PaginaRegiao({ params }) {
             <Reveal delay={0.1}>
               <span className="eyebrow">Porquê investir aqui</span>
               <ul className="value-list" style={{ marginTop: 10 }}>
-                {regiao.vantagens.map((v) => (
+                {(regiao.vantagens || []).map((v) => (
                   <li key={v}>
                     <span className="check"><Icon name="check" size={18} /></span>
                     <span>{v}</span>
@@ -114,7 +114,7 @@ export default async function PaginaRegiao({ params }) {
             <h2>Destaques da região</h2>
           </Reveal>
           <div className="grid grid-3">
-            {regiao.destaques.map((d, i) => (
+            {(regiao.destaques || []).map((d, i) => (
               <Reveal className="highlight-card" key={d.titulo} delay={i * 0.1}>
                 <span className="hl-icon">
                   <Icon name={d.icon} size={26} />

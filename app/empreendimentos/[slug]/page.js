@@ -54,10 +54,10 @@ export default async function PaginaEmpreendimento({ params }) {
           </nav>
           <div className="gallery">
             <div className="main">
-              <img src={e.imagens[0]} alt={e.nome} />
+              <img src={e.imagens?.[0] || ""} alt={e.nome} />
             </div>
             <div className="side">
-              {e.imagens.slice(1, 3).map((img, i) => (
+              {(e.imagens || []).slice(1, 3).map((img, i) => (
                 <div key={i}>
                   <img src={img} alt={`${e.nome} — foto ${i + 2}`} loading="lazy" />
                 </div>
@@ -142,7 +142,7 @@ export default async function PaginaEmpreendimento({ params }) {
 
               <h2 style={{ fontSize: "1.4rem", marginBottom: 12 }}>Características</h2>
               <ul className="feature-list">
-                {e.caracteristicas.map((c) => (
+                {(e.caracteristicas || []).map((c) => (
                   <li key={c}>
                     <span className="check"><Icon name="check" size={18} /></span>
                     <span>{c}</span>

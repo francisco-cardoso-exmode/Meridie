@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import ImageUploader from "@/components/admin/ImageUploader";
 
 const linhas = (s) =>
@@ -60,7 +59,6 @@ const slugify = (s) =>
 export default function RegiaoForm({ initial = null, regioesExistentes = [], prefill = null }) {
   const editing = !!initial;
   const pf = editing ? null : prefill;
-  const router = useRouter();
   const [estado, setEstado] = useState({ a: "idle", msg: "" });
 
   const [f, setF] = useState({
