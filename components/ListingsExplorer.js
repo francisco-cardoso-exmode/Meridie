@@ -11,6 +11,15 @@ const ORDENACOES = {
   "area-desc": "Área (maior)",
 };
 
+// Ordem canónica dos estados do imóvel (do mais inicial ao concluído).
+export const ESTADOS_ORDEM = [
+  "Planta",
+  "Pré-lançamento",
+  "Lançamento",
+  "Em construção",
+  "Pronto",
+];
+
 const norm = (s) =>
   (s || "")
     .toString()
@@ -34,10 +43,16 @@ export default function ListingsExplorer({
     zona: "",
     tipo: "",
     finalidade: "",
+    estado: "",
     ordenacao: "destaque",
   };
   const [f, setF] = useState(ESTADO_INICIAL);
   const [aberto, setAberto] = useState(!colapsavel);
+
+  // Estados presentes nos dados, pela ordem canónica.
+  const estados = ESTADOS_ORDEM.filter((s) =>
+    empreendimentos.some((e) => e.estado === s)
+  );
 
   const set = (campo) => (ev) => setF((prev) => ({ ...prev, [campo]: ev.target.value }));
   const reset = () => setF(ESTADO_INICIAL);
@@ -49,6 +64,7 @@ export default function ListingsExplorer({
       if (f.zona && e.zona !== f.zona) return false;
       if (f.tipo && e.tipo !== f.tipo) return false;
       if (f.finalidade && e.finalidade !== f.finalidade) return false;
+      if (f.estado && e.estado !== f.estado) return false;
       if (q) {
         const alvo = norm(
           [
@@ -82,6 +98,7 @@ export default function ListingsExplorer({
     f.zona ||
     f.tipo ||
     f.finalidade ||
+    f.estado ||
     f.ordenacao !== "destaque";
 
   return (
@@ -155,6 +172,17 @@ export default function ListingsExplorer({
               ))}
             </select>
           </div>
+          {estados.length > 0 && (
+            <div className="filter">
+              <label htmlFor="f-estado">Estado</label>
+              <select id="f-estado" value={f.estado} onChange={set("estado")}>
+                <option value="">Qualquer estado</option>
+                {estados.map((x) => (
+                  <option key={x} value={x}>{x}</option>
+                ))}
+              </select>
+            </div>
+          )}
           <div className="filter">
             <label htmlFor="f-ord">Ordenar por</label>
             <select id="f-ord" value={f.ordenacao} onChange={set("ordenacao")}>

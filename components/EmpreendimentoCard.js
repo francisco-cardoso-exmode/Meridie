@@ -29,7 +29,7 @@ export default function EmpreendimentoCard({ e }) {
         </div>
         <div className="prop-foot">
           <div className="prop-price">
-            <PrecoDual preco={e.preco} moeda={e.moeda} tipo={e.precoTipo} />
+            <PrecoDual preco={e.preco} moeda={e.moeda} tipo={e.precoTipo} max={e.precoMax} />
             <small>{e.finalidade}</small>
           </div>
           <span className="badge navy">Ver →</span>

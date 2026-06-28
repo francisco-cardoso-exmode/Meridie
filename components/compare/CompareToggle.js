@@ -1,7 +1,7 @@
 "use client";
 
 import { useCompare } from "@/components/compare/CompareProvider";
-import { zonaKey } from "@/lib/compare";
+import { paisKey } from "@/lib/compare";
 
 // Botão "Comparar" sobreposto ao card. Como o card é um <Link>, travamos a
 // navegação ao clicar no botão.
@@ -16,7 +16,7 @@ export default function CompareToggle({ e }) {
     cidade: e.cidade,
     pais: e.pais,
     imagem: e.imagens?.[0] || "",
-    zk: zonaKey(e),
+    zk: paisKey(e),
   };
 
   return (

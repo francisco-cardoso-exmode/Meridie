@@ -67,6 +67,7 @@ export default function EmpreendimentoForm({ initial = null, regioesExistentes =
     tipo: initial?.tipo || "Apartamento",
     finalidade: initial?.finalidade || "Investimento",
     preco: initial?.preco ?? "",
+    precoMax: initial?.precoMax ?? "",
     moeda: initial?.moeda || "EUR",
     quartos: initial?.quartos ?? 1,
     casasBanho: initial?.casasBanho ?? 1,
@@ -119,6 +120,8 @@ export default function EmpreendimentoForm({ initial = null, regioesExistentes =
       caracteristicas: linhasParaArray(f.caracteristicas),
       imagens: f.imagens,
     };
+    if (f.precoTipo === "intervalo" && Number(f.precoMax))
+      doc.precoMax = Number(f.precoMax);
     if (f.referencia.trim()) doc.referencia = f.referencia.trim();
     if (f.construtora.trim()) doc.construtora = f.construtora.trim();
     if (f.morada.trim()) doc.morada = f.morada.trim();
@@ -211,9 +214,11 @@ export default function EmpreendimentoForm({ initial = null, regioesExistentes =
         <label>
           Estado
           <select value={f.estado} onChange={set("estado")}>
-            <option>Pronto</option>
+            <option>Planta</option>
+            <option>Pré-lançamento</option>
+            <option>Lançamento</option>
             <option>Em construção</option>
-            <option>Em planta</option>
+            <option>Pronto</option>
           </select>
         </label>
         <label>
@@ -232,9 +237,21 @@ export default function EmpreendimentoForm({ initial = null, regioesExistentes =
           <select value={f.precoTipo} onChange={set("precoTipo")}>
             <option value="exato">Valor exato</option>
             <option value="desde">Desde (a partir de)</option>
+            <option value="intervalo">Intervalo (de X a Y)</option>
             <option value="consulta">Sob consulta</option>
           </select>
         </label>
+        {f.precoTipo === "intervalo" && (
+          <label>
+            Preço máximo (do intervalo)
+            <input
+              type="number"
+              value={f.precoMax}
+              onChange={set("precoMax")}
+              placeholder="ex.: 480000"
+            />
+          </label>
+        )}
         <label>
           Quartos
           <input type="number" value={f.quartos} onChange={set("quartos")} />
@@ -359,6 +376,7 @@ export default function EmpreendimentoForm({ initial = null, regioesExistentes =
                   preco={Number(f.preco) || 0}
                   moeda={f.moeda}
                   tipo={f.precoTipo}
+                  max={Number(f.precoMax) || 0}
                 />
                 <small>{f.finalidade}</small>
               </div>

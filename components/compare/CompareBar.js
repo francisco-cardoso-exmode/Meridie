@@ -39,11 +39,11 @@ export default function CompareBar() {
             </span>
           ))}
           {itens.length === 1 && (
-            <span className="cb-hint">Escolhe um segundo na mesma zona…</span>
+            <span className="cb-hint">Escolhe um segundo do mesmo país…</span>
           )}
           {dois && !mesma && (
             <span className="cb-hint cb-hint-warn">
-              Só dá para comparar dois da mesma zona.
+              Só dá para comparar dois empreendimentos do mesmo país.
             </span>
           )}
         </div>

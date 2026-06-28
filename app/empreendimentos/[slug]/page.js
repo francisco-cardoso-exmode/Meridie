@@ -170,7 +170,7 @@ export default async function PaginaEmpreendimento({ params }) {
 
             {/* Aside — preço + interesse */}
             <aside className="prop-aside">
-              <div className="price-big"><PrecoDual preco={e.preco} moeda={e.moeda} tipo={e.precoTipo} /></div>
+              <div className="price-big"><PrecoDual preco={e.preco} moeda={e.moeda} tipo={e.precoTipo} max={e.precoMax} /></div>
               <div className="price-sub">
                 {e.finalidade} · {e.cidade}, {paisLabel}
               </div>

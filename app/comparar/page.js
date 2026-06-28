@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { empreendimentoBySlug, regiaoDoEmpreendimento } from "@/lib/store";
 import { referenciaDe, PAIS_LABEL } from "@/lib/empreendimentos";
-import { mesmaZona, zonaLabel, cidadeLabel } from "@/lib/compare";
+import { comparaveis, zonaLabel, cidadeLabel } from "@/lib/compare";
 import PrecoDual from "@/components/PrecoDual";
 import CompareAnalysis from "@/components/compare/CompareAnalysis";
 
@@ -31,7 +31,7 @@ export default async function CompararPage({ searchParams }) {
         <div className="container" style={{ padding: "60px 0" }}>
           <h1>Comparador</h1>
           <p className="muted">
-            Escolhe <strong>dois</strong> empreendimentos da mesma zona para
+            Escolhe <strong>dois</strong> empreendimentos do mesmo país para
             comparar. Em cada cartão tens o botão <em>⇄ Comparar</em>.
           </p>
           <Link href="/empreendimentos" className="btn btn-primary" style={{ marginTop: 16 }}>
@@ -42,15 +42,16 @@ export default async function CompararPage({ searchParams }) {
     );
   }
 
-  if (!mesmaZona(a, b)) {
+  if (!comparaveis(a, b)) {
     return (
       <div className="pagina-area">
         <div className="container" style={{ padding: "60px 0" }}>
           <h1>Comparador</h1>
           <p className="muted">
-            Só dá para comparar dois empreendimentos da <strong>mesma zona</strong>.
+            Só dá para comparar dois empreendimentos do <strong>mesmo país</strong>.
             <br />
-            {a.nome} ({zonaLabel(a)}) e {b.nome} ({zonaLabel(b)}) estão em zonas diferentes.
+            {a.nome} ({PAIS_LABEL[a.pais] || a.pais}) e {b.nome} ({PAIS_LABEL[b.pais] || b.pais})
+            são de países diferentes.
           </p>
           <Link href="/empreendimentos" className="btn btn-primary" style={{ marginTop: 16 }}>
             Voltar aos empreendimentos
@@ -60,8 +61,9 @@ export default async function CompararPage({ searchParams }) {
     );
   }
 
-  // Mesma zona → contexto da zona (partilhado) vem de qualquer um dos dois.
-  const regiao = await regiaoDoEmpreendimento(a);
+  // Contexto da zona só faz sentido quando os dois são da MESMA cidade.
+  const mesmaCidade = (a.cidade || "") === (b.cidade || "");
+  const regiao = mesmaCidade ? await regiaoDoEmpreendimento(a) : null;
 
   const linhas = [
     { k: "Referência", v: (x) => `Ref. ${referenciaDe(x)}` },
@@ -82,8 +84,17 @@ export default async function CompararPage({ searchParams }) {
           <Link href="/empreendimentos">Empreendimentos</Link> · Comparar
         </nav>
         <p className="comp-zona">
-          Comparação em <strong>{cidadeLabel(a)}</strong> ·{" "}
-          {PAIS_LABEL[a.pais] || a.pais}
+          Comparação{" "}
+          {mesmaCidade ? (
+            <>
+              em <strong>{cidadeLabel(a)}</strong>
+            </>
+          ) : (
+            <>
+              entre <strong>{cidadeLabel(a)}</strong> e <strong>{cidadeLabel(b)}</strong>
+            </>
+          )}{" "}
+          · {PAIS_LABEL[a.pais] || a.pais}
         </p>
 
         {/* Cabeçalho: os dois empreendimentos com o símbolo = no meio */}
@@ -95,7 +106,7 @@ export default async function CompararPage({ searchParams }) {
               </Link>
               <h2>{x.nome}</h2>
               <div className="comp-preco">
-                <PrecoDual preco={x.preco} moeda={x.moeda} tipo={x.precoTipo} />
+                <PrecoDual preco={x.preco} moeda={x.moeda} tipo={x.precoTipo} max={x.precoMax} />
               </div>
               {i === 0 && <span className="comp-eq" aria-hidden>=</span>}
             </div>

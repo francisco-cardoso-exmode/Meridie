@@ -2,7 +2,7 @@ import { createHash } from "crypto";
 import Anthropic from "@anthropic-ai/sdk";
 import { getDb } from "@/lib/mongodb";
 import { empreendimentoBySlug, regiaoDoEmpreendimento } from "@/lib/store";
-import { mesmaZona, zonaLabel } from "@/lib/compare";
+import { comparaveis, zonaLabel } from "@/lib/compare";
 import {
   referenciaDe,
   formatarPreco,
@@ -21,50 +21,51 @@ function precoTxt(e) {
   if (e.precoTipo === "consulta") return "Sob consulta";
   const dual = precoDual(e.preco, e.moeda);
   if (!dual) return "Sob consulta";
+  if (e.precoTipo === "intervalo" && Number(e.precoMax) > Number(e.preco)) {
+    const dMax = precoDual(Number(e.precoMax), e.moeda);
+    return `${dual.principal} a ${dMax.principal} (≈ ${dual.secundario} a ${dMax.secundario})`;
+  }
   const prefixo = e.precoTipo === "desde" ? "Desde " : "";
   return `${prefixo}${dual.principal} (≈ ${dual.secundario})`;
 }
 
-function descreve(e, n) {
-  const t =
-    Array.isArray(e.tipologias) && e.tipologias.length
-      ? e.tipologias
-          .map((x) =>
-            [x.nome, x.area && `${x.area} m²`, x.preco && formatarPreco(x.preco, e.moeda)]
-              .filter(Boolean)
-              .join(" — ")
-          )
-          .join("; ")
-      : "—";
+function descreve(e, n, regiao) {
+  const ctx = regiao
+    ? [
+        regiao.conhecidaPor && `Cidade/zona conhecida por: ${regiao.conhecidaPor}`,
+        linhas(regiao.oQueVer) && `O que ver / espaços: ${regiao.oQueVer.join(", ")}`,
+        linhas(regiao.transportes) && `Transportes e acessos: ${regiao.transportes.join(", ")}`,
+        linhas(regiao.distancias) &&
+          `Distâncias: ${regiao.distancias.map((d) => `${d.local} ${d.km} km`).join(", ")}`,
+      ].filter(Boolean)
+    : [];
   return [
     `EMPREENDIMENTO ${n}: ${e.nome} (Ref. ${referenciaDe(e)})`,
     `Localização: ${zonaLabel(e)}, ${PAIS_LABEL[e.pais] || e.pais}`,
     `Tipologia: ${e.tipo || "—"} · Finalidade: ${e.finalidade || "—"} · Estado: ${e.estado || "—"}`,
     `Preço: ${precoTxt(e)}`,
     `Quartos: ${e.quartos ?? "?"} · Casas de banho: ${e.casasBanho ?? "?"} · Área: ${e.area ? e.area + " m²" : "?"}`,
-    `Tipologias disponíveis: ${t}`,
+    `Tipologias disponíveis: ${tipologiasStr(e)}`,
     linhas(e.caracteristicas) && `Características: ${e.caracteristicas.join(", ")}`,
     linhas(e.proximidades) && `Proximidades: ${e.proximidades.join(", ")}`,
+    ...ctx,
   ]
     .filter(Boolean)
     .join("\n");
 }
 
-function descreveZona(r) {
-  if (!r) return "";
-  return [
-    `\nZONA (partilhada pelos dois): ${r.nome}`,
-    r.conhecidaPor && `Conhecida por: ${r.conhecidaPor}`,
-    linhas(r.oQueVer) && `O que ver / espaços: ${r.oQueVer.join(", ")}`,
-    linhas(r.transportes) && `Transportes e acessos: ${r.transportes.join(", ")}`,
-    linhas(r.distancias) &&
-      `Distâncias: ${r.distancias.map((d) => `${d.local} ${d.km} km`).join(", ")}`,
-  ]
-    .filter(Boolean)
-    .join("\n");
+function tipologiasStr(e) {
+  if (!Array.isArray(e.tipologias) || !e.tipologias.length) return "—";
+  return e.tipologias
+    .map((x) =>
+      [x.nome, x.area && `${x.area} m²`, x.preco && formatarPreco(x.preco, e.moeda)]
+        .filter(Boolean)
+        .join(" — ")
+    )
+    .join("; ");
 }
 
-const SISTEMA = `És o consultor de investimento da Meridie Investments — uma plataforma de intermediação de investimento imobiliário entre Portugal e o Brasil. Estás a comparar DOIS empreendimentos DA MESMA CIDADE do nosso portfólio para um potencial INVESTIDOR.
+const SISTEMA = `És o consultor de investimento da Meridie Investments — uma plataforma de intermediação de investimento imobiliário entre Portugal e o Brasil. Estás a comparar DOIS empreendimentos DO MESMO PAÍS do nosso portfólio para um potencial INVESTIDOR. Podem ser da mesma cidade ou de cidades diferentes do mesmo país (ex.: Lisboa vs Porto, ou São Paulo vs Rio) — nesse caso valoriza o carácter de cada cidade (ex.: Lisboa mais cosmopolita, Porto mais histórico e pitoresco) como vantagens distintas.
 
 IDIOMA: Português de Portugal (PT-PT).
 
@@ -89,17 +90,22 @@ export async function POST(request) {
     if (!a || !b) {
       return Response.json({ erro: "Empreendimentos não encontrados." }, { status: 404 });
     }
-    if (!mesmaZona(a, b)) {
+    if (!comparaveis(a, b)) {
       return Response.json(
-        { erro: "Só dá para comparar dois empreendimentos da mesma zona." },
+        { erro: "Só dá para comparar dois empreendimentos do mesmo país." },
         { status: 400 }
       );
     }
 
-    const regiao = await regiaoDoEmpreendimento(a);
-    const conteudo = `${descreve(a, 1)}\n\n${descreve(b, 2)}\n${descreveZona(
-      regiao
-    )}\n\nCompara os dois e ajuda o investidor a escolher.`;
+    const [regiaoA, regiaoB] = await Promise.all([
+      regiaoDoEmpreendimento(a),
+      regiaoDoEmpreendimento(b),
+    ]);
+    const conteudo = `${descreve(a, 1, regiaoA)}\n\n${descreve(
+      b,
+      2,
+      regiaoB
+    )}\n\nCompara os dois e ajuda o investidor a escolher, enaltecendo as diferenças e vantagens de cada um.`;
 
     const key = createHash("sha256")
       .update(`${MODEL}::${SISTEMA}::${conteudo}`)

@@ -18,8 +18,11 @@ export default function AdminAjuda() {
           <li><strong>Construtora</strong>: se preencheres, o imóvel é tratado como &quot;real&quot; e <strong>aparece primeiro</strong> na Home e nas listagens.</li>
           <li><strong>Em destaque</strong>: aparece na secção de destaques da Home.</li>
           <li><strong>Preço + Tipo de preço</strong>: escolhe <strong>Valor exato</strong> (uma casa/terreno único),
-            <strong> Desde</strong> (lote ou bloco de apartamentos — põe o valor da unidade mais barata e o site mostra &quot;Desde X&quot;)
+            <strong> Desde</strong> (lote/bloco — valor da unidade mais barata → &quot;Desde X&quot;),
+            <strong> Intervalo</strong> (mostra &quot;X – Y&quot;; aparece o campo <em>Preço máximo</em>)
             ou <strong>Sob consulta</strong>.</li>
+          <li><strong>Estado</strong>: escolhe na lista (por ordem) <strong>Planta → Pré-lançamento → Lançamento → Em construção → Pronto</strong>.
+            O visitante pode filtrar os imóveis por este estado.</li>
           <li><strong>Referência</strong>: código do imóvel (ex.: <code>MER-001</code>). Se deixares vazio é gerada automaticamente.
             Aparece no card, na página do imóvel e no assunto do email de interesse.</li>
           <li><strong>Imagens</strong>: <strong>arrasta os ficheiros</strong> para a caixa (ou clica para escolher).
@@ -47,6 +50,11 @@ T3 | 110 m² | 420000</pre>
             <strong>Lote ou bloco de apartamentos</strong> → Tipo de preço <em>Desde</em>, Preço <code>220000</code>
             (a unidade mais barata) → aparece <strong>&quot;Desde 220.000 €&quot;</strong>. As várias tipologias
             (T1, T2, T3…) aparecem numa tabela na página do imóvel.
+          </li>
+          <li>
+            <strong>Intervalo de preços</strong> → Tipo de preço <em>Intervalo</em>, Preço <code>350000</code> e
+            Preço máximo <code>480000</code> → aparece <strong>&quot;350.000 € – 480.000 €&quot;</strong>.
+            Bom para um lote/bloco em que queres mostrar o leque de valores.
           </li>
           <li>
             <strong>Sem valor público</strong> → Tipo de preço <em>Sob consulta</em> → aparece
@@ -132,9 +140,9 @@ Praia de Iracema | praia | -3.719 | -38.512</pre>
           <li><strong>Filtros e pesquisa</strong>: na Home, em <code>/empreendimentos</code> e nas páginas de região,
             o visitante filtra por país, zona, tipologia, finalidade e <strong>preço (mais caro/mais barato)</strong>,
             ou pesquisa por nome/cidade/referência. Funciona sozinho com os imóveis que crias.</li>
-          <li><strong>Comparador</strong>: o visitante escolhe <strong>dois imóveis da mesma cidade</strong> (botão
-            &quot;⇄ Comparar&quot;) e vê uma comparação lado a lado + uma <strong>análise por IA</strong> focada no
-            investimento. Não tens de fazer nada — basta haver 2+ imóveis na mesma cidade.</li>
+          <li><strong>Comparador</strong>: o visitante escolhe <strong>dois imóveis do mesmo país</strong> (botão
+            &quot;⇄ Comparar&quot;) — podem ser de cidades diferentes (ex.: Lisboa vs Porto) — e vê uma comparação
+            lado a lado + uma <strong>análise por IA</strong> focada no investimento. Não compara Portugal com Brasil.</li>
         </ul>
       </section>
     </div>
