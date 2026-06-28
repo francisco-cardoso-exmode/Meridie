@@ -13,7 +13,7 @@ const ORDENACOES = {
 
 // Ordem canónica dos estados do imóvel (do mais inicial ao concluído).
 export const ESTADOS_ORDEM = [
-  "Planta",
+  "Em planta",
   "Pré-lançamento",
   "Lançamento",
   "Em construção",

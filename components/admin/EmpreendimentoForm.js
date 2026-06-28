@@ -214,7 +214,7 @@ export default function EmpreendimentoForm({ initial = null, regioesExistentes =
         <label>
           Estado
           <select value={f.estado} onChange={set("estado")}>
-            <option>Planta</option>
+            <option>Em planta</option>
             <option>Pré-lançamento</option>
             <option>Lançamento</option>
             <option>Em construção</option>

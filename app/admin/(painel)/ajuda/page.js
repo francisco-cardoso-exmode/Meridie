@@ -21,7 +21,7 @@ export default function AdminAjuda() {
             <strong> Desde</strong> (lote/bloco — valor da unidade mais barata → &quot;Desde X&quot;),
             <strong> Intervalo</strong> (mostra &quot;X – Y&quot;; aparece o campo <em>Preço máximo</em>)
             ou <strong>Sob consulta</strong>.</li>
-          <li><strong>Estado</strong>: escolhe na lista (por ordem) <strong>Planta → Pré-lançamento → Lançamento → Em construção → Pronto</strong>.
+          <li><strong>Estado</strong>: escolhe na lista (por ordem) <strong>Em planta → Pré-lançamento → Lançamento → Em construção → Pronto</strong>.
             O visitante pode filtrar os imóveis por este estado.</li>
           <li><strong>Referência</strong>: código do imóvel (ex.: <code>MER-001</code>). Se deixares vazio é gerada automaticamente.
             Aparece no card, na página do imóvel e no assunto do email de interesse.</li>
