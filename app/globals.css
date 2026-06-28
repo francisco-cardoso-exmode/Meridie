@@ -2431,6 +2431,7 @@ body:has(.admin-page) .site-footer {
   font-size: 1.15rem;
   font-weight: 800;
   line-height: 1;
+  padding-bottom: 3px; /* centra opticamente o glyph "=" na altura */
   cursor: pointer;
   backdrop-filter: blur(2px);
   transition: background 0.15s, transform 0.1s;

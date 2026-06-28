@@ -32,7 +32,7 @@ export default function EmpreendimentoCard({ e }) {
             <PrecoDual preco={e.preco} moeda={e.moeda} tipo={e.precoTipo} max={e.precoMax} />
             <small>{e.finalidade}</small>
           </div>
-          <span className="badge navy">Ver →</span>
+          <span className="badge navy">Ver</span>
         </div>
       </div>
     </Link>
