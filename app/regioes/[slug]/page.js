@@ -42,7 +42,21 @@ export async function generateMetadata({ params }) {
   const { slug } = await params;
   const r = await regiaoBySlug(slug);
   if (!r) return { title: "Região não encontrada" };
-  return { title: `Investir em ${r.nome}`, description: r.descricao };
+  const titulo = `Investir em ${r.nome}`;
+  const desc = r.descricao || r.tagline || `Oportunidades de investimento em ${r.nome}.`;
+  const url = `/regioes/${r.slug}`;
+  return {
+    title: titulo,
+    description: desc,
+    alternates: { canonical: url },
+    openGraph: {
+      type: "website",
+      title: titulo,
+      description: desc,
+      url,
+      images: r.imagem ? [{ url: r.imagem }] : undefined,
+    },
+  };
 }
 
 export default async function PaginaRegiao({ params }) {

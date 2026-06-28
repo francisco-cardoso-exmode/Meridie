@@ -9,6 +9,7 @@ import PrecoDual from "@/components/PrecoDual";
 import VideoEmbed from "@/components/VideoEmbed";
 import { textoComLinks } from "@/lib/format";
 import { PAIS_LABEL, referenciaDe } from "@/lib/empreendimentos";
+import { abs } from "@/lib/site";
 import {
   empreendimentoBySlug,
   allEmpreendimentos,
@@ -26,10 +27,30 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const e = await empreendimentoBySlug(slug);
-  if (!e) return { title: "Empreendimento não encontrado" };
+  if (!e || e.publicado === false) return { title: "Empreendimento não encontrado" };
+  const titulo = `${e.nome} — ${e.cidade}`;
+  const desc =
+    e.resumo ||
+    (e.descricao ? e.descricao.slice(0, 160) : `Investir em ${e.nome}, ${e.cidade}.`);
+  const img = e.imagens?.[0];
+  const url = `/empreendimentos/${e.slug}`;
   return {
-    title: `${e.nome} — ${e.cidade}`,
-    description: e.resumo,
+    title: titulo,
+    description: desc,
+    alternates: { canonical: url },
+    openGraph: {
+      type: "website",
+      title: titulo,
+      description: desc,
+      url,
+      images: img ? [{ url: img }] : undefined,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: titulo,
+      description: desc,
+      images: img ? [img] : undefined,
+    },
   };
 }
 
@@ -44,8 +65,34 @@ export default async function PaginaEmpreendimento({ params }) {
     .filter((x) => x.slug !== e.slug)
     .slice(0, 3);
 
+  const ld = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: e.nome,
+    description: e.resumo || e.descricao || `${e.nome}, ${e.cidade}`,
+    sku: referenciaDe(e),
+    category: e.tipo,
+    image: Array.isArray(e.imagens) ? e.imagens : undefined,
+    url: abs(`/empreendimentos/${e.slug}`),
+    ...(e.precoTipo !== "consulta" && e.preco
+      ? {
+          offers: {
+            "@type": "Offer",
+            price: e.preco,
+            priceCurrency: e.moeda || "EUR",
+            availability: "https://schema.org/InStock",
+            url: abs(`/empreendimentos/${e.slug}`),
+          },
+        }
+      : {}),
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }}
+      />
       <div className="prop-hero">
         <div className="container">
           <nav className="breadcrumb">
