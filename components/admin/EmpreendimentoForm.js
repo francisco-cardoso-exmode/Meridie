@@ -4,7 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import ImageUploader from "@/components/admin/ImageUploader";
 import VideoUploader from "@/components/admin/VideoUploader";
-import { precoDual, referenciaDe } from "@/lib/empreendimentos";
+import { referenciaDe } from "@/lib/empreendimentos";
+import PrecoDual from "@/components/PrecoDual";
 
 const linhasParaArray = (s) =>
   (s || "")
@@ -159,7 +160,6 @@ export default function EmpreendimentoForm({ initial = null, regioesExistentes =
   const linkCriarZona =
     `/admin/regioes/novo?nome=${encodeURIComponent(zonaTrim || cidadeTrim)}` +
     `&cidade=${encodeURIComponent(cidadeTrim)}&zona=${encodeURIComponent(zonaTrim)}`;
-  const dual = precoDual(Number(f.preco) || 0, f.moeda);
 
   return (
     <div className="form-layout">
@@ -355,14 +355,11 @@ export default function EmpreendimentoForm({ initial = null, regioesExistentes =
             </div>
             <div className="prop-foot">
               <div className="prop-price">
-                {dual ? (
-                  <>
-                    <span className="pd-main">{dual.principal}</span>
-                    <span className="pd-sec">≈ {dual.secundario}</span>
-                  </>
-                ) : (
-                  <span className="pd-main">Sob consulta</span>
-                )}
+                <PrecoDual
+                  preco={Number(f.preco) || 0}
+                  moeda={f.moeda}
+                  tipo={f.precoTipo}
+                />
                 <small>{f.finalidade}</small>
               </div>
             </div>

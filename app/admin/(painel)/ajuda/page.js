@@ -17,9 +17,47 @@ export default function AdminAjuda() {
           <li><strong>Cidade</strong> e <strong>Zona</strong>: é o que <strong>liga o imóvel à página de região/zona</strong> (ver ponto 2).</li>
           <li><strong>Construtora</strong>: se preencheres, o imóvel é tratado como &quot;real&quot; e <strong>aparece primeiro</strong> na Home e nas listagens.</li>
           <li><strong>Em destaque</strong>: aparece na secção de destaques da Home.</li>
-          <li><strong>Imagens</strong>: um URL por linha (a 1.ª é a foto principal do card).</li>
-          <li><strong>Tipologias</strong> e <strong>Proximidades</strong>: opcionais, um item por linha — aparecem na página do imóvel.</li>
+          <li><strong>Preço + Tipo de preço</strong>: escolhe <strong>Valor exato</strong> (uma casa/terreno único),
+            <strong> Desde</strong> (lote ou bloco de apartamentos — põe o valor da unidade mais barata e o site mostra &quot;Desde X&quot;)
+            ou <strong>Sob consulta</strong>.</li>
+          <li><strong>Referência</strong>: código do imóvel (ex.: <code>MER-001</code>). Se deixares vazio é gerada automaticamente.
+            Aparece no card, na página do imóvel e no assunto do email de interesse.</li>
+          <li><strong>Imagens</strong>: <strong>arrasta os ficheiros</strong> para a caixa (ou clica para escolher).
+            A 1.ª é a foto principal; podes reordenar e marcar a principal com ★.</li>
+          <li><strong>Tipologias</strong>: cada tipo de unidade com o seu preço, no formato <code>nome | área | preço</code>
+            (área/preço opcionais) — ideal para lotes e blocos.</li>
+          <li><strong>Proximidades</strong>: opcionais, um item por linha — aparecem na página do imóvel.</li>
         </ul>
+        <pre>T1 | 52 m² | 220000
+T2 | 78 m² | 310000
+T3 | 110 m² | 420000</pre>
+        <div className="ajuda-aviso">
+          💡 <strong>Lote ou bloco de apartamentos?</strong> Põe o <strong>Tipo de preço</strong> em
+          <strong> &quot;Desde&quot;</strong> com o valor de entrada e detalha cada unidade no campo
+          <strong> Tipologias</strong>. Para uma casa ou terreno único, usa <strong>&quot;Valor exato&quot;</strong>.
+        </div>
+
+        <p style={{ marginTop: 16 }}><strong>Exemplos — como o preço fica no site:</strong></p>
+        <ul>
+          <li>
+            <strong>Casa / terreno único</strong> → Tipo de preço <em>Valor exato</em>, Preço <code>350000</code>,
+            moeda EUR → aparece <strong>&quot;350.000 €&quot;</strong> (com a conversão <em>≈ R$</em> por baixo).
+          </li>
+          <li>
+            <strong>Lote ou bloco de apartamentos</strong> → Tipo de preço <em>Desde</em>, Preço <code>220000</code>
+            (a unidade mais barata) → aparece <strong>&quot;Desde 220.000 €&quot;</strong>. As várias tipologias
+            (T1, T2, T3…) aparecem numa tabela na página do imóvel.
+          </li>
+          <li>
+            <strong>Sem valor público</strong> → Tipo de preço <em>Sob consulta</em> → aparece
+            <strong> &quot;Sob consulta&quot;</strong> (não mostra número).
+          </li>
+        </ul>
+        <p className="email-note">
+          No formulário do empreendimento, a <strong>pré-visualização ao lado</strong> mostra-te em tempo real
+          como o card e o preço vão ficar — incluindo o &quot;Desde&quot;, o &quot;Sob consulta&quot; e a
+          conversão €↔R$. É só ir escrevendo e ver.
+        </p>
       </section>
 
       <section className="ajuda-bloco">
@@ -70,10 +108,33 @@ Praia de Iracema | praia | -3.719 | -38.512</pre>
       </section>
 
       <section className="ajuda-bloco">
-        <h2>5. Emails &amp; imagens</h2>
+        <h2>5. Imagens &amp; Emails</h2>
         <ul>
+          <li><strong>Imagens</strong>: já é por <strong>upload</strong> — arrastas os ficheiros (ou clicas para escolher).
+            Aplica-se aos empreendimentos, regiões e publicidade.</li>
           <li>Vê os <strong>templates de email</strong> e quando são enviados em <strong>Emails</strong>.</li>
-          <li>As fotos são, por agora, <strong>por URL</strong>. O upload de ficheiros para storage é o próximo passo.</li>
+        </ul>
+      </section>
+
+      <section className="ajuda-bloco">
+        <h2>6. Publicidade (parceiros / patrocínios)</h2>
+        <ul>
+          <li><strong>Publicidade global</strong> (menu <strong>Publicidade</strong>): cards que aparecem na Home e na
+            página <code>/publicidade</code>. Com <strong>upload de imagem</strong>, título, texto e link.</li>
+          <li><strong>Publicidade por região</strong> (no formulário da região): cards de parceiros só naquela zona —
+            também com <strong>upload de imagem</strong> (botão &quot;+ Adicionar card&quot;).</li>
+        </ul>
+      </section>
+
+      <section className="ajuda-bloco">
+        <h2>7. Comparador &amp; Filtros (automático)</h2>
+        <ul>
+          <li><strong>Filtros e pesquisa</strong>: na Home, em <code>/empreendimentos</code> e nas páginas de região,
+            o visitante filtra por país, zona, tipologia, finalidade e <strong>preço (mais caro/mais barato)</strong>,
+            ou pesquisa por nome/cidade/referência. Funciona sozinho com os imóveis que crias.</li>
+          <li><strong>Comparador</strong>: o visitante escolhe <strong>dois imóveis da mesma cidade</strong> (botão
+            &quot;⇄ Comparar&quot;) e vê uma comparação lado a lado + uma <strong>análise por IA</strong> focada no
+            investimento. Não tens de fazer nada — basta haver 2+ imóveis na mesma cidade.</li>
         </ul>
       </section>
     </div>
