@@ -141,8 +141,7 @@ export default function EmpreendimentoForm({ initial = null, regioesExistentes =
       });
       const json = await res.json();
       if (res.ok && json.ok) {
-        router.push("/admin/empreendimentos");
-        router.refresh();
+        window.location.href = "/admin/empreendimentos";
       } else {
         setEstado({ a: "erro", msg: json.erro || "Erro ao guardar." });
       }

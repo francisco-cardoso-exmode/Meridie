@@ -1,17 +1,22 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 
 export default function DeleteButton({ slug, nome, endpoint = "empreendimentos" }) {
-  const router = useRouter();
   const [a, setA] = useState("idle");
 
   async function apagar() {
     if (!confirm(`Apagar "${nome}"? Esta ação não pode ser desfeita.`)) return;
     setA("loading");
-    await fetch(`/api/admin/${endpoint}/${slug}`, { method: "DELETE" });
-    router.refresh();
+    try {
+      const res = await fetch(`/api/admin/${endpoint}/${slug}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("falhou");
+      // Recarrega a página inteira (mais robusto que router.refresh em produção).
+      window.location.reload();
+    } catch {
+      alert("Não foi possível apagar. Tenta novamente.");
+      setA("idle");
+    }
   }
 
   return (

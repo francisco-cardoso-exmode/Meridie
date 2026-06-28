@@ -48,8 +48,7 @@ export default function AnuncioForm({ initial = null }) {
       });
       const json = await res.json();
       if (res.ok && json.ok) {
-        router.push("/admin/publicidade");
-        router.refresh();
+        window.location.href = "/admin/publicidade";
       } else {
         setEstado({ a: "erro", msg: json.erro || "Erro ao guardar." });
       }

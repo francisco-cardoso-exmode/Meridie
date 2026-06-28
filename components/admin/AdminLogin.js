@@ -19,8 +19,7 @@ export default function AdminLogin() {
       });
       const json = await res.json();
       if (res.ok && json.ok) {
-        router.push("/admin");
-        router.refresh();
+        window.location.href = "/admin";
       } else {
         setEstado({ a: "erro", msg: json.erro || "Não foi possível entrar." });
       }

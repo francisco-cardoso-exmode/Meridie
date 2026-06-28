@@ -136,8 +136,7 @@ export default function RegiaoForm({ initial = null, regioesExistentes = [], pre
       });
       const json = await res.json();
       if (res.ok && json.ok) {
-        router.push("/admin/regioes");
-        router.refresh();
+        window.location.href = "/admin/regioes";
       } else {
         setEstado({ a: "erro", msg: json.erro || "Erro ao guardar." });
       }
