@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import ImageUploader from "@/components/admin/ImageUploader";
 import VideoUploader from "@/components/admin/VideoUploader";
-import { precoDual } from "@/lib/empreendimentos";
+import { precoDual, referenciaDe } from "@/lib/empreendimentos";
 
 const linhasParaArray = (s) =>
   (s || "")
@@ -58,6 +58,7 @@ export default function EmpreendimentoForm({ initial = null, regioesExistentes =
 
   const [f, setF] = useState({
     slug: initial?.slug || "",
+    referencia: initial?.referencia || "",
     nome: initial?.nome || "",
     pais: initial?.pais || "portugal",
     cidade: initial?.cidade || "",
@@ -117,6 +118,7 @@ export default function EmpreendimentoForm({ initial = null, regioesExistentes =
       caracteristicas: linhasParaArray(f.caracteristicas),
       imagens: f.imagens,
     };
+    if (f.referencia.trim()) doc.referencia = f.referencia.trim();
     if (f.construtora.trim()) doc.construtora = f.construtora.trim();
     if (f.morada.trim()) doc.morada = f.morada.trim();
     if (f.video.trim()) doc.video = f.video.trim();
@@ -170,6 +172,14 @@ export default function EmpreendimentoForm({ initial = null, regioesExistentes =
         <label>
           Nome
           <input value={f.nome} onChange={set("nome")} required />
+        </label>
+        <label>
+          Referência {!f.referencia && <small>— auto: {referenciaDe({ slug: f.slug })}</small>}
+          <input
+            value={f.referencia}
+            onChange={set("referencia")}
+            placeholder={referenciaDe({ slug: f.slug })}
+          />
         </label>
         <label>
           País

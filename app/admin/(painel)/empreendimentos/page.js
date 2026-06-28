@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { allEmpreendimentos } from "@/lib/store";
-import { formatarPreco } from "@/lib/empreendimentos";
+import { formatarPreco, referenciaDe } from "@/lib/empreendimentos";
 import { thumbUrl } from "@/lib/format";
 import DeleteButton from "@/components/admin/DeleteButton";
+import RefCopy from "@/components/admin/RefCopy";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Empreendimentos" };
@@ -40,6 +41,7 @@ export default async function AdminEmpreendimentos() {
                 {e.cidade} · {e.zona} · {e.tipo} · {formatarPreco(e.preco, e.moeda)}
               </div>
             </div>
+            <RefCopy valor={referenciaDe(e)} />
             <div className="admin-row-actions">
               <Link href={`/empreendimentos/${e.slug}`} target="_blank" className="admin-link">
                 Ver

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Icon from "@/components/Icon";
 import PrecoDual from "@/components/PrecoDual";
+import { referenciaDe } from "@/lib/empreendimentos";
 
 export default function EmpreendimentoCard({ e }) {
   return (
@@ -15,6 +16,7 @@ export default function EmpreendimentoCard({ e }) {
       <div className="prop-body">
         <div className="prop-loc">
           {e.cidade} · {e.zona}
+          <span className="prop-ref">Ref. {referenciaDe(e)}</span>
         </div>
         <h3>{e.nome}</h3>
         <p className="prop-resumo">{e.resumo}</p>

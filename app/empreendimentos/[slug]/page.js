@@ -8,7 +8,7 @@ import RegionBanner from "@/components/RegionBanner";
 import PrecoDual from "@/components/PrecoDual";
 import VideoEmbed from "@/components/VideoEmbed";
 import { textoComLinks } from "@/lib/format";
-import { PAIS_LABEL } from "@/lib/empreendimentos";
+import { PAIS_LABEL, referenciaDe } from "@/lib/empreendimentos";
 import {
   empreendimentoBySlug,
   allEmpreendimentos,
@@ -77,6 +77,7 @@ export default async function PaginaEmpreendimento({ params }) {
                 <span className="badge navy">{e.estado}</span>
                 <span className="badge">{e.finalidade}</span>
               </div>
+              <div className="detalhe-ref">Ref. {referenciaDe(e)}</div>
               <h1 style={{ fontSize: "2.2rem", marginBottom: 6 }}>{e.nome}</h1>
               <p style={{ fontSize: "1.05rem", color: "var(--muted)", marginBottom: 4 }}>
                 {e.cidade} · {e.zona} · {paisLabel}

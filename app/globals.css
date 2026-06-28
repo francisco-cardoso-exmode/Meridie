@@ -2368,3 +2368,37 @@ body:has(.admin-page) .site-footer {
   font-size: 0.85rem;
   color: var(--ink);
 }
+
+/* Referência do empreendimento */
+.prop-ref {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--muted);
+  margin-top: 2px;
+  letter-spacing: 0.03em;
+}
+.detalhe-ref {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--gold);
+  background: var(--paper-soft);
+  padding: 3px 12px;
+  border-radius: 999px;
+  margin-bottom: 12px;
+}
+.ref-copy {
+  flex: none;
+  background: var(--paper-soft);
+  border: 1px solid var(--border);
+  color: var(--navy);
+  font-weight: 600;
+  font-size: 0.78rem;
+  padding: 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: inherit;
+}
+.ref-copy:hover { border-color: var(--gold); color: var(--gold); }
