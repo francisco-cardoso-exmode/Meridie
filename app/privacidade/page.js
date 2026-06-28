@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getEmpresa } from "@/lib/config";
 
 export const metadata = {
   title: "Política de Privacidade",
@@ -6,7 +7,14 @@ export const metadata = {
     "Como a Meridie Investments recolhe, usa e protege os teus dados pessoais, e quais os teus direitos ao abrigo do RGPD.",
 };
 
-export default function PrivacidadePage() {
+export const dynamic = "force-dynamic";
+
+export default async function PrivacidadePage() {
+  const emp = await getEmpresa();
+  const denom = emp.denominacao || "Meridie Investments";
+  const nif = emp.nif || "[NIF a indicar]";
+  const morada = emp.morada || "[morada a indicar]";
+  const email = emp.email || "geral@meridie.pt";
   return (
     <div className="pagina-area">
       <div className="container legal">
@@ -22,8 +30,8 @@ export default function PrivacidadePage() {
 
         <h2>1. Responsável pelo tratamento</h2>
         <p>
-          Meridie Investments — [denominação social], NIF [——], com sede em [morada].
-          Contacto para assuntos de privacidade: <strong>geral@meridie.pt</strong>.
+          {denom}, NIF {nif}, com sede em {morada}. Contacto para assuntos de privacidade:{" "}
+          <strong>{email}</strong>.
         </p>
 
         <h2>2. Que dados recolhemos</h2>
@@ -75,7 +83,7 @@ export default function PrivacidadePage() {
         <p>
           Tens direito a aceder, retificar, apagar, limitar ou opor-te ao tratamento dos teus
           dados, bem como à portabilidade e a retirar o consentimento a qualquer momento. Para
-          exercer estes direitos, contacta <strong>geral@meridie.pt</strong>. Podes também
+          exercer estes direitos, contacta <strong>{email}</strong>. Podes também
           apresentar reclamação à autoridade de controlo (em Portugal, a CNPD —{" "}
           <a href="https://www.cnpd.pt" target="_blank" rel="noopener">www.cnpd.pt</a>).
         </p>

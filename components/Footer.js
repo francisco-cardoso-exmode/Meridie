@@ -1,11 +1,14 @@
 import Link from "next/link";
 import Logo from "@/components/Logo";
 import Icon from "@/components/Icon";
-import { getRedes } from "@/lib/config";
+import { getRedes, getEmpresa } from "@/lib/config";
 
 export default async function Footer() {
   const ano = new Date().getFullYear();
-  const redes = await getRedes();
+  const [redes, empresa] = await Promise.all([getRedes(), getEmpresa()]);
+  const email = empresa.email || "geral@meridie.pt";
+  const telefone = empresa.telefone || "+351 210 000 000";
+  const locais = empresa.locais || "Lisboa · São Paulo";
   return (
     <footer className="site-footer">
       <div className="container">
@@ -69,9 +72,9 @@ export default async function Footer() {
           <div>
             <h4>Contactos</h4>
             <ul>
-              <li>geral@meridie.pt</li>
-              <li>+351 210 000 000</li>
-              <li>Lisboa · São Paulo</li>
+              <li>{email}</li>
+              <li>{telefone}</li>
+              <li>{locais}</li>
             </ul>
           </div>
         </div>
