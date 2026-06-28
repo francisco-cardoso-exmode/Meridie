@@ -31,7 +31,7 @@ export default function CompareToggle({ e }) {
         toggle(item);
       }}
     >
-      {ativo ? "✓ A comparar" : "⇄ Comparar"}
+      {ativo ? "✓" : "="}
     </button>
   );
 }

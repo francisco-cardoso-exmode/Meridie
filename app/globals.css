@@ -2420,22 +2420,25 @@ body:has(.admin-page) .site-footer {
   bottom: 10px;
   right: 10px;
   z-index: 2;
-  border: 1px solid rgba(255, 255, 255, 0.7);
+  border: none;
   background: rgba(27, 63, 110, 0.82);
   color: #fff;
-  font-size: 0.74rem;
-  font-weight: 600;
-  padding: 6px 11px;
-  border-radius: 999px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 1.15rem;
+  font-weight: 800;
+  line-height: 1;
   cursor: pointer;
   backdrop-filter: blur(2px);
   transition: background 0.15s, transform 0.1s;
 }
-.compare-toggle:hover { background: var(--navy); }
+.compare-toggle:hover { background: var(--navy); transform: scale(1.08); }
 .compare-toggle.is-on {
   background: var(--gold);
   color: #1a1a1a;
-  border-color: #fff;
 }
 
 /* Barra flutuante do comparador */
