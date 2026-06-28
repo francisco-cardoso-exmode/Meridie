@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { upload } from "@vercel/blob/client";
 
 // Carrega um ficheiro de vídeo para o Vercel Blob e devolve o URL.
 export default function VideoUploader({ onUploaded }) {
@@ -13,17 +12,20 @@ export default function VideoUploader({ onUploaded }) {
     if (!file) return;
     setEstado({ a: "loading", msg: "A enviar vídeo..." });
     try {
-      const blob = await upload(file.name, file, {
-        access: "public",
-        handleUploadUrl: "/api/admin/upload",
-      });
-      onUploaded?.(blob.url);
+      const fd = new FormData();
+      fd.append("file", file, file.name);
+      const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
+      const json = await res.json();
+      if (!res.ok || !json.ok) throw new Error(json.erro || "Falha.");
+      onUploaded?.(json.url);
       setEstado({ a: "ok", msg: "Vídeo carregado." });
     } catch (err) {
       const m = err?.message || "";
       setEstado({
         a: "erro",
-        msg: /token|blob/i.test(m) ? "Falta configurar o Vercel Blob." : m || "Falha.",
+        msg: /413|large|size/i.test(m)
+          ? "Vídeo demasiado grande — usa um link do YouTube/Vimeo."
+          : m || "Falha.",
       });
     } finally {
       if (ref.current) ref.current.value = "";

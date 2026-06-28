@@ -1,42 +1,29 @@
-import { handleUpload } from "@vercel/blob/client";
+import { put } from "@vercel/blob";
 import { NextResponse } from "next/server";
 import { isAdmin } from "@/lib/adminAuth";
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 60;
 
-// Upload direto do browser para o Vercel Blob.
-// Esta rota apenas gera o token (validando que é admin) — o ficheiro vai
-// diretamente do cliente para o storage, sem passar pelo servidor.
+// Upload simples pelo servidor: recebe o ficheiro e guarda no Vercel Blob.
+// Só usa BLOB_READ_WRITE_TOKEN (sem webhooks/tokens de cliente).
 export async function POST(request) {
-  const body = await request.json();
+  if (!(await isAdmin()))
+    return NextResponse.json({ ok: false, erro: "Não autorizado" }, { status: 401 });
+
   try {
-    const json = await handleUpload({
-      body,
-      request,
-      onBeforeGenerateToken: async () => {
-        if (!(await isAdmin())) throw new Error("Não autorizado");
-        return {
-          allowedContentTypes: [
-            "image/jpeg",
-            "image/jpg",
-            "image/png",
-            "image/webp",
-            "image/avif",
-            "video/mp4",
-            "video/webm",
-            "video/quicktime",
-          ],
-          addRandomSuffix: true,
-          maximumSizeInBytes: 300 * 1024 * 1024,
-        };
-      },
-      onUploadCompleted: async () => {},
-    });
-    return NextResponse.json(json);
+    const form = await request.formData();
+    const file = form.get("file");
+    if (!file || typeof file === "string") {
+      return NextResponse.json({ ok: false, erro: "Sem ficheiro." }, { status: 400 });
+    }
+    const nome = file.name || `upload-${Date.now()}`;
+    const blob = await put(nome, file, { access: "public", addRandomSuffix: true });
+    return NextResponse.json({ ok: true, url: blob.url });
   } catch (e) {
     return NextResponse.json(
-      { error: e?.message || "Falha no upload." },
-      { status: 400 }
+      { ok: false, erro: e?.message || "Falha no upload." },
+      { status: 500 }
     );
   }
 }

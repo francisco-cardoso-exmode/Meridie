@@ -1,7 +1,35 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { upload } from "@vercel/blob/client";
+
+// Redimensiona a imagem no browser (máx. 1920px) para ficar leve e dentro do
+// limite de upload. Devolve um Blob (ou o ficheiro original se falhar).
+async function redimensionar(file, maxW = 1920, q = 0.82) {
+  if (!file.type.startsWith("image/")) return file;
+  try {
+    const bitmap = await createImageBitmap(file);
+    const escala = Math.min(1, maxW / bitmap.width);
+    if (escala >= 1) return file;
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(bitmap.width * escala);
+    canvas.height = Math.round(bitmap.height * escala);
+    canvas.getContext("2d").drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    const blob = await new Promise((res) => canvas.toBlob(res, "image/jpeg", q));
+    return blob || file;
+  } catch {
+    return file;
+  }
+}
+
+async function enviarFicheiro(file) {
+  const fd = new FormData();
+  const nome = (file.name || "imagem").replace(/\.\w+$/, "") + ".jpg";
+  fd.append("file", file, file.name || nome);
+  const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
+  const json = await res.json();
+  if (!res.ok || !json.ok) throw new Error(json.erro || "Falha no upload.");
+  return json.url;
+}
 
 /**
  * Galeria de imagens controlada — arrastar/largar OU clicar para abrir a pasta
@@ -37,11 +65,8 @@ export default function ImageUploader({ value = [], onChange, multiple = true })
     try {
       const novas = [];
       for (const file of files) {
-        const blob = await upload(file.name, file, {
-          access: "public",
-          handleUploadUrl: "/api/admin/upload",
-        });
-        novas.push(blob.url);
+        const reduzido = await redimensionar(file);
+        novas.push(await enviarFicheiro(reduzido));
       }
       onChange?.(multiple ? [...value, ...novas] : [novas[novas.length - 1]]);
       setEstado({ a: "idle", msg: "" });
@@ -49,10 +74,9 @@ export default function ImageUploader({ value = [], onChange, multiple = true })
       const m = err?.message || "";
       setEstado({
         a: "erro",
-        msg:
-          /token|blob/i.test(m)
-            ? "Falta configurar o Vercel Blob (BLOB_READ_WRITE_TOKEN)."
-            : m || "Falha no upload.",
+        msg: /token|blob/i.test(m)
+          ? "Falta configurar o Vercel Blob (BLOB_READ_WRITE_TOKEN)."
+          : m || "Falha no upload.",
       });
     } finally {
       if (inputRef.current) inputRef.current.value = "";
