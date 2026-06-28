@@ -8,6 +8,8 @@ const TIPOS = new Set([
   "pesquisa",
   "filtro",
   "comparacao",
+  "interesse",
+  "lead_enviada",
 ]);
 
 export async function POST(request) {

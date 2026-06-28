@@ -1,10 +1,25 @@
-import Script from "next/script";
+"use client";
 
-// Google Analytics 4 (gratuito). Só liga se NEXT_PUBLIC_GA_ID estiver definido
-// (ex.: G-XXXXXXXXXX). Define-o na Vercel e no .env.local.
+import Script from "next/script";
+import { useEffect, useState } from "react";
+
+// Google Analytics 4 (gratuito). Só carrega se:
+//  - NEXT_PUBLIC_GA_ID estiver definido (ex.: G-XXXXXXXXXX), e
+//  - o visitante tiver ACEITE os cookies (RGPD).
 export default function Analytics() {
   const id = process.env.NEXT_PUBLIC_GA_ID;
-  if (!id) return null;
+  const [consentido, setConsentido] = useState(false);
+
+  useEffect(() => {
+    const ver = () =>
+      setConsentido(localStorage.getItem("meridie_consent") === "accept");
+    ver();
+    window.addEventListener("meridie-consent", ver);
+    return () => window.removeEventListener("meridie-consent", ver);
+  }, []);
+
+  if (!id || !consentido) return null;
+
   return (
     <>
       <Script

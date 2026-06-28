@@ -1,9 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { enviarEvento } from "@/components/Track";
 
-export default function ContactForm({ assuntoInicial = "" }) {
+export default function ContactForm({ assuntoInicial = "", origem = "contacto" }) {
   const [estado, setEstado] = useState({ a: "idle", msg: "" });
+  const interesseFeito = useRef(false);
+
+  // Primeira interação com o formulário = sinal de interesse.
+  function marcarInteresse() {
+    if (interesseFeito.current) return;
+    interesseFeito.current = true;
+    enviarEvento("interesse", origem);
+  }
 
   async function onSubmit(e) {
     e.preventDefault();
@@ -30,6 +39,7 @@ export default function ContactForm({ assuntoInicial = "" }) {
           a: "ok",
           msg: "Mensagem enviada! Enviámos-te um email de confirmação e a nossa equipa entrará em contacto muito em breve.",
         });
+        enviarEvento("lead_enviada", origem);
         form.reset();
       } else {
         setEstado({ a: "erro", msg: json.erro || "Não foi possível enviar." });
@@ -43,7 +53,7 @@ export default function ContactForm({ assuntoInicial = "" }) {
   }
 
   return (
-    <form className="form-grid" onSubmit={onSubmit} noValidate>
+    <form className="form-grid" onSubmit={onSubmit} onFocus={marcarInteresse} noValidate>
       <div className="field">
         <label htmlFor="nome">Nome *</label>
         <input id="nome" name="nome" type="text" required placeholder="O teu nome" />

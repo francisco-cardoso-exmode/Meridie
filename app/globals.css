@@ -2810,3 +2810,62 @@ body:has(.admin-page) .site-footer {
 }
 .an-precos li:last-child { border-bottom: none; }
 .an-precos strong { color: var(--navy); }
+
+/* ===== Banner de cookies (RGPD) ===== */
+.cookie-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 70;
+  background: var(--navy);
+  color: #fff;
+  box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.22);
+}
+.cookie-inner {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+.cookie-txt { font-size: 0.86rem; line-height: 1.5; margin: 0; flex: 1 1 320px; }
+.cookie-txt a { color: var(--gold); text-decoration: underline; }
+.cookie-acoes { display: flex; gap: 10px; align-items: center; flex: none; }
+.cookie-rej {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  color: #fff;
+  padding: 9px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+  font-family: inherit;
+}
+.cookie-rej:hover { border-color: #fff; }
+.cookie-bar .btn-primary { padding: 9px 18px; }
+
+.footer-legal { display: inline-flex; gap: 14px; }
+.footer-legal a { color: inherit; opacity: 0.85; }
+.footer-legal a:hover { opacity: 1; color: var(--gold); }
+
+/* ===== Páginas legais ===== */
+.legal { max-width: 760px; padding: 40px 0 80px; }
+.legal h1 { font-size: 2rem; margin-bottom: 6px; }
+.legal h2 { font-size: 1.15rem; margin: 26px 0 8px; color: var(--navy); }
+.legal p { line-height: 1.7; margin: 0 0 12px; }
+.legal ul { margin: 0 0 14px; padding-left: 20px; }
+.legal li { line-height: 1.6; margin: 6px 0; }
+.legal a { color: var(--navy); text-decoration: underline; }
+.legal-data { color: var(--muted); font-size: 0.85rem; margin-bottom: 20px; }
+.legal-nota {
+  margin-top: 26px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--border);
+  font-size: 0.82rem;
+  color: var(--muted);
+}

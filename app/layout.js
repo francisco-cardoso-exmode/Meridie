@@ -4,6 +4,7 @@ import Footer from "@/components/Footer";
 import { CompareProvider } from "@/components/compare/CompareProvider";
 import CompareBar from "@/components/compare/CompareBar";
 import Analytics from "@/components/Analytics";
+import CookieConsent from "@/components/CookieConsent";
 import { SITE_URL, SITE_NAME } from "@/lib/site";
 
 const DESC =
@@ -76,6 +77,7 @@ export default function RootLayout({ children }) {
           <main>{children}</main>
           <Footer />
           <CompareBar />
+          <CookieConsent />
         </CompareProvider>
       </body>
     </html>

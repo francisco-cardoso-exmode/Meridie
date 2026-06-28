@@ -27,7 +27,16 @@ async function contagensDb() {
 }
 
 async function eventosAgg() {
-  const vazio = { vistos: [], pesquisas: [], filtros: [], comparacoes: [], paises: [], total: 0 };
+  const vazio = {
+    vistos: [],
+    pesquisas: [],
+    filtros: [],
+    comparacoes: [],
+    leads: [],
+    interesse: [],
+    paises: [],
+    total: 0,
+  };
   try {
     const db = await getDb();
     const col = db.collection("eventos");
@@ -40,11 +49,14 @@ async function eventosAgg() {
           { $limit: limit },
         ])
         .toArray();
-    const [vistos, pesquisas, filtros, comparacoes, paises, total] = await Promise.all([
+    const [vistos, pesquisas, filtros, comparacoes, leads, interesse, paises, total] =
+      await Promise.all([
       top("empreendimento_visto"),
       top("pesquisa"),
       top("filtro"),
       top("comparacao"),
+      top("lead_enviada"),
+      top("interesse"),
       col
         .aggregate([
           { $match: { pais: { $nin: [null, ""] } } },
@@ -55,7 +67,7 @@ async function eventosAgg() {
         .toArray(),
       col.countDocuments(),
     ]);
-    return { vistos, pesquisas, filtros, comparacoes, paises, total };
+    return { vistos, pesquisas, filtros, comparacoes, leads, interesse, paises, total };
   } catch {
     return vazio;
   }
@@ -134,6 +146,8 @@ export default async function AdminAnalytics() {
     return [`${nomePorSlug[s1] || s1} vs ${nomePorSlug[s2] || s2}`, x.n];
   });
   const paisesD = ev.paises.map((x) => [PAIS_COD[x._id] || x._id, x.n]);
+  const leadsD = ev.leads.map((x) => [nomePorSlug[x._id] || x._id, x.n]);
+  const interesseD = ev.interesse.map((x) => [nomePorSlug[x._id] || x._id, x.n]);
 
   const publicados = emp.filter((e) => e.publicado !== false);
   const ocultos = emp.length - publicados.length;
@@ -229,6 +243,8 @@ export default async function AdminAnalytics() {
           <Breakdown titulo="Pesquisas mais feitas" dados={pesquisasD} />
           <Breakdown titulo="Filtros mais usados" dados={filtrosD} />
           <Breakdown titulo="Comparações mais feitas" dados={comparacoesD} />
+          <Breakdown titulo="Interesse por empreendimento" dados={interesseD} />
+          <Breakdown titulo="Leads por empreendimento" dados={leadsD} />
           <Breakdown titulo="Visitantes por país" dados={paisesD} />
         </div>
       )}

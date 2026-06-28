@@ -77,7 +77,11 @@ export default async function Footer() {
         </div>
         <div className="footer-bottom">
           <span>© {ano} Meridie Investments. Todos os direitos reservados.</span>
-          <span>Portugal · Brasil</span>
+          <span className="footer-legal">
+            <Link href="/privacidade">Privacidade</Link>
+            <Link href="/cookies">Cookies</Link>
+            <Link href="/termos">Termos</Link>
+          </span>
         </div>
       </div>
     </footer>

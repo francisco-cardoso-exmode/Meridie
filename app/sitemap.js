@@ -18,6 +18,9 @@ export default async function sitemap() {
     "/publicidade",
     "/faq",
     "/contactos",
+    "/privacidade",
+    "/cookies",
+    "/termos",
   ].map((p) => ({
     url: `${SITE_URL}${p}`,
     lastModified: agora,
