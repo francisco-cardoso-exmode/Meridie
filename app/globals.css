@@ -2767,3 +2767,7 @@ body:has(.admin-page) .site-footer {
   font-family: inherit;
 }
 .btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+
+.comp-ia-texto h4 { font-size: 1rem; margin: 14px 0 6px; color: var(--navy); }
+.comp-ia-texto hr { border: none; border-top: 1px dashed var(--border); margin: 14px 0; }
+.comp-ia-texto strong { color: var(--navy); }

@@ -77,7 +77,7 @@ REGRAS OBRIGATÓRIAS:
 5. Fala do potencial de investimento de forma positiva para ambos.
 6. Termina com uma orientação tipo "ideal para quem…" para cada um, sem nunca desvalorizar nenhum.
 
-FORMATO: 2 a 3 parágrafos curtos OU bullets curtos. Máximo ~200 palavras. Direto e útil, sem encher.`;
+FORMATO: parágrafos curtos e, quando útil, bullets a começar por "- ". Podes destacar a negrito com **texto**. NÃO uses tabelas nem títulos markdown com # (cardinais). Máximo ~180 palavras. Direto e útil, sem encher.`;
 
 export async function POST(request) {
   try {
@@ -100,7 +100,9 @@ export async function POST(request) {
       regiao
     )}\n\nCompara os dois e ajuda o investidor a escolher.`;
 
-    const key = createHash("sha256").update(`${MODEL}::${conteudo}`).digest("hex");
+    const key = createHash("sha256")
+      .update(`${MODEL}::${SISTEMA}::${conteudo}`)
+      .digest("hex");
 
     // Cache: a mesma comparação (e mesmos dados) não volta a chamar a IA.
     let db = null;

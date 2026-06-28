@@ -2,31 +2,66 @@
 
 import { useEffect, useState } from "react";
 
-// Converte o texto da IA em parágrafos / listas simples.
-function render(texto) {
+// Negrito inline: **texto** → <strong>
+function inline(texto, kp) {
+  return texto.split(/(\*\*[^*]+\*\*)/g).map((parte, i) => {
+    if (/^\*\*[^*]+\*\*$/.test(parte)) {
+      return <strong key={`${kp}-${i}`}>{parte.slice(2, -2)}</strong>;
+    }
+    return <span key={`${kp}-${i}`}>{parte}</span>;
+  });
+}
+
+// Converte o texto da IA em blocos (subtítulos, parágrafos, listas, separadores).
+function parse(texto) {
   const linhas = (texto || "").split("\n").map((l) => l.trim());
   const blocos = [];
   let lista = null;
-  linhas.forEach((l, i) => {
-    if (!l) {
-      if (lista) {
-        blocos.push({ tipo: "ul", itens: lista });
-        lista = null;
-      }
-      return;
+  const fecharLista = () => {
+    if (lista) {
+      blocos.push({ tipo: "ul", itens: lista });
+      lista = null;
     }
+  };
+
+  for (const l of linhas) {
+    if (!l) {
+      fecharLista();
+      continue;
+    }
+    // Linha separadora de tabela markdown (|---|---|) — ignorar
+    if (/^\|?[\s:|-]+\|[\s:|-]*$/.test(l)) continue;
+    // Separador ---
+    if (/^-{3,}$/.test(l)) {
+      fecharLista();
+      blocos.push({ tipo: "hr" });
+      continue;
+    }
+    // Subtítulo markdown (# / ## / ###)
+    if (/^#{1,4}\s+/.test(l)) {
+      fecharLista();
+      blocos.push({ tipo: "h", texto: l.replace(/^#{1,4}\s+/, "") });
+      continue;
+    }
+    // Linha de tabela markdown — converter para frase legível
+    if (/^\|.*\|/.test(l)) {
+      const celulas = l
+        .split("|")
+        .map((c) => c.trim())
+        .filter(Boolean);
+      if (celulas.length) blocos.push({ tipo: "p", texto: celulas.join(" — ") });
+      continue;
+    }
+    // Bullet
     if (/^[-•*]\s+/.test(l)) {
       lista = lista || [];
       lista.push(l.replace(/^[-•*]\s+/, ""));
-    } else {
-      if (lista) {
-        blocos.push({ tipo: "ul", itens: lista });
-        lista = null;
-      }
-      blocos.push({ tipo: "p", texto: l.replace(/\*\*/g, "") });
+      continue;
     }
-    if (i === linhas.length - 1 && lista) blocos.push({ tipo: "ul", itens: lista });
-  });
+    fecharLista();
+    blocos.push({ tipo: "p", texto: l });
+  }
+  fecharLista();
   return blocos;
 }
 
@@ -55,8 +90,7 @@ export default function CompareAnalysis({ a, b, nomeA, nomeB }) {
         }
       })
       .catch(() => {
-        if (vivo)
-          setEstado({ a: "erro", texto: "", erro: "Erro de ligação." });
+        if (vivo) setEstado({ a: "erro", texto: "", erro: "Erro de ligação." });
       });
     return () => {
       vivo = false;
@@ -82,17 +116,19 @@ export default function CompareAnalysis({ a, b, nomeA, nomeB }) {
 
       {estado.a === "ok" && (
         <div className="comp-ia-texto">
-          {render(estado.texto).map((bl, i) =>
-            bl.tipo === "ul" ? (
-              <ul key={i}>
-                {bl.itens.map((it, j) => (
-                  <li key={j}>{it}</li>
-                ))}
-              </ul>
-            ) : (
-              <p key={i}>{bl.texto}</p>
-            )
-          )}
+          {parse(estado.texto).map((bl, i) => {
+            if (bl.tipo === "hr") return <hr key={i} />;
+            if (bl.tipo === "h") return <h4 key={i}>{inline(bl.texto, i)}</h4>;
+            if (bl.tipo === "ul")
+              return (
+                <ul key={i}>
+                  {bl.itens.map((it, j) => (
+                    <li key={j}>{inline(it, `${i}-${j}`)}</li>
+                  ))}
+                </ul>
+              );
+            return <p key={i}>{inline(bl.texto, i)}</p>;
+          })}
           <p className="comp-ia-nota">
             Análise gerada por IA com base nos dados dos empreendimentos. Confirme
             sempre os detalhes com a nossa equipa.
