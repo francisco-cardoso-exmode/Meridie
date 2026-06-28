@@ -2,6 +2,7 @@ import Link from "next/link";
 import Icon from "@/components/Icon";
 import PrecoDual from "@/components/PrecoDual";
 import { referenciaDe } from "@/lib/empreendimentos";
+import CompareToggle from "@/components/compare/CompareToggle";
 
 export default function EmpreendimentoCard({ e }) {
   return (
@@ -12,6 +13,7 @@ export default function EmpreendimentoCard({ e }) {
           <span className="badge gold">{e.tipo}</span>
           <span className="badge">{e.estado}</span>
         </div>
+        <CompareToggle e={e} />
       </div>
       <div className="prop-body">
         <div className="prop-loc">

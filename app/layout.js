@@ -1,6 +1,8 @@
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { CompareProvider } from "@/components/compare/CompareProvider";
+import CompareBar from "@/components/compare/CompareBar";
 
 export const metadata = {
   title: {
@@ -22,9 +24,12 @@ export default function RootLayout({ children }) {
   return (
     <html lang="pt-PT">
       <body>
-        <Header />
-        <main>{children}</main>
-        <Footer />
+        <CompareProvider>
+          <Header />
+          <main>{children}</main>
+          <Footer />
+          <CompareBar />
+        </CompareProvider>
       </body>
     </html>
   );
