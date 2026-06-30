@@ -33,7 +33,6 @@ export default async function AdminEmpreendimentos() {
             <div className="admin-row-main">
               <div className="admin-row-title">
                 {e.nome}
-                {e.construtora && <span className="tag-real">REAL</span>}
                 {e.destaque && <span className="tag-dest">DESTAQUE</span>}
                 {e.publicado === false && <span className="tag-oculto">OCULTO</span>}
               </div>

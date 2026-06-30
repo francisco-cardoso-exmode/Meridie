@@ -265,7 +265,7 @@ export default function EmpreendimentoForm({ initial = null, regioesExistentes =
         </label>
         <label>
           Construtora (opcional)
-          <input value={f.construtora} onChange={set("construtora")} placeholder="marca como 'real' e aparece primeiro" />
+          <input value={f.construtora} onChange={set("construtora")} placeholder="Nome da construtora (opcional)" />
         </label>
         <label className="full">
           Morada (opcional)

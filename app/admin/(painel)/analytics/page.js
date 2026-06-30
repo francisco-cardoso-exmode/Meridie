@@ -151,7 +151,6 @@ export default async function AdminAnalytics() {
 
   const publicados = emp.filter((e) => e.publicado !== false);
   const ocultos = emp.length - publicados.length;
-  const reais = emp.filter((e) => e.construtora).length;
   const destaque = emp.filter((e) => e.destaque).length;
 
   const porPais = agrupar(emp, (e) => PAIS_LABEL[e.pais] || e.pais);
@@ -170,7 +169,6 @@ export default async function AdminAnalytics() {
     { n: emp.length, l: "Empreendimentos" },
     { n: publicados.length, l: "Publicados" },
     { n: ocultos, l: "Ocultos" },
-    { n: reais, l: "Reais (com construtora)" },
     { n: destaque, l: "Em destaque" },
     { n: reg.length, l: "Regiões / zonas" },
     { n: db.leads, l: "Leads (total)" },

@@ -19,7 +19,6 @@ export default async function AdminDashboard() {
     allRegioes(),
     contarLeads(),
   ]);
-  const reais = emp.filter((e) => e.construtora).length;
 
   return (
     <div className="admin-container">
@@ -30,10 +29,6 @@ export default async function AdminDashboard() {
         <div className="admin-stat">
           <div className="n">{emp.length}</div>
           <div className="l">Empreendimentos</div>
-        </div>
-        <div className="admin-stat">
-          <div className="n">{reais}</div>
-          <div className="l">Reais (com construtora)</div>
         </div>
         <div className="admin-stat">
           <div className="n">{reg.length}</div>

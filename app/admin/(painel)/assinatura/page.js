@@ -18,7 +18,7 @@ export default async function AdminAssinatura() {
     preco: e.preco,
     moeda: e.moeda,
     imagens: e.imagens?.slice(0, 1) || [],
-    real: !!e.construtora,
+    destaque: !!e.destaque,
   }));
 
   return (

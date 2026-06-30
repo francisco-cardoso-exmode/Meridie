@@ -12,10 +12,10 @@ export default function SignatureGenerator({ empreendimentos = [], baseUrl, logo
     telefone: "",
     email: "",
   });
-  // Por defeito, seleciona o empreendimento real (VIBE) se existir.
+  // Por defeito, seleciona um empreendimento em destaque (ou o primeiro).
   const [sel, setSel] = useState(() => {
-    const real = empreendimentos.find((e) => e.real) || empreendimentos[0];
-    return real ? [real.slug] : [];
+    const inicial = empreendimentos.find((e) => e.destaque) || empreendimentos[0];
+    return inicial ? [inicial.slug] : [];
   });
 
   const set = (k) => (e) => setF((p) => ({ ...p, [k]: e.target.value }));
@@ -90,7 +90,6 @@ export default function SignatureGenerator({ empreendimentos = [], baseUrl, logo
                 />
                 <span>
                   {e.nome} <small>· {e.cidade}</small>
-                  {e.real && <span className="tag-real" style={{ marginLeft: 6 }}>REAL</span>}
                 </span>
               </label>
             ))}
