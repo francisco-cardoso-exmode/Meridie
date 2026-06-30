@@ -119,20 +119,19 @@ export default function EmpreendimentoForm({ initial = null, regioesExistentes =
       descricao: f.descricao.trim(),
       caracteristicas: linhasParaArray(f.caracteristicas),
       imagens: f.imagens,
+      // Campos opcionais — enviados SEMPRE (mesmo vazios) para que apagar
+      // a informação a limpe mesmo (o $set não mexe no que não recebe).
+      precoMax:
+        f.precoTipo === "intervalo" ? Number(f.precoMax) || 0 : 0,
+      referencia: f.referencia.trim(),
+      construtora: f.construtora.trim(),
+      morada: f.morada.trim(),
+      video: f.video.trim(),
+      siteUrl: f.siteUrl.trim(),
+      links: textoParaLinks(f.links),
+      tipologias: textoParaTipologias(f.tipologias),
+      proximidades: linhasParaArray(f.proximidades),
     };
-    if (f.precoTipo === "intervalo" && Number(f.precoMax))
-      doc.precoMax = Number(f.precoMax);
-    if (f.referencia.trim()) doc.referencia = f.referencia.trim();
-    if (f.construtora.trim()) doc.construtora = f.construtora.trim();
-    if (f.morada.trim()) doc.morada = f.morada.trim();
-    if (f.video.trim()) doc.video = f.video.trim();
-    if (f.siteUrl.trim()) doc.siteUrl = f.siteUrl.trim();
-    const lnk = textoParaLinks(f.links);
-    if (lnk.length) doc.links = lnk;
-    const tip = textoParaTipologias(f.tipologias);
-    if (tip.length) doc.tipologias = tip;
-    if (linhasParaArray(f.proximidades).length)
-      doc.proximidades = linhasParaArray(f.proximidades);
 
     try {
       const url = editing
