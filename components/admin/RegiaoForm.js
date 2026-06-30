@@ -124,7 +124,7 @@ export default function RegiaoForm({ initial = null, regioesExistentes = [], pre
       },
       pontos: textoParaPontos(f.pontos),
     };
-    if (f.parent) doc.parent = f.parent;
+    doc.parent = f.parent || ""; // enviar sempre (vazio = região de topo)
 
     try {
       const url = editing ? `/api/admin/regioes/${initial.slug}` : "/api/admin/regioes";
