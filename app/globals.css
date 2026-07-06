@@ -543,16 +543,21 @@ section {
   text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
 }
 
-/* Quando um cartão é embrulhado por um wrapper de animação (Reveal),
-   garantir que continua a esticar para alturas iguais na grelha. */
-.listing-grid > *,
+/* Cartão embrulhado num wrapper de animação (Reveal) — estica para alturas iguais.
+   Excluímos o .prop-card direto (sem wrapper) para NÃO esticar a imagem: assim
+   a foto mantém o rácio 16/10 e todos os cards ficam alinhados. */
+.listing-grid > *:not(.prop-card),
 .region-grid > * {
   display: flex;
 }
-.listing-grid > * > *,
+.listing-grid > *:not(.prop-card) > *,
 .region-grid > * > * {
   flex: 1;
   width: 100%;
+}
+/* Cartão direto (ex.: no explorador de filtros das regiões/mercados) enche a célula. */
+.listing-grid > .prop-card {
+  height: 100%;
 }
 
 /* ============ Ícones SVG ============ */
