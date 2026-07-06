@@ -1120,12 +1120,14 @@ section {
 }
 .gallery .side {
   display: grid;
+  grid-auto-rows: 1fr; /* 1 ou 2 caixas iguais que preenchem a altura da principal */
   gap: 12px;
-  grid-auto-rows: 1fr; /* divide a altura igualmente e estica as caixas */
+  min-height: 0; /* deixa encolher à altura da principal (não crescer com a foto) */
 }
 .gallery .side > div {
   border-radius: 14px;
   overflow: hidden;
+  min-height: 0;
 }
 /* Se não houver fotos laterais, a principal ocupa a largura toda (sem vazio). */
 .gallery .side:empty {
