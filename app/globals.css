@@ -906,6 +906,7 @@ section {
 .listing-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: 1fr; /* todas as linhas com a mesma altura → cards uniformes */
   gap: 26px;
 }
 .prop-card {
@@ -973,11 +974,19 @@ section {
 .prop-card h3 {
   font-size: 1.18rem;
   margin-bottom: 10px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 .prop-resumo {
   font-size: 0.92rem;
   margin-bottom: 16px;
   flex: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 .prop-specs {
   display: flex;
