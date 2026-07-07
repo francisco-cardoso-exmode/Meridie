@@ -4,6 +4,7 @@ import Footer from "@/components/Footer";
 import { CompareProvider } from "@/components/compare/CompareProvider";
 import CompareBar from "@/components/compare/CompareBar";
 import Analytics from "@/components/Analytics";
+import TrackVisita from "@/components/TrackVisita";
 import CookieConsent from "@/components/CookieConsent";
 import { SITE_URL, SITE_NAME } from "@/lib/site";
 
@@ -68,6 +69,7 @@ export default function RootLayout({ children }) {
     <html lang="pt-PT">
       <body>
         <Analytics />
+        <TrackVisita />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

@@ -10,6 +10,7 @@ const TIPOS = new Set([
   "comparacao",
   "interesse",
   "lead_enviada",
+  "origem",
 ]);
 
 export async function POST(request) {

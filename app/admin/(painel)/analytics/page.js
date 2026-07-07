@@ -34,6 +34,7 @@ async function eventosAgg() {
     comparacoes: [],
     leads: [],
     interesse: [],
+    origem: [],
     paises: [],
     total: 0,
   };
@@ -49,7 +50,7 @@ async function eventosAgg() {
           { $limit: limit },
         ])
         .toArray();
-    const [vistos, pesquisas, filtros, comparacoes, leads, interesse, paises, total] =
+    const [vistos, pesquisas, filtros, comparacoes, leads, interesse, origem, paises, total] =
       await Promise.all([
       top("empreendimento_visto"),
       top("pesquisa"),
@@ -57,6 +58,7 @@ async function eventosAgg() {
       top("comparacao"),
       top("lead_enviada"),
       top("interesse"),
+      top("origem", 12),
       col
         .aggregate([
           { $match: { pais: { $nin: [null, ""] } } },
@@ -67,7 +69,7 @@ async function eventosAgg() {
         .toArray(),
       col.countDocuments(),
     ]);
-    return { vistos, pesquisas, filtros, comparacoes, leads, interesse, paises, total };
+    return { vistos, pesquisas, filtros, comparacoes, leads, interesse, origem, paises, total };
   } catch {
     return vazio;
   }
@@ -148,6 +150,7 @@ export default async function AdminAnalytics() {
   const paisesD = ev.paises.map((x) => [PAIS_COD[x._id] || x._id, x.n]);
   const leadsD = ev.leads.map((x) => [nomePorSlug[x._id] || x._id, x.n]);
   const interesseD = ev.interesse.map((x) => [nomePorSlug[x._id] || x._id, x.n]);
+  const origemD = ev.origem.map((x) => [x._id, x.n]);
 
   const publicados = emp.filter((e) => e.publicado !== false);
   const ocultos = emp.length - publicados.length;
@@ -237,6 +240,7 @@ export default async function AdminAnalytics() {
         </div>
       ) : (
         <div className="an-grid">
+          <Breakdown titulo="De onde vêm (origem)" dados={origemD} />
           <Breakdown titulo="Empreendimentos mais vistos" dados={vistosD} />
           <Breakdown titulo="Pesquisas mais feitas" dados={pesquisasD} />
           <Breakdown titulo="Filtros mais usados" dados={filtrosD} />
