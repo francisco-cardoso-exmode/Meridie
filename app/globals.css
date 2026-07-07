@@ -2291,15 +2291,32 @@ body:has(.admin-page) .site-footer {
 .gthumb-star:hover { background: var(--gold); color: var(--navy-dark); }
 
 /* Gerador de assinatura */
-.sig-list { display: grid; gap: 6px; margin-top: 6px; }
+.sig-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 8px;
+  margin-top: 6px;
+}
 .sig-item {
   flex-direction: row !important;
   align-items: center !important;
   gap: 10px !important;
   font-weight: 400 !important;
   font-size: 0.9rem;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
 }
-.sig-item input { width: 16px; height: 16px; }
+.sig-item input { width: 16px; height: 16px; flex: none; }
+.sig-item > span {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .sig-item small { color: var(--muted); }
 .sig-instr {
   margin-top: 18px;
