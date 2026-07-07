@@ -11,6 +11,8 @@ import { textoComLinks } from "@/lib/format";
 import { PAIS_LABEL, referenciaDe } from "@/lib/empreendimentos";
 import { abs } from "@/lib/site";
 import Track from "@/components/Track";
+import ProjetoGaleria from "@/components/ProjetoGaleria";
+import GaleriaExtra from "@/components/GaleriaExtra";
 import {
   empreendimentoBySlug,
   allEmpreendimentos,
@@ -101,18 +103,7 @@ export default async function PaginaEmpreendimento({ params }) {
             <Link href="/">Início</Link> ·{" "}
             <Link href={`/${e.pais}`}>{paisLabel}</Link> · {e.nome}
           </nav>
-          <div className="gallery">
-            <div className="main">
-              <img src={e.imagens?.[0] || ""} alt={e.nome} />
-            </div>
-            <div className="side">
-              {(e.imagens || []).slice(1, 3).map((img, i) => (
-                <div key={i}>
-                  <img src={img} alt={`${e.nome} — foto ${i + 2}`} loading="lazy" />
-                </div>
-              ))}
-            </div>
-          </div>
+          <ProjetoGaleria imagens={e.imagens || []} nome={e.nome} />
         </div>
       </div>
 
@@ -272,13 +263,7 @@ export default async function PaginaEmpreendimento({ params }) {
           <div className="container">
             <Reveal>
               <h2 style={{ fontSize: "1.5rem", marginBottom: 18 }}>Galeria</h2>
-              <div className="galeria-grid">
-                {e.imagens.slice(3).map((img, i) => (
-                  <div className="galeria-item" key={i}>
-                    <img src={img} alt={`${e.nome} — foto ${i + 4}`} loading="lazy" />
-                  </div>
-                ))}
-              </div>
+              <GaleriaExtra imagens={e.imagens} nome={e.nome} />
             </Reveal>
           </div>
         </section>
