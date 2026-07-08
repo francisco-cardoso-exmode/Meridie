@@ -8,12 +8,12 @@
 
       .cls-1, .cls-2 {
         fill: none;
-        stroke: #997939;
+        stroke: #c89b3c;
         stroke-miterlimit: 10;
       }
 
       .cls-3 {
-        fill: #997939;
+        fill: #c89b3c;
       }
 
       .cls-2 {
