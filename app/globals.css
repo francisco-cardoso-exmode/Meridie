@@ -3006,3 +3006,17 @@ body:has(.admin-page) .site-footer {
   .lb-ant { left: 8px; }
   .lb-prox { right: 8px; }
 }
+
+/* Marca + slogan por baixo do logo no rodapé */
+.footer-marca { margin-top: 12px; }
+.footer-marca-nome {
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.02em;
+  margin: 0;
+}
+.footer-marca-slogan {
+  color: var(--gold);
+  font-size: 0.86rem;
+  margin: 2px 0 0;
+}

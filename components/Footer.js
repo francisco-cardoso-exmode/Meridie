@@ -14,7 +14,13 @@ export default async function Footer() {
       <div className="container">
         <div className="footer-grid">
           <div>
-            <Logo size={44} variant="stacked" />
+            <Logo size={44} />
+            <div className="footer-marca">
+              <p className="footer-marca-nome">Meridie Investments</p>
+              <p className="footer-marca-slogan">
+                Capital sem fronteiras. Investimento com precisão.
+              </p>
+            </div>
             <p style={{ color: "rgba(255,255,255,0.7)", maxWidth: 340, marginTop: 18 }}>
               Plataforma de investimento imobiliário entre Portugal e o Brasil.
               Intermediação, assessoria jurídica e fiscal num único processo
