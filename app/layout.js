@@ -1,4 +1,5 @@
 import "./globals.css";
+import { Spectral } from "next/font/google";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { CompareProvider } from "@/components/compare/CompareProvider";
@@ -7,6 +8,14 @@ import Analytics from "@/components/Analytics";
 import TrackVisita from "@/components/TrackVisita";
 import CookieConsent from "@/components/CookieConsent";
 import { SITE_URL, SITE_NAME } from "@/lib/site";
+
+// Fonte serif dos títulos (liga ao logo). Igual em todos os dispositivos.
+const spectral = Spectral({
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+  variable: "--fonte-serif",
+  display: "swap",
+});
 
 const DESC =
   "Plataforma de investimento imobiliário transfronteiriço entre Portugal e o Brasil. Capital sem fronteiras, investimento com precisão — intermediação, assessoria jurídica e fiscal num único processo.";
@@ -66,7 +75,7 @@ const jsonLd = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="pt-PT">
+    <html lang="pt-PT" className={spectral.variable}>
       <body>
         <Analytics />
         <TrackVisita />

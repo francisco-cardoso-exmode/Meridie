@@ -221,7 +221,7 @@ section {
 .eyebrow {
   display: inline-block;
   color: var(--gold);
-  font-family: Athelas, Georgia, "Times New Roman", serif;
+  font-family: var(--fonte-serif), Georgia, serif;
   font-weight: 600;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -235,6 +235,7 @@ section {
   margin-bottom: 52px;
 }
 .section-head h2 {
+  font-family: var(--fonte-serif), Georgia, serif;
   font-size: clamp(1.8rem, 3.5vw, 2.4rem);
   margin-bottom: 14px;
 }
