@@ -7,7 +7,7 @@ export const metadata = { title: "Assinatura" };
 
 export default async function AdminAssinatura() {
   const baseUrl = SITE_URL; // domínio real (NEXT_PUBLIC_SITE_URL), não o da Vercel
-  const logoUrl = `${baseUrl}/meridie_logo.png`;
+  const logoUrl = `${baseUrl}/logo-horizontal.png`; // logo oficial (PNG, email-safe)
 
   const lista = (await allEmpreendimentos()).map((e) => ({
     slug: e.slug,
