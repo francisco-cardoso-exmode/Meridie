@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import Reveal from "@/components/Reveal";
 import Icon from "@/components/Icon";
 import ContactForm from "@/components/ContactForm";
@@ -65,7 +65,7 @@ export default async function PaginaEmpreendimento({ params }) {
     // URL antigo? Reencaminha para o novo slug.
     const antigo = await empreendimentoPorSlugAntigo(slug);
     if (antigo && antigo.publicado !== false) {
-      redirect(`/empreendimentos/${antigo.slug}`);
+      permanentRedirect(`/empreendimentos/${antigo.slug}`);
     }
     notFound();
   }
