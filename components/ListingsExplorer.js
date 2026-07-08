@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useEffect } from "react";
 import EmpreendimentoCard from "@/components/EmpreendimentoCard";
-import { referenciaDe, PAIS_LABEL } from "@/lib/empreendimentos";
+import { referenciaDe, PAIS_LABEL, TAXA_EUR_BRL } from "@/lib/empreendimentos";
 import { enviarEvento } from "@/components/Track";
 
 const ORDENACOES = {
@@ -11,6 +11,20 @@ const ORDENACOES = {
   "preco-desc": "Preço (mais alto)",
   "area-desc": "Área (maior)",
 };
+
+// Faixas de preço (valor aproximado em €; imóveis em R$ são convertidos).
+const FAIXAS = {
+  "": "Qualquer preço",
+  "0-200000": "Até 200.000 €",
+  "200000-400000": "200.000 – 400.000 €",
+  "400000-700000": "400.000 – 700.000 €",
+  "700000-1000000": "700.000 € – 1M €",
+  "1000000-": "Mais de 1M €",
+};
+
+// Valor aproximado em euros (para comparar imóveis em moedas diferentes).
+const precoEur = (e) =>
+  e.moeda === "BRL" ? (e.preco || 0) / TAXA_EUR_BRL : e.preco || 0;
 
 // Ordem canónica dos estados do imóvel (do mais inicial ao concluído).
 export const ESTADOS_ORDEM = [
@@ -45,6 +59,7 @@ export default function ListingsExplorer({
     tipo: "",
     finalidade: "",
     estado: "",
+    preco: "",
     ordenacao: "destaque",
   };
   const [f, setF] = useState(ESTADO_INICIAL);
@@ -79,6 +94,12 @@ export default function ListingsExplorer({
       if (f.tipo && e.tipo !== f.tipo) return false;
       if (f.finalidade && e.finalidade !== f.finalidade) return false;
       if (f.estado && e.estado !== f.estado) return false;
+      if (f.preco) {
+        const [min, max] = f.preco.split("-").map(Number);
+        const v = precoEur(e);
+        if (min && v < min) return false;
+        if (max && v > max) return false;
+      }
       if (q) {
         const alvo = norm(
           [
@@ -97,8 +118,8 @@ export default function ListingsExplorer({
     });
 
     const ord = {
-      "preco-asc": (a, b) => a.preco - b.preco,
-      "preco-desc": (a, b) => b.preco - a.preco,
+      "preco-asc": (a, b) => precoEur(a) - precoEur(b),
+      "preco-desc": (a, b) => precoEur(b) - precoEur(a),
       "area-desc": (a, b) => b.area - a.area,
       destaque: (a, b) => Number(b.destaque) - Number(a.destaque),
     }[f.ordenacao];
@@ -113,6 +134,7 @@ export default function ListingsExplorer({
     f.tipo ||
     f.finalidade ||
     f.estado ||
+    f.preco ||
     f.ordenacao !== "destaque";
 
   return (
@@ -197,6 +219,14 @@ export default function ListingsExplorer({
               </select>
             </div>
           )}
+          <div className="filter">
+            <label htmlFor="f-preco">Preço</label>
+            <select id="f-preco" value={f.preco} onChange={setFiltro("preco")}>
+              {Object.entries(FAIXAS).map(([v, l]) => (
+                <option key={v} value={v}>{l}</option>
+              ))}
+            </select>
+          </div>
           <div className="filter">
             <label htmlFor="f-ord">Ordenar por</label>
             <select id="f-ord" value={f.ordenacao} onChange={set("ordenacao")}>
