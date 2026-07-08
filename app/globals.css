@@ -221,10 +221,11 @@ section {
 .eyebrow {
   display: inline-block;
   color: var(--gold);
+  font-family: Athelas, Georgia, "Times New Roman", serif;
   font-weight: 600;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   margin-bottom: 18px;
 }
 
