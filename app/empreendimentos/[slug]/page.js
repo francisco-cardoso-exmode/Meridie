@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import Reveal from "@/components/Reveal";
 import Icon from "@/components/Icon";
 import ContactForm from "@/components/ContactForm";
@@ -15,6 +15,7 @@ import ProjetoGaleria from "@/components/ProjetoGaleria";
 import GaleriaExtra from "@/components/GaleriaExtra";
 import {
   empreendimentoBySlug,
+  empreendimentoPorSlugAntigo,
   allEmpreendimentos,
   regiaoDoEmpreendimento,
 } from "@/lib/store";
@@ -60,7 +61,14 @@ export async function generateMetadata({ params }) {
 export default async function PaginaEmpreendimento({ params }) {
   const { slug } = await params;
   const e = await empreendimentoBySlug(slug);
-  if (!e || e.publicado === false) notFound();
+  if (!e || e.publicado === false) {
+    // URL antigo? Reencaminha para o novo slug.
+    const antigo = await empreendimentoPorSlugAntigo(slug);
+    if (antigo && antigo.publicado !== false) {
+      redirect(`/empreendimentos/${antigo.slug}`);
+    }
+    notFound();
+  }
 
   const paisLabel = PAIS_LABEL[e.pais];
   const regiao = await regiaoDoEmpreendimento(e);
