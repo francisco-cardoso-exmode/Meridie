@@ -9,6 +9,7 @@ import {
   precoDual,
   PAIS_LABEL,
 } from "@/lib/empreendimentos";
+import { getTaxaEurBrl } from "@/lib/cambio";
 
 export const maxDuration = 30;
 
@@ -17,19 +18,19 @@ const CACHE_DIAS = 30;
 
 const linhas = (a) => (Array.isArray(a) && a.length ? a : null);
 
-function precoTxt(e) {
+function precoTxt(e, taxa) {
   if (e.precoTipo === "consulta") return "Sob consulta";
-  const dual = precoDual(e.preco, e.moeda);
+  const dual = precoDual(e.preco, e.moeda, taxa);
   if (!dual) return "Sob consulta";
   if (e.precoTipo === "intervalo" && Number(e.precoMax) > Number(e.preco)) {
-    const dMax = precoDual(Number(e.precoMax), e.moeda);
+    const dMax = precoDual(Number(e.precoMax), e.moeda, taxa);
     return `${dual.principal} a ${dMax.principal} (≈ ${dual.secundario} a ${dMax.secundario})`;
   }
   const prefixo = e.precoTipo === "desde" ? "Desde " : "";
   return `${prefixo}${dual.principal} (≈ ${dual.secundario})`;
 }
 
-function descreve(e, n, regiao) {
+function descreve(e, n, regiao, taxa) {
   const ctx = regiao
     ? [
         regiao.conhecidaPor && `Cidade/zona conhecida por: ${regiao.conhecidaPor}`,
@@ -43,7 +44,7 @@ function descreve(e, n, regiao) {
     `EMPREENDIMENTO ${n}: ${e.nome} (Ref. ${referenciaDe(e)})`,
     `Localização: ${zonaLabel(e)}, ${PAIS_LABEL[e.pais] || e.pais}`,
     `Tipologia: ${e.tipo || "—"} · Finalidade: ${e.finalidade || "—"} · Estado: ${e.estado || "—"}`,
-    `Preço: ${precoTxt(e)}`,
+    `Preço: ${precoTxt(e, taxa)}`,
     `Quartos: ${e.quartos ?? "?"} · Casas de banho: ${e.casasBanho ?? "?"} · Área: ${e.area ? e.area + " m²" : "?"}`,
     `Tipologias disponíveis: ${tipologiasStr(e)}`,
     linhas(e.caracteristicas) && `Características: ${e.caracteristicas.join(", ")}`,
@@ -97,18 +98,23 @@ export async function POST(request) {
       );
     }
 
-    const [regiaoA, regiaoB] = await Promise.all([
+    const [regiaoA, regiaoB, taxa] = await Promise.all([
       regiaoDoEmpreendimento(a),
       regiaoDoEmpreendimento(b),
+      getTaxaEurBrl(),
     ]);
-    const conteudo = `${descreve(a, 1, regiaoA)}\n\n${descreve(
+    const conteudo = `${descreve(a, 1, regiaoA, taxa)}\n\n${descreve(
       b,
       2,
-      regiaoB
+      regiaoB,
+      taxa
     )}\n\nCompara os dois e ajuda o investidor a escolher, enaltecendo as diferenças e vantagens de cada um.`;
 
+    // A chave de cache usa a descrição sem o câmbio ao vivo (taxa de recurso),
+    // para que uma variação da cotação não obrigue a gerar tudo de novo.
+    const conteudoEstavel = `${descreve(a, 1, regiaoA)}\n\n${descreve(b, 2, regiaoB)}`;
     const key = createHash("sha256")
-      .update(`${MODEL}::${SISTEMA}::${conteudo}`)
+      .update(`${MODEL}::${SISTEMA}::${conteudoEstavel}`)
       .digest("hex");
 
     // Cache: a mesma comparação (e mesmos dados) não volta a chamar a IA.

@@ -2,7 +2,8 @@
 
 import { useMemo, useState, useEffect } from "react";
 import EmpreendimentoCard from "@/components/EmpreendimentoCard";
-import { referenciaDe, PAIS_LABEL, TAXA_EUR_BRL } from "@/lib/empreendimentos";
+import { referenciaDe, PAIS_LABEL, precoEmEuros } from "@/lib/empreendimentos";
+import { useTaxaEurBrl } from "@/components/CambioProvider";
 import { enviarEvento } from "@/components/Track";
 
 const ORDENACOES = {
@@ -21,10 +22,6 @@ const FAIXAS = {
   "700000-1000000": "700.000 € – 1M €",
   "1000000-": "Mais de 1M €",
 };
-
-// Valor aproximado em euros (para comparar imóveis em moedas diferentes).
-const precoEur = (e) =>
-  e.moeda === "BRL" ? (e.preco || 0) / TAXA_EUR_BRL : e.preco || 0;
 
 // Ordem canónica dos estados do imóvel (do mais inicial ao concluído).
 export const ESTADOS_ORDEM = [
@@ -64,6 +61,8 @@ export default function ListingsExplorer({
   };
   const [f, setF] = useState(ESTADO_INICIAL);
   const [aberto, setAberto] = useState(!colapsavel);
+  // Câmbio do momento: os imóveis em R$ são convertidos para € ao filtrar/ordenar.
+  const taxa = useTaxaEurBrl();
 
   // Estados presentes nos dados, pela ordem canónica.
   const estados = ESTADOS_ORDEM.filter((s) =>
@@ -88,6 +87,7 @@ export default function ListingsExplorer({
 
   const resultados = useMemo(() => {
     const q = norm(f.texto);
+    const precoEur = (e) => precoEmEuros(e, taxa);
     let lista = empreendimentos.filter((e) => {
       if (comPais && f.pais && e.pais !== f.pais) return false;
       if (f.zona && e.zona !== f.zona) return false;
@@ -125,7 +125,7 @@ export default function ListingsExplorer({
     }[f.ordenacao];
 
     return [...lista].sort(ord);
-  }, [empreendimentos, f, comPais]);
+  }, [empreendimentos, f, comPais, taxa]);
 
   const ativo =
     f.texto ||

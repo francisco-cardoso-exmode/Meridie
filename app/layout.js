@@ -3,6 +3,8 @@ import { Spectral } from "next/font/google";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { CompareProvider } from "@/components/compare/CompareProvider";
+import { CambioProvider } from "@/components/CambioProvider";
+import { getCambio } from "@/lib/cambio";
 import CompareBar from "@/components/compare/CompareBar";
 import Analytics from "@/components/Analytics";
 import TrackVisita from "@/components/TrackVisita";
@@ -73,7 +75,10 @@ const jsonLd = {
   slogan: "Capital sem fronteiras. Investimento com precisão.",
 };
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+  // Cotação EUR→BRL do momento; no browser é revalidada (ver CambioProvider).
+  const cambio = await getCambio();
+
   return (
     <html lang="pt-PT" className={spectral.variable}>
       <body>
@@ -83,13 +88,23 @@ export default function RootLayout({ children }) {
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        <CompareProvider>
-          <Header />
-          <main>{children}</main>
-          <Footer />
-          <CompareBar />
-          <CookieConsent />
-        </CompareProvider>
+        <CambioProvider
+          inicial={{
+            taxa: cambio.taxa,
+            aoVivo: cambio.aoVivo,
+            atualizadoEm: cambio.atualizadoEm
+              ? new Date(cambio.atualizadoEm).toISOString()
+              : null,
+          }}
+        >
+          <CompareProvider>
+            <Header />
+            <main>{children}</main>
+            <Footer />
+            <CompareBar />
+            <CookieConsent />
+          </CompareProvider>
+        </CambioProvider>
       </body>
     </html>
   );
