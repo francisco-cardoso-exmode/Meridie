@@ -1,9 +1,12 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
+import { traduzirEmFundo } from "@/lib/traducao";
 import { getDb } from "@/lib/mongodb";
 import { isAdmin } from "@/lib/adminAuth";
 import { revalidaSite } from "@/lib/revalida";
 
 export const dynamic = "force-dynamic";
+// A tradução para inglês corre em segundo plano depois de responder.
+export const maxDuration = 120;
 
 export async function GET() {
   if (!(await isAdmin())) return NextResponse.json({ ok: false }, { status: 401 });
@@ -21,7 +24,9 @@ export async function POST(request) {
   if (await db.collection("anuncios").findOne({ slug: doc.slug }))
     return NextResponse.json({ ok: false, erro: "Já existe um anúncio com esse slug." }, { status: 409 });
   delete doc._id;
+  delete doc.enFonte;
   await db.collection("anuncios").insertOne(doc);
+  after(() => traduzirEmFundo("anuncios", doc.slug));
   revalidaSite();
   return NextResponse.json({ ok: true, slug: doc.slug });
 }

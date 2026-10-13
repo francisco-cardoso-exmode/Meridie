@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { useT } from "@/components/LangProvider";
 
 // Galeria simples da marca: foto grande + miniaturas.
 export default function MarcaGaleria({ imagens, nome }) {
+  const { t, tf } = useT();
   const [i, setI] = useState(0);
   return (
     <div className="marca-galeria">
@@ -18,7 +20,7 @@ export default function MarcaGaleria({ imagens, nome }) {
               key={src}
               className={idx === i ? "on" : undefined}
               onClick={() => setI(idx)}
-              aria-label={`Fotografia ${idx + 1} de ${nome}`}
+              aria-label={tf("Fotografia {i} de {nome}", { i: idx + 1, nome })}
             >
               <img src={src} alt="" loading="lazy" />
             </button>

@@ -1,10 +1,12 @@
-import Link from "next/link";
+import L from "@/components/L";
 import Logo from "@/components/Logo";
 import Icon from "@/components/Icon";
 import { getRedes, getEmpresa } from "@/lib/config";
 import { TECNOLOGIA_VISIVEL } from "@/lib/flags";
+import { t } from "@/lib/i18n";
 
-export default async function Footer() {
+export default async function Footer({ lang = "pt" }) {
+  const T = (x) => t(lang, x);
   const ano = new Date().getFullYear();
   const [redes, empresa] = await Promise.all([getRedes(), getEmpresa()]);
   const email = empresa.email || "geral@meridie.pt";
@@ -19,13 +21,13 @@ export default async function Footer() {
             <div className="footer-marca">
               <p className="footer-marca-nome">Meridie Investments</p>
               <p className="footer-marca-slogan">
-                Capital sem fronteiras. Investimento com precisão.
+                {T("Capital sem fronteiras. Investimento com precisão.")}
               </p>
             </div>
             <p style={{ color: "rgba(255,255,255,0.7)", maxWidth: 340, marginTop: 18 }}>
-              Investimento imobiliário entre Portugal e o Brasil e representação
-              de bebidas e alimentação{TECNOLOGIA_VISIVEL ? ", e tecnologia" : ""} — com o
-              mesmo rigor e acompanhamento em cada área.
+              {TECNOLOGIA_VISIVEL
+                ? T("Investimento imobiliário entre Portugal e o Brasil, representação de bebidas e alimentação, e tecnologia — com o mesmo rigor e acompanhamento em cada área.")
+                : T("Investimento imobiliário entre Portugal e o Brasil e representação de bebidas e alimentação — com o mesmo rigor e acompanhamento em cada área.")}
             </p>
             {(redes.instagram || redes.linkedin) && (
               <div className="footer-social">
@@ -43,49 +45,49 @@ export default async function Footer() {
             )}
           </div>
           <div>
-            <h4>Áreas</h4>
+            <h4>{T("Áreas")}</h4>
             <ul>
               <li>
-                <Link href="/portugal">Investir em Portugal</Link>
+                <L href="/portugal">{T("Investir em Portugal")}</L>
               </li>
               <li>
-                <Link href="/brasil">Investir no Brasil</Link>
+                <L href="/brasil">{T("Investir no Brasil")}</L>
               </li>
               <li>
-                <Link href="/marcas">Bebidas & Alimentação</Link>
+                <L href="/marcas">{T("Bebidas & Alimentação")}</L>
               </li>
               {TECNOLOGIA_VISIVEL && (
                 <li>
-                  <Link href="/tecnologia">Tecnologia</Link>
+                  <L href="/tecnologia">{T("Tecnologia")}</L>
                 </li>
               )}
               <li>
-                <Link href="/como-funciona">Como Funciona</Link>
+                <L href="/como-funciona">{T("Como Funciona")}</L>
               </li>
               <li>
-                <Link href="/faq">Perguntas frequentes</Link>
+                <L href="/faq">{T("Perguntas frequentes")}</L>
               </li>
             </ul>
           </div>
           <div>
-            <h4>Empresa</h4>
+            <h4>{T("Empresa")}</h4>
             <ul>
               <li>
-                <Link href="/quem-somos">Quem Somos</Link>
+                <L href="/quem-somos">{T("Quem Somos")}</L>
               </li>
               <li>
-                <Link href="/parcerias">Parcerias</Link>
+                <L href="/parcerias">{T("Parcerias")}</L>
               </li>
               <li>
-                <Link href="/publicidade">Parceiros</Link>
+                <L href="/publicidade">{T("Parceiros")}</L>
               </li>
               <li>
-                <Link href="/contactos">Contactos</Link>
+                <L href="/contactos">{T("Contactos")}</L>
               </li>
             </ul>
           </div>
           <div>
-            <h4>Contactos</h4>
+            <h4>{T("Contactos")}</h4>
             <ul>
               <li>{email}</li>
               <li>{telefone}</li>
@@ -94,11 +96,11 @@ export default async function Footer() {
           </div>
         </div>
         <div className="footer-bottom">
-          <span>© {ano} Meridie Investments. Todos os direitos reservados.</span>
+          <span>© {ano} Meridie Investments. {T("Todos os direitos reservados.")}</span>
           <span className="footer-legal">
-            <Link href="/privacidade">Privacidade</Link>
-            <Link href="/cookies">Cookies</Link>
-            <Link href="/termos">Termos</Link>
+            <L href="/privacidade">{T("Privacidade")}</L>
+            <L href="/cookies">{T("Cookies")}</L>
+            <L href="/termos">{T("Termos")}</L>
           </span>
         </div>
       </div>

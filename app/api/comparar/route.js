@@ -84,7 +84,8 @@ FORMATO: parágrafos curtos e, quando útil, bullets a começar por "- ". Destac
 
 export async function POST(request) {
   try {
-    const { a: slugA, b: slugB } = await request.json();
+    const { a: slugA, b: slugB, lang } = await request.json();
+    const emIngles = lang === "en";
     const a = await empreendimentoBySlug(slugA);
     const b = await empreendimentoBySlug(slugB);
 
@@ -108,13 +109,15 @@ export async function POST(request) {
       2,
       regiaoB,
       taxa
-    )}\n\nCompara os dois e ajuda o investidor a escolher, enaltecendo as diferenças e vantagens de cada um.`;
+    )}\n\nCompara os dois e ajuda o investidor a escolher, enaltecendo as diferenças e vantagens de cada um.${
+      emIngles ? "\n\nEscreve a resposta em inglês (British English)." : ""
+    }`;
 
     // A chave de cache usa a descrição sem o câmbio ao vivo (taxa de recurso),
     // para que uma variação da cotação não obrigue a gerar tudo de novo.
     const conteudoEstavel = `${descreve(a, 1, regiaoA)}\n\n${descreve(b, 2, regiaoB)}`;
     const key = createHash("sha256")
-      .update(`${MODEL}::${SISTEMA}::${conteudoEstavel}`)
+      .update(`${MODEL}::${SISTEMA}::${emIngles ? "en::" : ""}${conteudoEstavel}`)
       .digest("hex");
 
     // Cache: a mesma comparação (e mesmos dados) não volta a chamar a IA.

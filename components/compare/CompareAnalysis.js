@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useT } from "@/components/LangProvider";
 
 // Negrito inline: **texto** → <strong>
 function inline(texto, kp) {
@@ -65,6 +66,7 @@ function parse(texto) {
 }
 
 export default function CompareAnalysis({ a, b, nomeA, nomeB }) {
+  const { t, tf, lang } = useT();
   const [estado, setEstado] = useState({ a: "loading", texto: "", erro: "" });
 
   useEffect(() => {
@@ -73,7 +75,7 @@ export default function CompareAnalysis({ a, b, nomeA, nomeB }) {
     fetch("/api/comparar", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ a, b }),
+      body: JSON.stringify({ a, b, lang }),
     })
       .then(async (res) => {
         const json = await res.json().catch(() => ({}));
@@ -84,12 +86,12 @@ export default function CompareAnalysis({ a, b, nomeA, nomeB }) {
           setEstado({
             a: "erro",
             texto: "",
-            erro: json.erro || "Não foi possível gerar a análise agora.",
+            erro: t(json.erro || "Não foi possível gerar a análise agora."),
           });
         }
       })
       .catch(() => {
-        if (vivo) setEstado({ a: "erro", texto: "", erro: "Erro de ligação." });
+        if (vivo) setEstado({ a: "erro", texto: "", erro: t("Erro de ligação.") });
       });
     return () => {
       vivo = false;
@@ -99,15 +101,15 @@ export default function CompareAnalysis({ a, b, nomeA, nomeB }) {
   return (
     <section className="comp-ia">
       <h3>
-        <span className="comp-ia-badge">IA</span> Análise comparativa
+        <span className="comp-ia-badge">{t("IA")}</span> {t("Análise comparativa")}
       </h3>
       <p className="comp-ia-sub">
-        Pontos fortes de cada um para te ajudar a decidir entre {nomeA} e {nomeB}.
+        {tf("Pontos fortes de cada um para te ajudar a decidir entre {a} e {b}.", { a: nomeA, b: nomeB })}
       </p>
 
       {estado.a === "loading" && (
         <div className="comp-ia-load">
-          <span className="spinner" /> A analisar os dois empreendimentos…
+          <span className="spinner" /> {t("A analisar os dois empreendimentos…")}
         </div>
       )}
 
@@ -129,8 +131,7 @@ export default function CompareAnalysis({ a, b, nomeA, nomeB }) {
             return <p key={i}>{inline(bl.texto, i)}</p>;
           })}
           <p className="comp-ia-nota">
-            Análise gerada por IA com base nos dados dos empreendimentos. Confirme
-            sempre os detalhes com a nossa equipa.
+            {t("Análise gerada por IA com base nos dados dos empreendimentos. Confirme sempre os detalhes com a nossa equipa.")}
           </p>
         </div>
       )}

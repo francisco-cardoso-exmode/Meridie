@@ -1,4 +1,7 @@
-import Link from "next/link";
+"use client";
+
+import L from "@/components/L";
+import { useT } from "@/components/LangProvider";
 
 /**
  * Logo oficial da Meridie Investments (símbolo + marca, horizontal, dourado).
@@ -10,6 +13,7 @@ export default function Logo({
   variant = "inline",
   className = "",
 }) {
+  const { t } = useT();
   const content = (
     <span className={`logo logo-${variant} ${className}`.trim()}>
       <img
@@ -20,7 +24,7 @@ export default function Logo({
       />
       {variant === "stacked" && (
         <span className="logo-tagline">
-          Capital sem fronteiras. Investimento com precisão.
+          {t("Capital sem fronteiras. Investimento com precisão.")}
         </span>
       )}
     </span>
@@ -28,8 +32,8 @@ export default function Logo({
 
   if (!href) return content;
   return (
-    <Link href={href} className="logo-link" aria-label="Meridie Investments — início">
+    <L href={href} className="logo-link" aria-label={t("Meridie Investments — início")}>
       {content}
-    </Link>
+    </L>
   );
 }

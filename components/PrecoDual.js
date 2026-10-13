@@ -3,6 +3,7 @@
 import { precoDual } from "@/lib/empreendimentos";
 import { etiquetaCambio } from "@/lib/cambio";
 import { useTaxaEurBrl } from "@/components/CambioProvider";
+import { useT } from "@/components/LangProvider";
 
 // Mostra o preço na moeda principal (grande) e a conversão na outra (pequena),
 // sempre ao câmbio do momento (ver components/CambioProvider.js).
@@ -10,13 +11,14 @@ import { useTaxaEurBrl } from "@/components/CambioProvider";
 // max: limite superior (só usado quando tipo === "intervalo").
 export default function PrecoDual({ preco, moeda = "EUR", sub, tipo = "exato", max }) {
   const taxa = useTaxaEurBrl();
-  if (tipo === "consulta") return <span className="pd-main">Sob consulta</span>;
-  const d = precoDual(preco, moeda, taxa);
-  if (!d) return <span className="pd-main">Sob consulta</span>;
-  const titulo = etiquetaCambio(taxa);
+  const { lang, t } = useT();
+  if (tipo === "consulta") return <span className="pd-main">{t("Sob consulta")}</span>;
+  const d = precoDual(preco, moeda, taxa, lang);
+  if (!d) return <span className="pd-main">{t("Sob consulta")}</span>;
+  const titulo = etiquetaCambio(taxa, lang);
 
   if (tipo === "intervalo" && Number(max) > Number(preco)) {
-    const dMax = precoDual(Number(max), moeda, taxa);
+    const dMax = precoDual(Number(max), moeda, taxa, lang);
     return (
       <>
         <span className="pd-main">
@@ -30,7 +32,7 @@ export default function PrecoDual({ preco, moeda = "EUR", sub, tipo = "exato", m
     );
   }
 
-  const prefixo = tipo === "desde" ? "Desde " : "";
+  const prefixo = tipo === "desde" ? `${t("Desde")} ` : "";
   return (
     <>
       <span className="pd-main">

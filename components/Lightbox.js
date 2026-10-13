@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useCallback } from "react";
+import { useT } from "@/components/LangProvider";
 
 // Popup para ver as fotos em grande, com navegação (setas/teclado) e fecho.
 // indice: número da foto aberta (ou null). onMudar: setter (aceita valor ou função).
 export default function Lightbox({ imagens = [], nome = "", indice, onMudar }) {
+  const { t, tf } = useT();
   const total = imagens.length;
   const aberto = indice !== null && indice !== undefined;
 
@@ -39,7 +41,7 @@ export default function Lightbox({ imagens = [], nome = "", indice, onMudar }) {
         <button
           type="button"
           className="lb-nav lb-ant"
-          aria-label="Anterior"
+          aria-label={t("Anterior")}
           onClick={(e) => {
             e.stopPropagation();
             ant();
@@ -51,14 +53,14 @@ export default function Lightbox({ imagens = [], nome = "", indice, onMudar }) {
       <img
         className="lb-img"
         src={imagens[indice]}
-        alt={`${nome} — foto ${indice + 1} de ${total}`}
+        alt={tf("{nome} — foto {i} de {n}", { nome, i: indice + 1, n: total })}
         onClick={(e) => e.stopPropagation()}
       />
       {total > 1 && (
         <button
           type="button"
           className="lb-nav lb-prox"
-          aria-label="Seguinte"
+          aria-label={t("Seguinte")}
           onClick={(e) => {
             e.stopPropagation();
             prox();

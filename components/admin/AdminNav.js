@@ -11,6 +11,7 @@ const LINKS = [
   { href: "/admin/marcas", label: "Marcas" },
   { href: "/admin/publicidade", label: "Parceiros" },
   { href: "/admin/paginas", label: "Páginas" },
+  { href: "/admin/traducoes", label: "Traduções" },
   { href: "/admin/leads", label: "Leads" },
   { href: "/admin/emails", label: "Emails" },
   { href: "/admin/assinatura", label: "Assinatura" },

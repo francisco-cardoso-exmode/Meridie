@@ -3636,3 +3636,91 @@ a.marca-card:hover {
 .admin-login-link:hover {
   color: var(--navy);
 }
+
+/* Troca de idioma (PT | EN) no menu */
+.troca-idioma {
+  display: inline-flex;
+  gap: 2px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+  padding: 2px;
+}
+.troca-idioma > * {
+  padding: 4px 9px;
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.7);
+}
+.troca-idioma .on {
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+}
+.nav .troca-idioma a:hover {
+  color: var(--gold-light);
+}
+@media (max-width: 860px) {
+  .nav .troca-idioma {
+    margin-top: 12px;
+  }
+  .nav .troca-idioma a {
+    width: auto;
+    padding: 4px 9px;
+    border-bottom: none;
+  }
+}
+
+/* Backoffice — Traduções */
+.trad-linha {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.trad-progresso {
+  margin-top: 8px;
+}
+.trad-barra {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--paper-soft);
+  overflow: hidden;
+}
+.trad-barra span {
+  display: block;
+  height: 100%;
+  background: var(--gold);
+  transition: width 0.3s ease;
+}
+
+/* Backoffice — painel "Versão inglesa" */
+.versao-en {
+  border-top: 1px dashed var(--border);
+  padding-top: 14px;
+}
+.versao-en-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 12px;
+}
+.versao-en-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.versao-en-rotulo {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+.versao-en-pt {
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-weight: 400;
+  white-space: pre-wrap;
+}

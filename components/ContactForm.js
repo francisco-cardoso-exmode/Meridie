@@ -2,8 +2,10 @@
 
 import { useState, useRef } from "react";
 import { enviarEvento } from "@/components/Track";
+import { useT } from "@/components/LangProvider";
 
 export default function ContactForm({ assuntoInicial = "", origem = "contacto" }) {
+  const { t, lang } = useT();
   const [estado, setEstado] = useState({ a: "idle", msg: "" });
   const interesseFeito = useRef(false);
 
@@ -24,6 +26,7 @@ export default function ContactForm({ assuntoInicial = "", origem = "contacto" }
       email: form.email.value,
       assunto: form.assunto.value,
       mensagem: form.mensagem.value,
+      lang,
     };
 
     try {
@@ -37,17 +40,17 @@ export default function ContactForm({ assuntoInicial = "", origem = "contacto" }
       if (res.ok && json.ok) {
         setEstado({
           a: "ok",
-          msg: "Mensagem enviada! Enviámos-te um email de confirmação e a nossa equipa entrará em contacto muito em breve.",
+          msg: t("Mensagem enviada! Enviámos-te um email de confirmação e a nossa equipa entrará em contacto muito em breve."),
         });
         enviarEvento("lead_enviada", origem);
         form.reset();
       } else {
-        setEstado({ a: "erro", msg: json.erro || "Não foi possível enviar." });
+        setEstado({ a: "erro", msg: t(json.erro || "Não foi possível enviar.") });
       }
     } catch {
       setEstado({
         a: "erro",
-        msg: "Erro de ligação. Verifica a internet e tenta novamente.",
+        msg: t("Erro de ligação. Verifica a internet e tenta novamente."),
       });
     }
   }
@@ -55,26 +58,26 @@ export default function ContactForm({ assuntoInicial = "", origem = "contacto" }
   return (
     <form className="form-grid" onSubmit={onSubmit} onFocus={marcarInteresse} noValidate>
       <div className="field">
-        <label htmlFor="nome">Nome *</label>
-        <input id="nome" name="nome" type="text" required placeholder="O teu nome" />
+        <label htmlFor="nome">{t("Nome")} *</label>
+        <input id="nome" name="nome" type="text" required placeholder={t("O teu nome")} />
       </div>
       <div className="field">
         <label htmlFor="email">Email *</label>
-        <input id="email" name="email" type="email" required placeholder="email@exemplo.pt" />
+        <input id="email" name="email" type="email" required placeholder={t("email@exemplo.pt")} />
       </div>
       <div className="field full">
-        <label htmlFor="assunto">Assunto</label>
+        <label htmlFor="assunto">{t("Assunto")}</label>
         <input
           id="assunto"
           name="assunto"
           type="text"
           defaultValue={assuntoInicial}
-          placeholder="Sobre o que queres falar?"
+          placeholder={t("Sobre o que queres falar?")}
         />
       </div>
       <div className="field full">
-        <label htmlFor="mensagem">Mensagem *</label>
-        <textarea id="mensagem" name="mensagem" rows={6} required placeholder="Escreve a tua mensagem..." />
+        <label htmlFor="mensagem">{t("Mensagem")} *</label>
+        <textarea id="mensagem" name="mensagem" rows={6} required placeholder={t("Escreve a tua mensagem...")} />
       </div>
 
       {estado.a === "ok" && <div className="form-msg ok">{estado.msg}</div>}
@@ -82,7 +85,7 @@ export default function ContactForm({ assuntoInicial = "", origem = "contacto" }
 
       <div className="field full">
         <button type="submit" className="btn btn-primary" disabled={estado.a === "loading"}>
-          {estado.a === "loading" ? "A enviar..." : "Enviar mensagem"}
+          {estado.a === "loading" ? t("A enviar...") : t("Enviar mensagem")}
         </button>
       </div>
     </form>

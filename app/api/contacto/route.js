@@ -16,6 +16,7 @@ export async function POST(request) {
     const email = (dados.email || "").trim();
     const assunto = (dados.assunto || "").trim();
     const mensagem = (dados.mensagem || "").trim();
+    const lang = dados.lang === "en" ? "en" : "pt";
 
     // Validação no servidor
     if (!nome || !email || !mensagem) {
@@ -39,6 +40,7 @@ export async function POST(request) {
         email,
         assunto,
         mensagem,
+        idioma: lang,
         criadoEm: new Date(),
       });
     } catch (dbErro) {
@@ -51,7 +53,7 @@ export async function POST(request) {
 
     // 3. Enviar confirmação ao cliente (não bloqueia a resposta se falhar)
     try {
-      await enviarConfirmacaoCliente({ nome, email, assunto });
+      await enviarConfirmacaoCliente({ nome, email, assunto, lang });
     } catch (confErro) {
       console.error("Erro a enviar confirmação ao cliente:", confErro);
     }

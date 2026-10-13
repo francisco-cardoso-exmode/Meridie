@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import "leaflet/dist/leaflet.css";
+import { useT } from "@/components/LangProvider";
 
 // Cores dos marcadores por tipo de ponto de interesse.
 export const CORES_PONTO = {
@@ -14,6 +15,7 @@ export const CORES_PONTO = {
 };
 
 export default function RegionMap({ mapa, pontos = [], nome }) {
+  const { t, tf } = useT();
   const elRef = useRef(null);
   const mapRef = useRef(null);
 
@@ -69,7 +71,7 @@ export default function RegionMap({ mapa, pontos = [], nome }) {
       className="region-map"
       ref={elRef}
       role="img"
-      aria-label={`Mapa de ${nome}`}
+      aria-label={tf("Mapa de {nome}", { nome })}
     />
   );
 }

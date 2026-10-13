@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import ConteudoForm from "@/components/admin/ConteudoForm";
-import { PAGINAS, getConteudo } from "@/lib/conteudo";
+import { PAGINAS, getConteudo, getPaginaEn } from "@/lib/conteudo";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Editar página" };
@@ -10,7 +10,11 @@ export default async function EditarPagina({ params }) {
   const { pagina } = await params;
   const reg = PAGINAS.find((p) => p.key === pagina);
   if (!reg) notFound();
-  const valores = await getConteudo(pagina);
+  const [valores, enMostrado, enGuardado] = await Promise.all([
+    getConteudo(pagina),
+    getConteudo(pagina, "en"),
+    getPaginaEn(pagina),
+  ]);
 
   return (
     <div className="admin-container">
@@ -21,7 +25,13 @@ export default async function EditarPagina({ params }) {
           Ver no site ↗
         </Link>
       </div>
-      <ConteudoForm pagina={pagina} campos={reg.campos} valores={valores} />
+      <ConteudoForm
+        pagina={pagina}
+        campos={reg.campos}
+        valores={valores}
+        enMostrado={enMostrado}
+        enGuardado={enGuardado}
+      />
     </div>
   );
 }

@@ -1,9 +1,12 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
+import { traduzirEmFundo } from "@/lib/traducao";
 import { getDb } from "@/lib/mongodb";
 import { isAdmin } from "@/lib/adminAuth";
 import { revalidaSite } from "@/lib/revalida";
 
 export const dynamic = "force-dynamic";
+// A tradução para inglês corre em segundo plano depois de responder.
+export const maxDuration = 120;
 
 export async function GET() {
   if (!(await isAdmin()))
@@ -40,7 +43,9 @@ export async function POST(request) {
   }
 
   delete doc._id;
+  delete doc.enFonte;
   await db.collection("empreendimentos").insertOne(doc);
   revalidaSite();
+  after(() => traduzirEmFundo("empreendimentos", doc.slug));
   return NextResponse.json({ ok: true, slug: doc.slug });
 }

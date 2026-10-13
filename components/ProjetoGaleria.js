@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import Lightbox from "@/components/Lightbox";
+import { useT } from "@/components/LangProvider";
 
 // Galeria principal do empreendimento (imagem grande + 2 laterais). Clicar em
 // qualquer foto abre o lightbox, que navega por TODAS as imagens do projeto.
 export default function ProjetoGaleria({ imagens = [], nome = "" }) {
+  const { t, tf } = useT();
   const [indice, setIndice] = useState(null);
   if (!imagens.length) return null;
 
@@ -31,7 +33,7 @@ export default function ProjetoGaleria({ imagens = [], nome = "" }) {
                 >
                   <img src={img} alt={`${nome} — foto ${i + 2}`} loading="lazy" />
                   {i === lado.length - 1 && extra > 0 && (
-                    <span className="galeria-mais">+{extra} fotos</span>
+                    <span className="galeria-mais">+{extra} {t("fotos")}</span>
                   )}
                 </button>
               </div>

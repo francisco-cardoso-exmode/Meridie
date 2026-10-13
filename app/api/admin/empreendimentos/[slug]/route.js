@@ -1,9 +1,12 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
+import { traduzirEmFundo } from "@/lib/traducao";
 import { getDb } from "@/lib/mongodb";
 import { isAdmin } from "@/lib/adminAuth";
 import { revalidaSite } from "@/lib/revalida";
 
 export const dynamic = "force-dynamic";
+// A tradução para inglês corre em segundo plano depois de responder.
+export const maxDuration = 120;
 
 export async function PUT(request, { params }) {
   if (!(await isAdmin()))
@@ -14,9 +17,11 @@ export async function PUT(request, { params }) {
   if (!doc) return NextResponse.json({ ok: false }, { status: 400 });
 
   delete doc._id;
+  delete doc.enFonte;
   doc.slug = slug; // slug é a chave — não muda na edição
 
   const db = await getDb();
+  const antes = await db.collection("empreendimentos").findOne({ slug }, { projection: { en: 1 } });
   const r = await db
     .collection("empreendimentos")
     .updateOne({ slug }, { $set: doc });
@@ -24,6 +29,7 @@ export async function PUT(request, { params }) {
     return NextResponse.json({ ok: false, erro: "Não encontrado." }, { status: 404 });
 
   revalidaSite();
+  after(() => traduzirEmFundo("empreendimentos", slug, antes?.en ?? null));
   return NextResponse.json({ ok: true });
 }
 

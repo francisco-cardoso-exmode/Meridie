@@ -1,9 +1,12 @@
 "use client";
 
 import { useCompare } from "@/components/compare/CompareProvider";
+import { useT } from "@/components/LangProvider";
+
 
 export default function CompareBar() {
   const { itens, remover, limpar } = useCompare();
+  const { t, href } = useT();
   if (!itens.length) return null;
 
   const dois = itens.length === 2;
@@ -11,13 +14,13 @@ export default function CompareBar() {
 
   function comparar() {
     if (!mesma) return;
-    window.location.href = `/comparar?a=${encodeURIComponent(
-      itens[0].slug
-    )}&b=${encodeURIComponent(itens[1].slug)}`;
+    window.location.href = href(
+      `/comparar?a=${encodeURIComponent(itens[0].slug)}&b=${encodeURIComponent(itens[1].slug)}`
+    );
   }
 
   return (
-    <div className="compare-bar" role="region" aria-label="Comparador">
+    <div className="compare-bar" role="region" aria-label={t("Comparador")}>
       <div className="cb-inner">
         <div className="cb-itens">
           {itens.map((it, i) => (
@@ -30,7 +33,7 @@ export default function CompareBar() {
               <button
                 type="button"
                 className="cb-x"
-                aria-label="Remover"
+                aria-label={t("Remover")}
                 onClick={() => remover(it.slug)}
               >
                 ×
@@ -39,17 +42,17 @@ export default function CompareBar() {
             </span>
           ))}
           {itens.length === 1 && (
-            <span className="cb-hint">Escolhe um segundo do mesmo país…</span>
+            <span className="cb-hint">{t("Escolhe um segundo do mesmo país…")}</span>
           )}
           {dois && !mesma && (
             <span className="cb-hint cb-hint-warn">
-              Só dá para comparar dois empreendimentos do mesmo país.
+              {t("Só dá para comparar dois empreendimentos do mesmo país.")}
             </span>
           )}
         </div>
         <div className="cb-acoes">
           <button type="button" className="cb-limpar" onClick={limpar}>
-            Limpar
+            {t("Limpar")}
           </button>
           <button
             type="button"
@@ -57,7 +60,7 @@ export default function CompareBar() {
             disabled={!mesma}
             onClick={comparar}
           >
-            Comparar
+            {t("Comparar")}
           </button>
         </div>
       </div>

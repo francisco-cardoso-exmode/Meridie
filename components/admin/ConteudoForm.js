@@ -1,14 +1,17 @@
 "use client";
 
 import { useState } from "react";
+import VersaoInglesa from "@/components/admin/VersaoInglesa";
 
-export default function ConteudoForm({ pagina, campos, valores }) {
+export default function ConteudoForm({ pagina, campos, valores, enMostrado = {}, enGuardado = {} }) {
   const [f, setF] = useState(() => {
     const o = {};
     campos.forEach((c) => (o[c.k] = valores?.[c.k] ?? ""));
     return o;
   });
   const [estado, setEstado] = useState({ a: "idle", msg: "" });
+  // Só os campos ingleses corrigidos à mão nesta edição.
+  const [enEditado, setEnEditado] = useState({});
 
   const set = (k) => (e) => setF((p) => ({ ...p, [k]: e.target.value }));
 
@@ -19,11 +22,13 @@ export default function ConteudoForm({ pagina, campos, valores }) {
       const res = await fetch(`/api/admin/paginas/${pagina}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ campos: f }),
+        body: JSON.stringify(
+          Object.keys(enEditado).length ? { campos: f, en: { ...enGuardado, ...enEditado } } : { campos: f }
+        ),
       });
       const json = await res.json();
       if (res.ok && json.ok) {
-        setEstado({ a: "ok", msg: "Guardado. O site atualiza em ~1 minuto." });
+        setEstado({ a: "ok", msg: "Guardado. A versão inglesa é atualizada automaticamente." });
       } else {
         setEstado({ a: "erro", msg: "Não foi possível guardar." });
       }
@@ -46,6 +51,14 @@ export default function ConteudoForm({ pagina, campos, valores }) {
       ))}
       {estado.a === "ok" && <div className="form-msg ok">{estado.msg}</div>}
       {estado.a === "erro" && <div className="form-msg erro">{estado.msg}</div>}
+      <VersaoInglesa
+        colecao="paginas"
+        doc={{ campos: valores }}
+        en={{ ...enMostrado, ...enEditado }}
+        onChange={(novo) =>
+          setEnEditado(Object.fromEntries(Object.entries(novo).filter(([k, v]) => v !== enMostrado[k])))
+        }
+      />
       <div className="admin-form-actions">
         <button type="submit" className="btn btn-primary" disabled={estado.a === "loading"}>
           {estado.a === "loading" ? "A guardar..." : "Guardar"}

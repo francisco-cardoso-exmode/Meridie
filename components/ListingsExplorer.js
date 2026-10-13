@@ -5,6 +5,7 @@ import EmpreendimentoCard from "@/components/EmpreendimentoCard";
 import { referenciaDe, PAIS_LABEL, precoEmEuros } from "@/lib/empreendimentos";
 import { useTaxaEurBrl } from "@/components/CambioProvider";
 import { enviarEvento } from "@/components/Track";
+import { useT } from "@/components/LangProvider";
 
 const ORDENACOES = {
   destaque: "Em destaque",
@@ -49,6 +50,7 @@ export default function ListingsExplorer({
   comPais = false,
   colapsavel = false,
 }) {
+  const { t: tr } = useT();
   const ESTADO_INICIAL = {
     texto: "",
     pais: "",
@@ -148,8 +150,8 @@ export default function ListingsExplorer({
                 type="search"
                 value={f.texto}
                 onChange={set("texto")}
-                placeholder="Pesquisar por nome, cidade, zona, referência…"
-                aria-label="Pesquisar empreendimentos"
+                placeholder={tr("Pesquisar por nome, cidade, zona, referência…")}
+                aria-label={tr("Pesquisar empreendimentos")}
               />
             </div>
           )}
@@ -160,7 +162,7 @@ export default function ListingsExplorer({
               onClick={() => setAberto((v) => !v)}
               aria-expanded={aberto}
             >
-              Filtros {aberto ? "▴" : "▾"}
+              {tr("Filtros")} {aberto ? "▴" : "▾"}
             </button>
           )}
         </div>
@@ -170,68 +172,68 @@ export default function ListingsExplorer({
         <div className="filters">
           {comPais && (
             <div className="filter">
-              <label htmlFor="f-pais">País</label>
+              <label htmlFor="f-pais">{tr("País")}</label>
               <select id="f-pais" value={f.pais} onChange={setFiltro("pais")}>
-                <option value="">Portugal e Brasil</option>
+                <option value="">{tr("Portugal e Brasil")}</option>
                 {paises.map((p) => (
                   <option key={p} value={p}>
-                    {PAIS_LABEL[p] || p}
+                    {tr(PAIS_LABEL[p] || p)}
                   </option>
                 ))}
               </select>
             </div>
           )}
           <div className="filter">
-            <label htmlFor="f-zona">Zona</label>
+            <label htmlFor="f-zona">{tr("Zona")}</label>
             <select id="f-zona" value={f.zona} onChange={setFiltro("zona")}>
-              <option value="">Todas as zonas</option>
+              <option value="">{tr("Todas as zonas")}</option>
               {zonas.map((z) => (
                 <option key={z} value={z}>{z}</option>
               ))}
             </select>
           </div>
           <div className="filter">
-            <label htmlFor="f-tipo">Tipologia</label>
+            <label htmlFor="f-tipo">{tr("Tipologia")}</label>
             <select id="f-tipo" value={f.tipo} onChange={setFiltro("tipo")}>
-              <option value="">Todas as tipologias</option>
+              <option value="">{tr("Todas as tipologias")}</option>
               {tipos.map((t) => (
-                <option key={t} value={t}>{t}</option>
+                <option key={t} value={t}>{tr(t)}</option>
               ))}
             </select>
           </div>
           <div className="filter">
-            <label htmlFor="f-fin">Finalidade</label>
+            <label htmlFor="f-fin">{tr("Finalidade")}</label>
             <select id="f-fin" value={f.finalidade} onChange={setFiltro("finalidade")}>
-              <option value="">Qualquer</option>
+              <option value="">{tr("Qualquer")}</option>
               {finalidades.map((x) => (
-                <option key={x} value={x}>{x}</option>
+                <option key={x} value={x}>{tr(x)}</option>
               ))}
             </select>
           </div>
           {estados.length > 0 && (
             <div className="filter">
-              <label htmlFor="f-estado">Estado</label>
+              <label htmlFor="f-estado">{tr("Estado")}</label>
               <select id="f-estado" value={f.estado} onChange={setFiltro("estado")}>
-                <option value="">Qualquer estado</option>
+                <option value="">{tr("Qualquer estado")}</option>
                 {estados.map((x) => (
-                  <option key={x} value={x}>{x}</option>
+                  <option key={x} value={x}>{tr(x)}</option>
                 ))}
               </select>
             </div>
           )}
           <div className="filter">
-            <label htmlFor="f-preco">Preço</label>
+            <label htmlFor="f-preco">{tr("Preço")}</label>
             <select id="f-preco" value={f.preco} onChange={setFiltro("preco")}>
               {Object.entries(FAIXAS).map(([v, l]) => (
-                <option key={v} value={v}>{l}</option>
+                <option key={v} value={v}>{tr(l)}</option>
               ))}
             </select>
           </div>
           <div className="filter">
-            <label htmlFor="f-ord">Ordenar por</label>
+            <label htmlFor="f-ord">{tr("Ordenar por")}</label>
             <select id="f-ord" value={f.ordenacao} onChange={set("ordenacao")}>
               {Object.entries(ORDENACOES).map(([v, l]) => (
-                <option key={v} value={v}>{l}</option>
+                <option key={v} value={v}>{tr(l)}</option>
               ))}
             </select>
           </div>
@@ -241,11 +243,11 @@ export default function ListingsExplorer({
       <div className="filters-meta">
         <span className="filters-count">
           <strong>{resultados.length}</strong>{" "}
-          {resultados.length === 1 ? "empreendimento" : "empreendimentos"}
+          {resultados.length === 1 ? tr("empreendimento") : tr("empreendimentos")}
         </span>
         {ativo && (
           <button type="button" className="btn-reset" onClick={reset}>
-            Limpar filtros
+            {tr("Limpar filtros")}
           </button>
         )}
       </div>
@@ -258,9 +260,9 @@ export default function ListingsExplorer({
         </div>
       ) : (
         <div className="empty-state">
-          <p>Nenhum empreendimento corresponde à pesquisa.</p>
+          <p>{tr("Nenhum empreendimento corresponde à pesquisa.")}</p>
           <button type="button" className="btn-reset" onClick={reset}>
-            Limpar filtros
+            {tr("Limpar filtros")}
           </button>
         </div>
       )}

@@ -1,6 +1,10 @@
+"use client";
+
 import { videoSrc } from "@/lib/format";
+import { useT } from "@/components/LangProvider";
 
 export default function VideoEmbed({ url }) {
+  const { t, tf } = useT();
   const v = videoSrc(url);
   if (!v) return null;
   if (v.tipo === "file") {
@@ -10,7 +14,7 @@ export default function VideoEmbed({ url }) {
     <iframe
       className="video-embed"
       src={v.src}
-      title="Vídeo do empreendimento"
+      title={t("Vídeo do empreendimento")}
       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
       allowFullScreen
     />

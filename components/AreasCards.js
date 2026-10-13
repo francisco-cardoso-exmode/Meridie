@@ -1,7 +1,10 @@
-import Link from "next/link";
+"use client";
+
+import L from "@/components/L";
 import Reveal from "@/components/Reveal";
 import Icon from "@/components/Icon";
 import { TECNOLOGIA_VISIVEL } from "@/lib/flags";
+import { useT } from "@/components/LangProvider";
 
 // Cartões das áreas de negócio da Meridie (Home e Quem Somos).
 const AREAS = {
@@ -29,6 +32,7 @@ const AREAS = {
 };
 
 export default function AreasCards({ areas: pedidas = ["imobiliario", "marcas", "tecnologia"] }) {
+  const { t } = useT();
   const areas = pedidas.filter((k) => k !== "tecnologia" || TECNOLOGIA_VISIVEL);
   return (
     <div className={`grid ${areas.length === 2 ? "grid-2" : "grid-3"}`}>
@@ -36,12 +40,12 @@ export default function AreasCards({ areas: pedidas = ["imobiliario", "marcas", 
         const a = AREAS[k];
         return (
           <Reveal key={k} delay={i * 0.1}>
-            <Link href={a.href} className="card area-card">
+            <L href={a.href} className="card area-card">
               <div className="icon"><Icon name={a.icon} /></div>
-              <h3>{a.titulo}</h3>
-              <p>{a.texto}</p>
-              <span className="pub-cta">{a.cta} →</span>
-            </Link>
+              <h3>{t(a.titulo)}</h3>
+              <p>{t(a.texto)}</p>
+              <span className="pub-cta">{t(a.cta)} →</span>
+            </L>
           </Reveal>
         );
       })}

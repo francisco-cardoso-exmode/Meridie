@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import VersaoInglesa from "@/components/admin/VersaoInglesa";
 import ImageUploader from "@/components/admin/ImageUploader";
 import { AREAS_MARCA } from "@/lib/areasMarca";
 
@@ -24,6 +25,7 @@ const textoParaCarac = (t) =>
 export default function MarcaForm({ initial = null }) {
   const editing = !!initial;
   const [estado, setEstado] = useState({ a: "idle", msg: "" });
+  const [en, setEn] = useState(initial?.en || null);
   const [f, setF] = useState({
     nome: initial?.nome || "",
     area: initial?.area || "bebidas",
@@ -85,7 +87,7 @@ export default function MarcaForm({ initial = null }) {
       const res = await fetch(url, {
         method: editing ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(doc),
+        body: JSON.stringify(en ? { ...doc, en } : doc),
       });
       const json = await res.json();
       if (res.ok && json.ok) {
@@ -181,6 +183,7 @@ export default function MarcaForm({ initial = null }) {
         Ativa (visível no site)
       </label>
       {estado.a === "erro" && <div className="form-msg erro">{estado.msg}</div>}
+      {initial && <VersaoInglesa colecao="marcas" doc={initial} en={en} onChange={setEn} />}
       <div className="admin-form-actions">
         <button type="submit" className="btn btn-primary" disabled={estado.a === "loading"}>
           {estado.a === "loading" ? "A guardar..." : editing ? "Guardar" : "Criar marca"}

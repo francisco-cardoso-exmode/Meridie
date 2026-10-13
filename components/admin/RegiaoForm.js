@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import VersaoInglesa from "@/components/admin/VersaoInglesa";
 import Link from "next/link";
 import ImageUploader from "@/components/admin/ImageUploader";
 
@@ -49,6 +50,7 @@ export default function RegiaoForm({ initial = null, regioesExistentes = [], pre
   const editing = !!initial;
   const pf = editing ? null : prefill;
   const [estado, setEstado] = useState({ a: "idle", msg: "" });
+  const [en, setEn] = useState(initial?.en || null);
 
   const [f, setF] = useState({
     slug: initial?.slug || (pf?.nome ? slugify(pf.nome) : ""),
@@ -131,7 +133,7 @@ export default function RegiaoForm({ initial = null, regioesExistentes = [], pre
       const res = await fetch(url, {
         method: editing ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(doc),
+        body: JSON.stringify(en ? { ...doc, en } : doc),
       });
       const json = await res.json();
       if (res.ok && json.ok) {
@@ -312,6 +314,7 @@ export default function RegiaoForm({ initial = null, regioesExistentes = [], pre
       </div>
 
       {estado.a === "erro" && <div className="form-msg erro">{estado.msg}</div>}
+      {initial && <VersaoInglesa colecao="regioes" doc={initial} en={en} onChange={setEn} />}
       <div className="admin-form-actions">
         <button type="submit" className="btn btn-primary" disabled={estado.a === "loading"}>
           {estado.a === "loading" ? "A guardar..." : editing ? "Guardar alterações" : "Criar"}

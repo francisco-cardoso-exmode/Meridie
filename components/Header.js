@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import L from "@/components/L";
 import Logo from "@/components/Logo";
 import Icon from "@/components/Icon";
 import { TECNOLOGIA_VISIVEL } from "@/lib/flags";
+import { useT } from "@/components/LangProvider";
+import TrocaIdioma from "@/components/TrocaIdioma";
 
 const LINKS = [
   {
@@ -24,6 +26,7 @@ const LINKS = [
 ];
 
 export default function Header() {
+  const { t } = useT();
   const [hidden, setHidden] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -47,7 +50,7 @@ export default function Header() {
         <button
           type="button"
           className="nav-toggle"
-          aria-label={open ? "Fechar menu" : "Abrir menu"}
+          aria-label={open ? t("Fechar menu") : t("Abrir menu")}
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
         >
@@ -59,27 +62,28 @@ export default function Header() {
             l.sub ? (
               <div className="nav-drop" key={l.label}>
                 <button type="button" className="nav-drop-btn" aria-haspopup="true">
-                  {l.label} <span aria-hidden="true">▾</span>
+                  {t(l.label)} <span aria-hidden="true">▾</span>
                 </button>
                 <div className="nav-drop-menu">
                   {l.sub.map((s) => (
-                    <Link key={s.href} href={s.href} onClick={() => setOpen(false)}>
-                      {s.label}
-                    </Link>
+                    <L key={s.href} href={s.href} onClick={() => setOpen(false)}>
+                      {t(s.label)}
+                    </L>
                   ))}
                 </div>
               </div>
             ) : (
-              <Link
+              <L
                 key={l.href}
                 href={l.href}
                 className={l.destaque ? "nav-cta" : undefined}
                 onClick={() => setOpen(false)}
               >
-                {l.label}
-              </Link>
+                {t(l.label)}
+              </L>
             )
           )}
+          <TrocaIdioma onClick={() => setOpen(false)} />
         </nav>
       </div>
     </header>

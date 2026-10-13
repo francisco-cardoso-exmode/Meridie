@@ -1,11 +1,13 @@
 "use client";
 
-import Link from "next/link";
+import L from "@/components/L";
 import { useEffect, useState } from "react";
+import { useT } from "@/components/LangProvider";
 
 // Banner de consentimento de cookies (RGPD). Guarda a escolha em localStorage e
 // avisa o componente do Google Analytics para carregar (ou não).
 export default function CookieConsent() {
+  const { t } = useT();
   const [mostrar, setMostrar] = useState(false);
 
   useEffect(() => {
@@ -23,20 +25,19 @@ export default function CookieConsent() {
   if (!mostrar) return null;
 
   return (
-    <div className="cookie-bar" role="dialog" aria-label="Consentimento de cookies">
+    <div className="cookie-bar" role="dialog" aria-label={t("Consentimento de cookies")}>
       <div className="cookie-inner">
         <p className="cookie-txt">
-          Usamos cookies essenciais ao funcionamento do site e, com a tua autorização,
-          cookies de análise (Google Analytics) para perceber como é usado e melhorá-lo.
-          Vê a <Link href="/cookies">Política de Cookies</Link> e a{" "}
-          <Link href="/privacidade">Política de Privacidade</Link>.
+          {t("Usamos cookies essenciais ao funcionamento do site e, com a tua autorização, cookies de análise (Google Analytics) para perceber como é usado e melhorá-lo.")}{" "}
+          {t("Vê a")} <L href="/cookies">{t("Política de Cookies")}</L> {t("e a")}{" "}
+          <L href="/privacidade">{t("Política de Privacidade")}</L>.
         </p>
         <div className="cookie-acoes">
           <button type="button" className="cookie-rej" onClick={() => decidir("reject")}>
-            Rejeitar
+            {t("Rejeitar")}
           </button>
           <button type="button" className="btn btn-primary" onClick={() => decidir("accept")}>
-            Aceitar
+            {t("Aceitar")}
           </button>
         </div>
       </div>
