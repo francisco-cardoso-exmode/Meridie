@@ -12,6 +12,15 @@ const slugify = (s) =>
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
 
+// Características: uma por linha, "Etiqueta | valor".
+const caracParaTexto = (c) => (Array.isArray(c) ? c.map(([k, v]) => `${k} | ${v}`).join("\n") : "");
+const textoParaCarac = (t) =>
+  (t || "")
+    .split("\n")
+    .map((l) => l.split("|"))
+    .filter((p) => p.length >= 2 && p[0].trim())
+    .map(([k, ...v]) => [k.trim(), v.join("|").trim()]);
+
 export default function MarcaForm({ initial = null }) {
   const editing = !!initial;
   const [estado, setEstado] = useState({ a: "idle", msg: "" });
@@ -23,7 +32,7 @@ export default function MarcaForm({ initial = null }) {
     url: initial?.url || "",
     logo: initial?.logo || "",
     imagens: initial?.imagens || [],
-    produtos: initial?.produtos || [],
+    produtos: (initial?.produtos || []).map((p) => ({ ...p, caracTexto: caracParaTexto(p.caracteristicas) })),
     ordem: initial?.ordem ?? "",
     mostrarHome: initial?.mostrarHome ?? true,
     ativo: initial?.ativo !== false,
@@ -35,7 +44,7 @@ export default function MarcaForm({ initial = null }) {
   const setProd = (i, k, v) =>
     setF((p) => ({ ...p, produtos: p.produtos.map((x, j) => (j === i ? { ...x, [k]: v } : x)) }));
   const addProd = () =>
-    setF((p) => ({ ...p, produtos: [...p.produtos, { nome: "", descricao: "", imagem: "" }] }));
+    setF((p) => ({ ...p, produtos: [...p.produtos, { nome: "", descricao: "", imagem: "", caracTexto: "" }] }));
   const delProd = (i) =>
     setF((p) => ({ ...p, produtos: p.produtos.filter((_, j) => j !== i) }));
   const moveProd = (i, d) =>
@@ -60,7 +69,12 @@ export default function MarcaForm({ initial = null }) {
       logo: f.logo.trim(),
       imagens: f.imagens,
       produtos: f.produtos
-        .map((p) => ({ nome: p.nome.trim(), descricao: (p.descricao || "").trim(), imagem: p.imagem || "" }))
+        .map((p) => ({
+          nome: p.nome.trim(),
+          descricao: (p.descricao || "").trim(),
+          imagem: p.imagem || "",
+          caracteristicas: textoParaCarac(p.caracTexto ?? caracParaTexto(p.caracteristicas)),
+        }))
         .filter((p) => p.nome),
       ordem: Number(f.ordem) || 99,
       mostrarHome: !!f.mostrarHome,
@@ -124,7 +138,13 @@ export default function MarcaForm({ initial = null }) {
               </div>
               <div className="prod-editor-campos">
                 <input value={p.nome} onChange={(e) => setProd(i, "nome", e.target.value)} placeholder="Nome do produto" />
-                <textarea rows={2} value={p.descricao} onChange={(e) => setProd(i, "descricao", e.target.value)} placeholder="Descrição curta (opcional)" />
+                <textarea rows={3} value={p.descricao} onChange={(e) => setProd(i, "descricao", e.target.value)} placeholder="Descrição (opcional)" />
+                <textarea
+                  rows={5}
+                  value={p.caracTexto ?? ""}
+                  onChange={(e) => setProd(i, "caracTexto", e.target.value)}
+                  placeholder={"Ficha técnica — uma linha por característica:\nRegião | Vinho Verde\nTeor alcoólico | 11,5% vol."}
+                />
                 <div className="prod-editor-acoes">
                   <button type="button" className="btn-ghost" onClick={() => moveProd(i, -1)} disabled={i === 0}>↑</button>
                   <button type="button" className="btn-ghost" onClick={() => moveProd(i, 1)} disabled={i === f.produtos.length - 1}>↓</button>

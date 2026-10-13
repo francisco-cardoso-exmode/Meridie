@@ -3385,3 +3385,154 @@ a.marca-card:hover {
     grid-template-columns: 1fr;
   }
 }
+
+/* ============ Fichas de produto ============ */
+.ficha-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+  flex-wrap: wrap;
+  max-width: none;
+}
+.btn-pdf {
+  align-self: auto;
+}
+.ficha-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+.ficha {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 36px;
+  align-items: start;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 26px;
+  break-inside: avoid;
+}
+.ficha-foto {
+  aspect-ratio: 1;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ficha-foto img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+.ficha-texto h3 {
+  color: var(--navy);
+  font-size: 1.45rem;
+  margin: 0 0 10px;
+}
+.ficha-texto > p {
+  margin-bottom: 18px;
+}
+.ficha-tabela {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+.ficha-tabela th,
+.ficha-tabela td {
+  text-align: left;
+  vertical-align: top;
+  padding: 9px 12px;
+  border-top: 1px solid var(--border);
+}
+.ficha-tabela th {
+  width: 34%;
+  color: var(--navy);
+  font-weight: 600;
+  background: var(--paper-soft);
+}
+.ficha-tabela td {
+  color: var(--ink);
+}
+@media (max-width: 760px) {
+  .ficha {
+    grid-template-columns: 1fr;
+    gap: 18px;
+    padding: 18px;
+  }
+  .ficha-foto {
+    max-width: 320px;
+    margin: 0 auto;
+  }
+  .ficha-tabela th {
+    width: 42%;
+  }
+}
+
+/* Impressão / PDF: só as fichas, sem menu, rodapé, cookies nem botões */
+@media print {
+  .site-header,
+  .site-footer,
+  .cookie-bar,
+  .btn-pdf,
+  .marca-voltar,
+  .cta-band,
+  .marca-outras,
+  .marca-galeria {
+    display: none !important;
+  }
+  .page-hero {
+    background: none !important;
+    color: #000 !important;
+    padding: 0 0 12px !important;
+  }
+  .page-hero h1,
+  .page-hero p {
+    color: #000 !important;
+  }
+  section {
+    padding: 8px 0 !important;
+  }
+  .bg-soft {
+    background: none !important;
+  }
+  html {
+    font-size: 11px;
+  }
+  .page-hero .btn {
+    display: none !important;
+  }
+  .ficha-lista {
+    gap: 10px;
+  }
+  .ficha {
+    grid-template-columns: 150px 1fr;
+    gap: 18px;
+    padding: 12px;
+    border-radius: 8px;
+  }
+  .ficha-texto h3 {
+    font-size: 1.35rem;
+    margin-bottom: 4px;
+  }
+  .ficha-texto > p {
+    margin-bottom: 8px;
+    line-height: 1.45;
+  }
+  .ficha-tabela {
+    font-size: 0.9rem;
+  }
+  .ficha-tabela th,
+  .ficha-tabela td {
+    padding: 3px 8px;
+    line-height: 1.35;
+  }
+  .section-head {
+    margin-bottom: 10px !important;
+  }
+  [style*="opacity"] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

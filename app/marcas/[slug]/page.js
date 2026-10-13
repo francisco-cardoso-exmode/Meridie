@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import Reveal from "@/components/Reveal";
 import MarcaGaleria from "@/components/MarcaGaleria";
+import BotaoPdf from "@/components/BotaoPdf";
 import { allMarcas, marcaBySlug, AREAS_MARCA } from "@/lib/marcas";
 
 export const revalidate = 60;
@@ -52,23 +53,37 @@ export default async function PaginaMarca({ params }) {
       {m.produtos?.length > 0 && (
         <section>
           <div className="container">
-            <Reveal className="section-head">
-              <span className="eyebrow">Produtos</span>
-              <h2>A gama {m.nome}</h2>
+            <Reveal className="section-head ficha-head">
+              <div>
+                <span className="eyebrow">Fichas de produto</span>
+                <h2>A gama {m.nome}</h2>
+              </div>
+              <BotaoPdf />
             </Reveal>
-            <div className="produto-grid">
+            <div className="ficha-lista">
               {m.produtos.map((p, i) => (
-                <Reveal key={`${p.nome}-${i}`} delay={(i % 3) * 0.08}>
-                  <article className="produto-card">
-                    <div className="marca-foto">
-                      {p.imagem && <img src={p.imagem} alt={p.nome} loading="lazy" />}
-                    </div>
-                    <div className="marca-body">
-                      <h3>{p.nome}</h3>
-                      {p.descricao && <p>{p.descricao}</p>}
-                    </div>
-                  </article>
-                </Reveal>
+                <article className="ficha" key={`${p.nome}-${i}`}>
+                  <div className="ficha-foto">
+                    {p.imagem && <img src={p.imagem} alt={p.nome} loading="lazy" />}
+                  </div>
+                  <div className="ficha-texto">
+                    <span className="marca-origem">{m.nome}</span>
+                    <h3>{p.nome}</h3>
+                    {p.descricao && <p>{p.descricao}</p>}
+                    {p.caracteristicas?.length > 0 && (
+                      <table className="ficha-tabela">
+                        <tbody>
+                          {p.caracteristicas.map(([k, v], j) => (
+                            <tr key={j}>
+                              <th>{k}</th>
+                              <td>{v}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    )}
+                  </div>
+                </article>
               ))}
             </div>
           </div>
