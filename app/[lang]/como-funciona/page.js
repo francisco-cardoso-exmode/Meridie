@@ -2,7 +2,8 @@ import L from "@/components/L";
 import Reveal from "@/components/Reveal";
 import Icon from "@/components/Icon";
 import { getConteudo } from "@/lib/conteudo";
-import { t, tf, traduzDoc, traduzLista, alternates } from "@/lib/i18n";
+import { t, tf, alternates } from "@/lib/i18n";
+import { traduzDoc, traduzLista } from "@/lib/i18n/conteudo";
 
 export const revalidate = 60;
 

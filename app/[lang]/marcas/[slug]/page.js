@@ -4,7 +4,8 @@ import Reveal from "@/components/Reveal";
 import MarcaGaleria from "@/components/MarcaGaleria";
 import BotaoPdf from "@/components/BotaoPdf";
 import { allMarcas, marcaBySlug, AREAS_MARCA } from "@/lib/marcas";
-import { t, tf, traduzDoc, traduzLista, alternates } from "@/lib/i18n";
+import { t, tf, alternates } from "@/lib/i18n";
+import { traduzDoc, traduzLista } from "@/lib/i18n/conteudo";
 
 export const revalidate = 60;
 export const dynamicParams = true;

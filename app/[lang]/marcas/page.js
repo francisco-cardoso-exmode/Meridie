@@ -3,7 +3,8 @@ import Reveal from "@/components/Reveal";
 import MarcaCard from "@/components/MarcaCard";
 import { allMarcas, AREAS_MARCA } from "@/lib/marcas";
 import { getConteudo } from "@/lib/conteudo";
-import { t, tf, traduzDoc, traduzLista, alternates } from "@/lib/i18n";
+import { t, tf, alternates } from "@/lib/i18n";
+import { traduzDoc, traduzLista } from "@/lib/i18n/conteudo";
 
 export const revalidate = 60;
 

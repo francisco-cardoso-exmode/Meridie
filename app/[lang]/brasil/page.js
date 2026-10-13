@@ -9,7 +9,8 @@ import {
   tiposDe,
   finalidadesDe,
 } from "@/lib/store";
-import { t, tf, traduzDoc, traduzLista, alternates } from "@/lib/i18n";
+import { t, tf, alternates } from "@/lib/i18n";
+import { traduzDoc, traduzLista } from "@/lib/i18n/conteudo";
 
 export async function generateMetadata({ params }) {
   const { lang } = await params;

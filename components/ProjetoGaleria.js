@@ -31,7 +31,7 @@ export default function ProjetoGaleria({ imagens = [], nome = "" }) {
                   className="galeria-btn"
                   onClick={() => setIndice(i + 1)}
                 >
-                  <img src={img} alt={`${nome} — foto ${i + 2}`} loading="lazy" />
+                  <img src={img} alt={tf("{nome} — foto {i}", { nome, i: i + 2 })} loading="lazy" />
                   {i === lado.length - 1 && extra > 0 && (
                     <span className="galeria-mais">+{extra} {t("fotos")}</span>
                   )}

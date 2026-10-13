@@ -4,7 +4,8 @@ import Icon from "@/components/Icon";
 import { notFound } from "next/navigation";
 import { getConteudo } from "@/lib/conteudo";
 import { TECNOLOGIA_VISIVEL } from "@/lib/flags";
-import { t, tf, traduzDoc, traduzLista, alternates } from "@/lib/i18n";
+import { t, tf, alternates } from "@/lib/i18n";
+import { traduzDoc, traduzLista } from "@/lib/i18n/conteudo";
 
 export const revalidate = 60;
 

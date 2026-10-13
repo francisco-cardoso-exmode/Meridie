@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import Lightbox from "@/components/Lightbox";
+import { useT } from "@/components/LangProvider";
 
 // Grelha de fotos extra (a partir da 4.ª). Clicar abre o lightbox no índice
 // certo, navegando por todas as imagens do projeto.
 export default function GaleriaExtra({ imagens = [], nome = "" }) {
+  const { tf } = useT();
   const [indice, setIndice] = useState(null);
   const extras = imagens.slice(3);
   if (!extras.length) return null;
@@ -20,7 +22,7 @@ export default function GaleriaExtra({ imagens = [], nome = "" }) {
             key={i}
             onClick={() => setIndice(i + 3)}
           >
-            <img src={img} alt={`${nome} — foto ${i + 4}`} loading="lazy" />
+            <img src={img} alt={tf("{nome} — foto {i}", { nome, i: i + 4 })} loading="lazy" />
           </button>
         ))}
       </div>

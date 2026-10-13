@@ -18,7 +18,8 @@ import {
 import { PAIS_LABEL } from "@/lib/empreendimentos";
 import ListingsExplorer from "@/components/ListingsExplorer";
 import { textoComLinks } from "@/lib/format";
-import { t, tf, traduzDoc, traduzLista, alternates, caminho } from "@/lib/i18n";
+import { t, tf, alternates, caminho } from "@/lib/i18n";
+import { traduzDoc, traduzLista } from "@/lib/i18n/conteudo";
 
 const NIVEL_LABEL = { regiao: "Região", estado: "Estado", cidade: "Cidade", zona: "Zona" };
 

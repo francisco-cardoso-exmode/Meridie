@@ -20,7 +20,8 @@ import AreasCards from "@/components/AreasCards";
 import MarcasFaixa from "@/components/MarcasFaixa";
 import { allMarcas } from "@/lib/marcas";
 import { TECNOLOGIA_VISIVEL } from "@/lib/flags";
-import { t, traduzLista, alternates } from "@/lib/i18n";
+import { t, alternates } from "@/lib/i18n";
+import { traduzLista } from "@/lib/i18n/conteudo";
 
 export const revalidate = 60;
 

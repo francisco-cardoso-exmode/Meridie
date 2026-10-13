@@ -3,7 +3,8 @@ import Reveal from "@/components/Reveal";
 import AnuncioCard from "@/components/AnuncioCard";
 import { allAnuncios } from "@/lib/anuncios";
 import { CATEGORIAS_PARCEIRO } from "@/lib/categoriasParceiro";
-import { t, tf, traduzDoc, traduzLista, alternates } from "@/lib/i18n";
+import { t, tf, alternates } from "@/lib/i18n";
+import { traduzDoc, traduzLista } from "@/lib/i18n/conteudo";
 
 export const revalidate = 60;
 export async function generateMetadata({ params }) {

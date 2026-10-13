@@ -19,7 +19,8 @@ import {
   allEmpreendimentos,
   regiaoDoEmpreendimento,
 } from "@/lib/store";
-import { t, tf, traduzDoc, traduzLista, alternates, caminho } from "@/lib/i18n";
+import { t, tf, alternates, caminho } from "@/lib/i18n";
+import { traduzDoc, traduzLista } from "@/lib/i18n/conteudo";
 
 export const revalidate = 60;
 export const dynamicParams = true;

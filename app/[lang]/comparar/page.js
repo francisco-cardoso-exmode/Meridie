@@ -5,7 +5,8 @@ import { comparaveis, zonaLabel, cidadeLabel } from "@/lib/compare";
 import PrecoDual from "@/components/PrecoDual";
 import CompareAnalysis from "@/components/compare/CompareAnalysis";
 import Track from "@/components/Track";
-import { t, tf, traduzDoc, traduzLista, alternates } from "@/lib/i18n";
+import { t, tf, alternates } from "@/lib/i18n";
+import { traduzDoc, traduzLista } from "@/lib/i18n/conteudo";
 
 export const revalidate = 60;
 
