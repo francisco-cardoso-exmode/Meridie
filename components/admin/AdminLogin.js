@@ -76,7 +76,7 @@ export default function AdminLogin() {
       const res = await fetch("/api/admin/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ email, password }),
       });
       const json = await res.json();
       if (res.ok && json.ok) {
@@ -96,13 +96,21 @@ export default function AdminLogin() {
           MERIDIE <span>INVESTMENTS</span>
         </div>
         <h1>Backoffice</h1>
-        <p>Introduz a password de administração.</p>
+        <p>Entra com o teu email e password.</p>
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          autoComplete="username"
+          autoFocus
+        />
         <input
           type="password"
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          autoFocus
+          autoComplete="current-password"
         />
         {estado.a === "erro" && <div className="form-msg erro">{estado.msg}</div>}
         <button type="submit" className="btn btn-primary" disabled={estado.a === "loading"}>

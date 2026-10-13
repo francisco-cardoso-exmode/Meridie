@@ -5,5 +5,6 @@ export const dynamic = "force-dynamic";
 export async function POST() {
   const res = NextResponse.json({ ok: true });
   res.cookies.set("meridie_admin", "", { path: "/", maxAge: 0 });
+  res.cookies.set("meridie_user", "", { path: "/", maxAge: 0 });
   return res;
 }

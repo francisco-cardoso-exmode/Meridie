@@ -121,9 +121,11 @@ Praia de Iracema | praia | -3.719 | -38.512</pre>
           <li><strong>Imagens</strong>: já é por <strong>upload</strong> — arrastas os ficheiros (ou clicas para escolher).
             Aplica-se aos empreendimentos, regiões, marcas e parceiros.</li>
           <li>Tudo o que gravas no backoffice aparece no site <strong>de imediato</strong>.</li>
+          <li><strong>Utilizadores</strong>: cada pessoa entra com o seu email e password. Em <strong>Utilizadores</strong>
+            crias ou removes acessos e mudas a tua password.</li>
           <li><strong>Esqueceste a password?</strong> No ecrã de entrada, carrega em &quot;Esqueci-me da password&quot; e
-            escreve o teu email: recebes um link para entrar (válido 30 minutos, uso único). Só funciona para os
-            emails que recebem os contactos do site (em <strong>Definições</strong>).</li>
+            escreve o teu email: recebes um link para entrar (válido 30 minutos, uso único) e depois defines uma nova.
+            Só funciona para emails registados em <strong>Utilizadores</strong>.</li>
           <li>Vê os <strong>templates de email</strong> e quando são enviados em <strong>Emails</strong>.</li>
         </ul>
       </section>
