@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/mongodb";
 import { isAdmin } from "@/lib/adminAuth";
-import { garanteSeed } from "./seed";
+import { garanteSeed } from "@/lib/marcas";
 import { revalidaSite } from "@/lib/revalida";
 
 export const dynamic = "force-dynamic";

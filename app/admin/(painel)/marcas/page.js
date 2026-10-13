@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { allMarcas, AREAS_MARCA } from "@/lib/marcas";
+import { allMarcas, garanteSeed, AREAS_MARCA } from "@/lib/marcas";
+import { getDb } from "@/lib/mongodb";
 import { thumbUrl } from "@/lib/format";
 import DeleteButton from "@/components/admin/DeleteButton";
 
@@ -7,6 +8,16 @@ export const dynamic = "force-dynamic";
 export const metadata = { title: "Marcas" };
 
 export default async function AdminMarcas() {
+  // Na primeira visita, grava as marcas de exemplo na base de dados (o site
+  // público já as mostra, por isso não é preciso invalidar a cache).
+  if (process.env.MONGODB_URI) {
+    try {
+      const db = await getDb();
+      await garanteSeed(db);
+    } catch {
+      // sem ligação: a lista mostra o seed na mesma
+    }
+  }
   const lista = await allMarcas({ todos: true });
   return (
     <div className="admin-container">
