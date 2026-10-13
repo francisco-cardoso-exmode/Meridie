@@ -1,5 +1,6 @@
 import { SITE_URL } from "@/lib/site";
 import { allEmpreendimentos, allRegioes } from "@/lib/store";
+import { allMarcas } from "@/lib/marcas";
 
 export const revalidate = 3600;
 
@@ -32,6 +33,7 @@ export default async function sitemap() {
 
   let empreendimentos = [];
   let regioes = [];
+  let marcas = [];
   try {
     const [emps, regs] = await Promise.all([allEmpreendimentos(), allRegioes()]);
     empreendimentos = emps.map((e) => ({
@@ -46,9 +48,15 @@ export default async function sitemap() {
       changeFrequency: "weekly",
       priority: 0.6,
     }));
+    marcas = (await allMarcas()).map((m) => ({
+      url: `${SITE_URL}/marcas/${m.slug}`,
+      lastModified: agora,
+      changeFrequency: "monthly",
+      priority: 0.6,
+    }));
   } catch {
     // Sem DB no build — só as páginas estáticas.
   }
 
-  return [...estaticas, ...empreendimentos, ...regioes];
+  return [...estaticas, ...empreendimentos, ...regioes, ...marcas];
 }

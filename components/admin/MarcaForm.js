@@ -23,12 +23,29 @@ export default function MarcaForm({ initial = null }) {
     url: initial?.url || "",
     logo: initial?.logo || "",
     imagens: initial?.imagens || [],
+    produtos: initial?.produtos || [],
     ordem: initial?.ordem ?? "",
     mostrarHome: initial?.mostrarHome ?? true,
     ativo: initial?.ativo !== false,
   });
   const set = (k) => (e) =>
     setF((p) => ({ ...p, [k]: e.target.type === "checkbox" ? e.target.checked : e.target.value }));
+
+  // Produtos: lista editável (nome, descrição, foto).
+  const setProd = (i, k, v) =>
+    setF((p) => ({ ...p, produtos: p.produtos.map((x, j) => (j === i ? { ...x, [k]: v } : x)) }));
+  const addProd = () =>
+    setF((p) => ({ ...p, produtos: [...p.produtos, { nome: "", descricao: "", imagem: "" }] }));
+  const delProd = (i) =>
+    setF((p) => ({ ...p, produtos: p.produtos.filter((_, j) => j !== i) }));
+  const moveProd = (i, d) =>
+    setF((p) => {
+      const l = [...p.produtos];
+      const j = i + d;
+      if (j < 0 || j >= l.length) return p;
+      [l[i], l[j]] = [l[j], l[i]];
+      return { ...p, produtos: l };
+    });
 
   async function onSubmit(e) {
     e.preventDefault();
@@ -42,6 +59,9 @@ export default function MarcaForm({ initial = null }) {
       url: f.url.trim(),
       logo: f.logo.trim(),
       imagens: f.imagens,
+      produtos: f.produtos
+        .map((p) => ({ nome: p.nome.trim(), descricao: (p.descricao || "").trim(), imagem: p.imagem || "" }))
+        .filter((p) => p.nome),
       ordem: Number(f.ordem) || 99,
       mostrarHome: !!f.mostrarHome,
       ativo: !!f.ativo,
@@ -91,7 +111,33 @@ export default function MarcaForm({ initial = null }) {
         <input value={f.url} onChange={set("url")} placeholder="https://..." />
       </label>
       <div className="uploader-field">
-        <span className="uf-label">Fotografias (a primeira é a principal)</span>
+        <span className="uf-label">Produtos ({f.produtos.length})</span>
+        <div className="prod-editor">
+          {f.produtos.map((p, i) => (
+            <div className="prod-editor-row" key={i}>
+              <div className="prod-editor-foto">
+                <ImageUploader
+                  multiple={false}
+                  value={p.imagem ? [p.imagem] : []}
+                  onChange={(urls) => setProd(i, "imagem", urls[0] || "")}
+                />
+              </div>
+              <div className="prod-editor-campos">
+                <input value={p.nome} onChange={(e) => setProd(i, "nome", e.target.value)} placeholder="Nome do produto" />
+                <textarea rows={2} value={p.descricao} onChange={(e) => setProd(i, "descricao", e.target.value)} placeholder="Descrição curta (opcional)" />
+                <div className="prod-editor-acoes">
+                  <button type="button" className="btn-ghost" onClick={() => moveProd(i, -1)} disabled={i === 0}>↑</button>
+                  <button type="button" className="btn-ghost" onClick={() => moveProd(i, 1)} disabled={i === f.produtos.length - 1}>↓</button>
+                  <button type="button" className="admin-del" onClick={() => delProd(i)}>Remover</button>
+                </div>
+              </div>
+            </div>
+          ))}
+          <button type="button" className="btn-ghost" onClick={addProd}>+ Acrescentar produto</button>
+        </div>
+      </div>
+      <div className="uploader-field">
+        <span className="uf-label">Fotografias da marca — galeria (a primeira é a capa)</span>
         <ImageUploader value={f.imagens} onChange={(urls) => setF((p) => ({ ...p, imagens: urls }))} />
       </div>
       <div className="uploader-field">

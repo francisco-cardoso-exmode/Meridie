@@ -1,43 +1,20 @@
-"use client";
+import Link from "next/link";
 
-import { useState } from "react";
-
-// Card de uma marca representada: foto principal + miniaturas para trocar.
+// Card de uma marca representada (lista /marcas) — abre a página da marca.
 export default function MarcaCard({ marca: m }) {
-  const imagens = m.imagens?.length ? m.imagens : m.logo ? [m.logo] : [];
-  const [i, setI] = useState(0);
-  const externo = m.url && /^https?:\/\//.test(m.url);
-
+  const foto = m.imagens?.[0] || m.logo || m.produtos?.[0]?.imagem;
+  const n = m.produtos?.length || 0;
   return (
-    <article className="marca-card">
-      <div className="marca-foto">
-        {imagens[i] && <img src={imagens[i]} alt={m.nome} loading="lazy" />}
-      </div>
-      {imagens.length > 1 && (
-        <div className="marca-thumbs">
-          {imagens.map((src, idx) => (
-            <button
-              type="button"
-              key={src}
-              className={idx === i ? "on" : undefined}
-              onClick={() => setI(idx)}
-              aria-label={`Fotografia ${idx + 1} de ${m.nome}`}
-            >
-              <img src={src} alt="" loading="lazy" />
-            </button>
-          ))}
-        </div>
-      )}
+    <Link href={`/marcas/${m.slug}`} className="marca-card">
+      <div className="marca-foto">{foto && <img src={foto} alt={m.nome} loading="lazy" />}</div>
       <div className="marca-body">
         {m.origem && <span className="marca-origem">{m.origem}</span>}
         <h3>{m.nome}</h3>
         {m.texto && <p>{m.texto}</p>}
-        {m.url && (
-          <a href={m.url} target={externo ? "_blank" : undefined} rel="noopener" className="pub-cta">
-            Conhecer a marca ↗
-          </a>
-        )}
+        <span className="pub-cta">
+          {n > 0 ? `Ver ${n === 1 ? "o produto" : `os ${n} produtos`} →` : "Conhecer a marca →"}
+        </span>
       </div>
-    </article>
+    </Link>
   );
 }
