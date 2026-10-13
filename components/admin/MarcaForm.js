@@ -76,7 +76,7 @@ export default function MarcaForm({ initial = null }) {
           caracteristicas: textoParaCarac(p.caracTexto ?? caracParaTexto(p.caracteristicas)),
         }))
         .filter((p) => p.nome),
-      ordem: Number(f.ordem) || 99,
+      ordem: f.ordem === "" ? 99 : Number(f.ordem),
       mostrarHome: !!f.mostrarHome,
       ativo: !!f.ativo,
     };

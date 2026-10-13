@@ -3165,7 +3165,7 @@ body:has(.admin-page) .site-footer {
 }
 .marca-foto {
   height: 280px;
-  background: #f6f4ef;
+  background: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
