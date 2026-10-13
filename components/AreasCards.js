@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Reveal from "@/components/Reveal";
 import Icon from "@/components/Icon";
+import { TECNOLOGIA_VISIVEL } from "@/lib/flags";
 
 // Cartões das áreas de negócio da Meridie (Home e Quem Somos).
 const AREAS = {
@@ -27,7 +28,8 @@ const AREAS = {
   },
 };
 
-export default function AreasCards({ areas = ["imobiliario", "marcas", "tecnologia"] }) {
+export default function AreasCards({ areas: pedidas = ["imobiliario", "marcas", "tecnologia"] }) {
+  const areas = pedidas.filter((k) => k !== "tecnologia" || TECNOLOGIA_VISIVEL);
   return (
     <div className={`grid ${areas.length === 2 ? "grid-2" : "grid-3"}`}>
       {areas.map((k, i) => {

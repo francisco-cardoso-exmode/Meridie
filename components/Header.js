@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Logo from "@/components/Logo";
 import Icon from "@/components/Icon";
+import { TECNOLOGIA_VISIVEL } from "@/lib/flags";
 
 const LINKS = [
   {
@@ -16,7 +17,7 @@ const LINKS = [
     ],
   },
   { href: "/marcas", label: "Marcas" },
-  { href: "/tecnologia", label: "Tecnologia" },
+  ...(TECNOLOGIA_VISIVEL ? [{ href: "/tecnologia", label: "Tecnologia" }] : []),
   { href: "/publicidade", label: "Parceiros" },
   { href: "/quem-somos", label: "Quem Somos" },
   { href: "/contactos", label: "Contactar", destaque: true },

@@ -8,7 +8,7 @@ export const revalidate = 60;
 export const metadata = {
   title: "Quem Somos",
   description:
-    "A Meridie Investments liga Portugal e o Brasil no imobiliário, na representação de bebidas e alimentação e na tecnologia — com o mesmo rigor e acompanhamento em cada área.",
+    "A Meridie Investments liga Portugal e o Brasil no imobiliário, na representação de bebidas e alimentação — com o mesmo rigor e acompanhamento em cada área.",
 };
 
 const valores = [

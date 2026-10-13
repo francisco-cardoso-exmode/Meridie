@@ -1,6 +1,7 @@
 import { SITE_URL } from "@/lib/site";
 import { allEmpreendimentos, allRegioes } from "@/lib/store";
 import { allMarcas } from "@/lib/marcas";
+import { TECNOLOGIA_VISIVEL } from "@/lib/flags";
 
 export const revalidate = 3600;
 
@@ -13,7 +14,7 @@ export default async function sitemap() {
     "/brasil",
     "/empreendimentos",
     "/marcas",
-    "/tecnologia",
+    ...(TECNOLOGIA_VISIVEL ? ["/tecnologia"] : []),
     "/comparar",
     "/como-funciona",
     "/quem-somos",

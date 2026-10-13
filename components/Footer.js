@@ -2,6 +2,7 @@ import Link from "next/link";
 import Logo from "@/components/Logo";
 import Icon from "@/components/Icon";
 import { getRedes, getEmpresa } from "@/lib/config";
+import { TECNOLOGIA_VISIVEL } from "@/lib/flags";
 
 export default async function Footer() {
   const ano = new Date().getFullYear();
@@ -22,9 +23,9 @@ export default async function Footer() {
               </p>
             </div>
             <p style={{ color: "rgba(255,255,255,0.7)", maxWidth: 340, marginTop: 18 }}>
-              Investimento imobiliário entre Portugal e o Brasil, representação
-              de bebidas e alimentação, e tecnologia — com o mesmo rigor e
-              acompanhamento em cada área.
+              Investimento imobiliário entre Portugal e o Brasil e representação
+              de bebidas e alimentação{TECNOLOGIA_VISIVEL ? ", e tecnologia" : ""} — com o
+              mesmo rigor e acompanhamento em cada área.
             </p>
             {(redes.instagram || redes.linkedin) && (
               <div className="footer-social">
@@ -53,9 +54,11 @@ export default async function Footer() {
               <li>
                 <Link href="/marcas">Bebidas & Alimentação</Link>
               </li>
-              <li>
-                <Link href="/tecnologia">Tecnologia</Link>
-              </li>
+              {TECNOLOGIA_VISIVEL && (
+                <li>
+                  <Link href="/tecnologia">Tecnologia</Link>
+                </li>
+              )}
               <li>
                 <Link href="/como-funciona">Como Funciona</Link>
               </li>

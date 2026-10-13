@@ -1,7 +1,9 @@
 import Link from "next/link";
 import Reveal from "@/components/Reveal";
 import Icon from "@/components/Icon";
+import { notFound } from "next/navigation";
 import { getConteudo } from "@/lib/conteudo";
+import { TECNOLOGIA_VISIVEL } from "@/lib/flags";
 
 export const revalidate = 60;
 
@@ -15,6 +17,7 @@ export async function generateMetadata() {
 }
 
 export default async function PaginaTecnologia() {
+  if (!TECNOLOGIA_VISIVEL) notFound();
   const c = await getConteudo("tecnologia");
   const cards = [
     ["share", c.card1Titulo, c.card1Texto],

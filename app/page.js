@@ -19,6 +19,7 @@ import AnuncioCard from "@/components/AnuncioCard";
 import AreasCards from "@/components/AreasCards";
 import MarcasFaixa from "@/components/MarcasFaixa";
 import { allMarcas } from "@/lib/marcas";
+import { TECNOLOGIA_VISIVEL } from "@/lib/flags";
 
 export const revalidate = 60;
 
@@ -45,15 +46,20 @@ export default async function Home() {
       <section className="bg-soft">
         <div className="container">
           <Reveal className="section-head">
-            <span className="eyebrow">Um nome, três áreas de investimento</span>
+            <span className="eyebrow">
+              {TECNOLOGIA_VISIVEL ? "Um nome, três áreas de investimento" : "Bebidas & Alimentação"}
+            </span>
             <h2>{c.areasTitulo}</h2>
             <p>{c.areasTexto}</p>
           </Reveal>
-          <AreasCards areas={["marcas", "tecnologia"]} />
+          {TECNOLOGIA_VISIVEL && <AreasCards areas={["marcas", "tecnologia"]} />}
           {marcas.length > 0 && (
             <Reveal>
               <p className="marcas-faixa-titulo">Marcas que representamos</p>
               <MarcasFaixa marcas={marcas} />
+              <div style={{ marginTop: 26 }}>
+                <Link href="/marcas" className="btn btn-primary">Conhecer as marcas</Link>
+              </div>
             </Reveal>
           )}
         </div>
