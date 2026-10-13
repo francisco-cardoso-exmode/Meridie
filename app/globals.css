@@ -3232,7 +3232,7 @@ body:has(.admin-page) .site-footer {
   padding: 10px 12px;
   font-size: 0.9rem;
 }
-.pub-principal .pub-card {
+.pub-principal .pub-card:has(img) {
   display: grid;
   grid-template-columns: 1fr 1fr;
 }

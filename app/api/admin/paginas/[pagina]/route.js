@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { isAdmin } from "@/lib/adminAuth";
 import { getConteudo, setConteudo } from "@/lib/conteudo";
+import { revalidaSite } from "@/lib/revalida";
 
 export const dynamic = "force-dynamic";
 
@@ -16,5 +17,6 @@ export async function POST(request, { params }) {
   const body = await request.json().catch(() => ({}));
   const campos = body.campos || {};
   await setConteudo(pagina, campos);
+  revalidaSite();
   return NextResponse.json({ ok: true });
 }

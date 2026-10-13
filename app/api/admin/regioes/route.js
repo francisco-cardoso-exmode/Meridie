@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/mongodb";
 import { isAdmin } from "@/lib/adminAuth";
+import { revalidaSite } from "@/lib/revalida";
 
 export const dynamic = "force-dynamic";
 
@@ -37,5 +38,6 @@ export async function POST(request) {
 
   delete doc._id;
   await db.collection("regioes").insertOne(doc);
+  revalidaSite();
   return NextResponse.json({ ok: true, slug: doc.slug });
 }

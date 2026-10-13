@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { isAdmin } from "@/lib/adminAuth";
 import { getRedes, setRedes } from "@/lib/config";
+import { revalidaSite } from "@/lib/revalida";
 
 export const dynamic = "force-dynamic";
 
@@ -16,5 +17,6 @@ export async function POST(request) {
     instagram: String(body.instagram || "").trim(),
     linkedin: String(body.linkedin || "").trim(),
   });
+  revalidaSite();
   return NextResponse.json({ ok: true });
 }

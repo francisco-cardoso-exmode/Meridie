@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/mongodb";
 import { isAdmin } from "@/lib/adminAuth";
+import { revalidaSite } from "@/lib/revalida";
 
 export const dynamic = "force-dynamic";
 
@@ -22,6 +23,7 @@ export async function PUT(request, { params }) {
   if (!r.matchedCount)
     return NextResponse.json({ ok: false, erro: "Não encontrado." }, { status: 404 });
 
+  revalidaSite();
   return NextResponse.json({ ok: true });
 }
 
@@ -32,5 +34,6 @@ export async function DELETE(request, { params }) {
   const { slug } = await params;
   const db = await getDb();
   await db.collection("empreendimentos").deleteOne({ slug });
+  revalidaSite();
   return NextResponse.json({ ok: true });
 }

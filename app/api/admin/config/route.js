@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { isAdmin } from "@/lib/adminAuth";
 import { getDestinatarios, setDestinatarios } from "@/lib/config";
+import { revalidaSite } from "@/lib/revalida";
 
 export const dynamic = "force-dynamic";
 
@@ -16,5 +17,6 @@ export async function POST(request) {
     .map((s) => String(s).trim())
     .filter((s) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s));
   await setDestinatarios(lista);
+  revalidaSite();
   return NextResponse.json({ ok: true, destinatarios: lista });
 }

@@ -119,23 +119,49 @@ Praia de Iracema | praia | -3.719 | -38.512</pre>
         <h2>5. Imagens &amp; Emails</h2>
         <ul>
           <li><strong>Imagens</strong>: já é por <strong>upload</strong> — arrastas os ficheiros (ou clicas para escolher).
-            Aplica-se aos empreendimentos, regiões e publicidade.</li>
+            Aplica-se aos empreendimentos, regiões, marcas e parceiros.</li>
+          <li>Tudo o que gravas no backoffice aparece no site <strong>de imediato</strong>.</li>
           <li>Vê os <strong>templates de email</strong> e quando são enviados em <strong>Emails</strong>.</li>
         </ul>
       </section>
 
       <section className="ajuda-bloco">
-        <h2>6. Publicidade (parceiros / patrocínios)</h2>
+        <h2>6. Parceiros (patrocínios / publicidade)</h2>
         <ul>
-          <li><strong>Publicidade global</strong> (menu <strong>Publicidade</strong>): cards que aparecem na Home e na
+          <li><strong>Parceiros globais</strong> (menu <strong>Parceiros</strong>): cards que aparecem na Home e na
             página <code>/publicidade</code>. Com <strong>upload de imagem</strong>, título, texto e link.</li>
+          <li><strong>Categoria</strong> (Companhia aérea, Hotel, Restaurante, Guias…) e <strong>cidade</strong>: a página
+            de parceiros agrupa-os por categoria.</li>
+          <li><strong>Vantagem Meridie</strong>: o desconto ou condição para clientes (aparece destacado no card).</li>
+          <li><strong>Patrocinador principal</strong>: o parceiro marcado aparece em grande no topo da página.</li>
           <li><strong>Publicidade por região</strong> (no formulário da região): cards de parceiros só naquela zona —
             também com <strong>upload de imagem</strong> (botão &quot;+ Adicionar card&quot;).</li>
         </ul>
       </section>
 
       <section className="ajuda-bloco">
-        <h2>7. Comparador &amp; Filtros (automático)</h2>
+        <h2>7. Marcas (Bebidas &amp; Alimentação)</h2>
+        <ul>
+          <li>Menu <strong>Marcas</strong>: cada marca tem nome, área (Bebidas / Alimentação / Tecnologia), linha de
+            origem, texto, link, fotos e logótipo. Aparece em <code>/marcas</code> e tem página própria
+            (<code>/marcas/nome-da-marca</code>).</li>
+          <li><strong>Produtos</strong>: em &quot;+ Acrescentar produto&quot; pões a foto, o nome, a descrição e a
+            <strong> ficha técnica</strong> — uma característica por linha, no formato <code>Etiqueta | valor</code>:</li>
+        </ul>
+        <pre>Região | DOC Vinho Verde
+Castas | Loureiro, Arinto
+Teor alcoólico | 12% vol.</pre>
+        <ul>
+          <li>Os botões <strong>↑ ↓</strong> mudam a ordem dos produtos; <strong>Remover</strong> tira o produto.</li>
+          <li><strong>Ordem</strong> da marca: o número mais baixo aparece primeiro (0 = primeira).</li>
+          <li><strong>Fotos de produto</strong>: ficam melhor em <strong>fundo branco</strong>, com a garrafa/lata centrada.</li>
+          <li>Na página de cada marca, o visitante pode <strong>guardar as fichas em PDF</strong>.</li>
+          <li>Os textos das páginas <code>/marcas</code> e <code>/tecnologia</code> editam-se em <strong>Páginas</strong>.</li>
+        </ul>
+      </section>
+
+      <section className="ajuda-bloco">
+        <h2>8. Comparador &amp; Filtros (automático)</h2>
         <ul>
           <li><strong>Filtros e pesquisa</strong>: na Home, em <code>/empreendimentos</code> e nas páginas de região,
             o visitante filtra por país, zona, tipologia, finalidade e <strong>preço (mais caro/mais barato)</strong>,
