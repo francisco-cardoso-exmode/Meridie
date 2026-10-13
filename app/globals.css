@@ -3303,6 +3303,9 @@ a.marca-card:hover {
   height: 240px;
   padding: 10px;
 }
+.marca-card .marca-foto {
+  padding: 14px;
+}
 .produto-card h3 {
   font-size: 1.05rem;
 }
@@ -3415,7 +3418,8 @@ a.marca-card:hover {
   break-inside: avoid;
 }
 .ficha-foto {
-  aspect-ratio: 1;
+  height: 300px;
+  padding: 6px;
   background: #fff;
   display: flex;
   align-items: center;
@@ -3462,11 +3466,80 @@ a.marca-card:hover {
     padding: 18px;
   }
   .ficha-foto {
+    height: 240px;
     max-width: 320px;
+    width: 100%;
     margin: 0 auto;
   }
   .ficha-tabela th {
     width: 42%;
+  }
+}
+
+/* Página da marca — aproveita a largura em ecrãs grandes */
+.marca-pagina .container {
+  max-width: 1360px;
+}
+.marca-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 48px;
+  align-items: center;
+}
+.marca-montra {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 10px;
+  height: 280px;
+  padding: 22px 26px;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.25);
+}
+.marca-montra img {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 100%;
+  object-fit: contain;
+}
+@media (min-width: 1100px) {
+  .ficha-lista {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+  }
+  .ficha-lista > .ficha:only-child {
+    grid-column: 1 / -1;
+  }
+  .ficha {
+    grid-template-columns: 170px 1fr;
+    gap: 24px;
+    padding: 22px;
+  }
+  .ficha-foto {
+    height: 280px;
+  }
+  .ficha-texto h3 {
+    font-size: 1.25rem;
+  }
+  .ficha-tabela th {
+    width: 38%;
+  }
+}
+@media (max-width: 900px) {
+  .marca-hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+  }
+  .marca-montra {
+    height: 180px;
+    padding: 16px;
+  }
+}
+@media (max-width: 640px) {
+  .marca-montra {
+    display: none;
   }
 }
 
@@ -3504,7 +3577,18 @@ a.marca-card:hover {
     display: none !important;
   }
   .ficha-lista {
+    display: flex !important;
+    flex-direction: column;
     gap: 10px;
+  }
+  .marca-montra {
+    display: none !important;
+  }
+  .marca-hero {
+    display: block !important;
+  }
+  .ficha-foto {
+    height: 170px !important;
   }
   .ficha {
     grid-template-columns: 150px 1fr;

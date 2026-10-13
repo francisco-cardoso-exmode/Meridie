@@ -33,19 +33,30 @@ export default async function PaginaMarca({ params }) {
   // Galeria: só as fotos que não aparecem já nos produtos.
   const fotosProdutos = new Set((m.produtos || []).map((p) => p.imagem));
   const galeria = (m.imagens || []).filter((src) => !fotosProdutos.has(src));
+  // Montra do topo: até 5 fotos de produto, lado a lado.
+  const montra = [...fotosProdutos].filter(Boolean).slice(0, 5);
 
   return (
-    <>
+    <div className="marca-pagina">
       <section className="page-hero">
-        <div className="container">
-          <Link href="/marcas" className="marca-voltar">← Todas as marcas</Link>
-          <span className="eyebrow">{m.origem || AREAS_MARCA[m.area]}</span>
-          <h1>{m.nome}</h1>
-          {m.texto && <p>{m.texto}</p>}
-          {m.url && (
-            <a href={m.url} target={externo ? "_blank" : undefined} rel="noopener" className="btn btn-primary" style={{ marginTop: 22 }}>
-              Site da marca ↗
-            </a>
+        <div className="container marca-hero">
+          <div>
+            <Link href="/marcas" className="marca-voltar">← Todas as marcas</Link>
+            <span className="eyebrow">{m.origem || AREAS_MARCA[m.area]}</span>
+            <h1>{m.nome}</h1>
+            {m.texto && <p>{m.texto}</p>}
+            {m.url && (
+              <a href={m.url} target={externo ? "_blank" : undefined} rel="noopener" className="btn btn-primary" style={{ marginTop: 22 }}>
+                Site da marca ↗
+              </a>
+            )}
+          </div>
+          {montra.length > 0 && (
+            <div className="marca-montra" aria-hidden="true">
+              {montra.map((src) => (
+                <img key={src} src={src} alt="" />
+              ))}
+            </div>
           )}
         </div>
       </section>
@@ -118,6 +129,6 @@ export default async function PaginaMarca({ params }) {
           )}
         </div>
       </section>
-    </>
+    </div>
   );
 }
