@@ -23,9 +23,11 @@ export default function EmpreendimentoCard({ e }) {
         <h3>{e.nome}</h3>
         <p className="prop-resumo">{e.resumo}</p>
         <div className="prop-specs">
-          <span><Icon name="bed" size={16} /> {e.quartos} {e.quartos === 1 ? "quarto" : "quartos"}</span>
-          <span><Icon name="bath" size={16} /> {e.casasBanho}</span>
-          <span><Icon name="ruler" size={16} /> {e.area} m²</span>
+          {Number(e.quartos) > 0 && (
+            <span><Icon name="bed" size={16} /> {e.quartos} {Number(e.quartos) === 1 ? "quarto" : "quartos"}</span>
+          )}
+          {Number(e.casasBanho) > 0 && <span><Icon name="bath" size={16} /> {e.casasBanho}</span>}
+          {Number(e.area) > 0 && <span><Icon name="ruler" size={16} /> {e.area} m²</span>}
         </div>
         <div className="prop-foot">
           <div className="prop-price">

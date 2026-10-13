@@ -6,9 +6,18 @@ import Logo from "@/components/Logo";
 import Icon from "@/components/Icon";
 
 const LINKS = [
-  { href: "/portugal", label: "Portugal" },
-  { href: "/brasil", label: "Brasil" },
-  { href: "/como-funciona", label: "Como Funciona" },
+  {
+    label: "Imobiliário",
+    sub: [
+      { href: "/portugal", label: "Portugal" },
+      { href: "/brasil", label: "Brasil" },
+      { href: "/empreendimentos", label: "Toda a oferta" },
+      { href: "/como-funciona", label: "Como Funciona" },
+    ],
+  },
+  { href: "/marcas", label: "Marcas" },
+  { href: "/tecnologia", label: "Tecnologia" },
+  { href: "/publicidade", label: "Parceiros" },
   { href: "/quem-somos", label: "Quem Somos" },
   { href: "/contactos", label: "Contactar", destaque: true },
 ];
@@ -45,16 +54,31 @@ export default function Header() {
         </button>
 
         <nav className={`nav${open ? " open" : ""}`}>
-          {LINKS.map((l) => (
-            <Link
-              key={l.href}
-              href={l.href}
-              className={l.destaque ? "nav-cta" : undefined}
-              onClick={() => setOpen(false)}
-            >
-              {l.label}
-            </Link>
-          ))}
+          {LINKS.map((l) =>
+            l.sub ? (
+              <div className="nav-drop" key={l.label}>
+                <button type="button" className="nav-drop-btn" aria-haspopup="true">
+                  {l.label} <span aria-hidden="true">▾</span>
+                </button>
+                <div className="nav-drop-menu">
+                  {l.sub.map((s) => (
+                    <Link key={s.href} href={s.href} onClick={() => setOpen(false)}>
+                      {s.label}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <Link
+                key={l.href}
+                href={l.href}
+                className={l.destaque ? "nav-cta" : undefined}
+                onClick={() => setOpen(false)}
+              >
+                {l.label}
+              </Link>
+            )
+          )}
         </nav>
       </div>
     </header>

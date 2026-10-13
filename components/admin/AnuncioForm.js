@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import ImageUploader from "@/components/admin/ImageUploader";
+import { CATEGORIAS_PARCEIRO } from "@/lib/categoriasParceiro";
 
 const slugify = (s) =>
   (s || "")
@@ -19,6 +20,10 @@ export default function AnuncioForm({ initial = null }) {
     texto: initial?.texto || "",
     url: initial?.url || "",
     imagem: initial?.imagem || "",
+    categoria: initial?.categoria || "",
+    cidade: initial?.cidade || "",
+    vantagem: initial?.vantagem || "",
+    principal: !!initial?.principal,
     mostrarHome: initial?.mostrarHome ?? true,
     ativo: initial?.ativo !== false,
   });
@@ -34,6 +39,10 @@ export default function AnuncioForm({ initial = null }) {
       texto: f.texto.trim(),
       url: f.url.trim(),
       imagem: f.imagem.trim(),
+      categoria: f.categoria,
+      cidade: f.cidade.trim(),
+      vantagem: f.vantagem.trim(),
+      principal: !!f.principal,
       mostrarHome: !!f.mostrarHome,
       ativo: !!f.ativo,
     };
@@ -62,6 +71,19 @@ export default function AnuncioForm({ initial = null }) {
         <input value={f.titulo} onChange={set("titulo")} required placeholder="Hotel Meireles" />
       </label>
       <label className="full">
+        Categoria
+        <select value={f.categoria} onChange={set("categoria")}>
+          <option value="">— sem categoria —</option>
+          {CATEGORIAS_PARCEIRO.map((c) => (
+            <option key={c} value={c}>{c}</option>
+          ))}
+        </select>
+      </label>
+      <label className="full">
+        Cidade · país (opcional)
+        <input value={f.cidade} onChange={set("cidade")} placeholder="Fortaleza · Brasil" />
+      </label>
+      <label className="full">
         Texto
         <textarea rows={2} value={f.texto} onChange={set("texto")} placeholder="Estadia com desconto para clientes Meridie" />
       </label>
@@ -77,6 +99,14 @@ export default function AnuncioForm({ initial = null }) {
           onChange={(urls) => setF((p) => ({ ...p, imagem: urls[0] || "" }))}
         />
       </div>
+      <label className="full">
+        Vantagem para clientes Meridie (opcional)
+        <input value={f.vantagem} onChange={set("vantagem")} placeholder="10% de desconto na estadia" />
+      </label>
+      <label className="check-inline">
+        <input type="checkbox" checked={f.principal} onChange={set("principal")} />
+        Patrocinador principal (aparece em grande no topo da página de parceiros)
+      </label>
       <label className="check-inline">
         <input type="checkbox" checked={f.mostrarHome} onChange={set("mostrarHome")} />
         Mostrar na Home (antes do footer)
@@ -88,7 +118,7 @@ export default function AnuncioForm({ initial = null }) {
       {estado.a === "erro" && <div className="form-msg erro">{estado.msg}</div>}
       <div className="admin-form-actions">
         <button type="submit" className="btn btn-primary" disabled={estado.a === "loading"}>
-          {estado.a === "loading" ? "A guardar..." : editing ? "Guardar" : "Criar anúncio"}
+          {estado.a === "loading" ? "A guardar..." : editing ? "Guardar" : "Criar parceiro"}
         </button>
       </div>
     </form>

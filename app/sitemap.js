@@ -11,6 +11,8 @@ export default async function sitemap() {
     "/portugal",
     "/brasil",
     "/empreendimentos",
+    "/marcas",
+    "/tecnologia",
     "/comparar",
     "/como-funciona",
     "/quem-somos",

@@ -22,9 +22,9 @@ export default async function Footer() {
               </p>
             </div>
             <p style={{ color: "rgba(255,255,255,0.7)", maxWidth: 340, marginTop: 18 }}>
-              Plataforma de investimento imobiliário entre Portugal e o Brasil.
-              Intermediação, assessoria jurídica e fiscal num único processo
-              coordenado.
+              Investimento imobiliário entre Portugal e o Brasil, representação
+              de bebidas e alimentação, e tecnologia — com o mesmo rigor e
+              acompanhamento em cada área.
             </p>
             {(redes.instagram || redes.linkedin) && (
               <div className="footer-social">
@@ -42,13 +42,19 @@ export default async function Footer() {
             )}
           </div>
           <div>
-            <h4>Mercados</h4>
+            <h4>Áreas</h4>
             <ul>
               <li>
                 <Link href="/portugal">Investir em Portugal</Link>
               </li>
               <li>
                 <Link href="/brasil">Investir no Brasil</Link>
+              </li>
+              <li>
+                <Link href="/marcas">Bebidas & Alimentação</Link>
+              </li>
+              <li>
+                <Link href="/tecnologia">Tecnologia</Link>
               </li>
               <li>
                 <Link href="/como-funciona">Como Funciona</Link>

@@ -16,6 +16,9 @@ import {
 import { getConteudo } from "@/lib/conteudo";
 import { allAnuncios } from "@/lib/anuncios";
 import AnuncioCard from "@/components/AnuncioCard";
+import AreasCards from "@/components/AreasCards";
+import MarcasFaixa from "@/components/MarcasFaixa";
+import { allMarcas } from "@/lib/marcas";
 
 export const revalidate = 60;
 
@@ -26,6 +29,7 @@ export default async function Home() {
   const paises = [...new Set(todos.map((e) => e.pais))];
   const regioes = await allRegioes();
   const anuncios = await allAnuncios({ home: true });
+  const marcas = await allMarcas({ home: true });
   const pick = (s) => regioes.find((r) => r.slug === s);
   const regioesDestaque = ["lisboa", "algarve", "sao-paulo", "rio-de-janeiro"]
     .map(pick)
@@ -36,6 +40,24 @@ export default async function Home() {
     <>
       {/* Hero split 100vh — escolha Portugal / Brasil */}
       <HeroSplit slogan={c.heroSlogan} />
+
+      {/* Outras áreas — Bebidas & Alimentação e Tecnologia */}
+      <section className="bg-soft">
+        <div className="container">
+          <Reveal className="section-head">
+            <span className="eyebrow">Um nome, três áreas de investimento</span>
+            <h2>{c.areasTitulo}</h2>
+            <p>{c.areasTexto}</p>
+          </Reveal>
+          <AreasCards areas={["marcas", "tecnologia"]} />
+          {marcas.length > 0 && (
+            <Reveal>
+              <p className="marcas-faixa-titulo">Marcas que representamos</p>
+              <MarcasFaixa marcas={marcas} />
+            </Reveal>
+          )}
+        </div>
+      </section>
 
       {/* Diferenciais */}
       <section>

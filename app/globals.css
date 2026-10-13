@@ -174,6 +174,48 @@ section {
 .nav .nav-cta:hover {
   color: #fff;
 }
+/* Submenu "Imobiliário" */
+.nav-drop {
+  position: relative;
+}
+.nav-drop-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.82);
+  cursor: pointer;
+}
+.nav-drop-btn span {
+  font-size: 0.7em;
+  margin-left: 2px;
+}
+.nav-drop:hover .nav-drop-btn,
+.nav-drop:focus-within .nav-drop-btn {
+  color: var(--gold-light);
+}
+.nav-drop-menu {
+  position: absolute;
+  top: 100%;
+  left: -16px;
+  min-width: 190px;
+  padding: 14px 0 8px;
+  display: none;
+  flex-direction: column;
+  background: rgba(15, 31, 56, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.3);
+}
+.nav-drop:hover .nav-drop-menu,
+.nav-drop:focus-within .nav-drop-menu {
+  display: flex;
+}
+.nav-drop-menu a {
+  padding: 9px 16px;
+}
 .nav-toggle {
   display: none;
   background: none;
@@ -1416,6 +1458,32 @@ section {
     width: 100%;
     padding: 12px 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  /* No telemóvel o submenu fica sempre aberto, indentado */
+  .nav-drop {
+    width: 100%;
+  }
+  .nav-drop-btn {
+    padding: 12px 0 4px;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    cursor: default;
+  }
+  .nav-drop-btn span {
+    display: none;
+  }
+  .nav-drop-menu {
+    position: static;
+    display: flex;
+    padding: 0;
+    background: none;
+    border: none;
+    box-shadow: none;
+  }
+  .nav-drop-menu a {
+    padding: 12px 0 12px 14px;
   }
   .cta-band {
     padding: 40px 24px;
@@ -3021,4 +3089,181 @@ body:has(.admin-page) .site-footer {
   color: var(--gold);
   font-size: 0.86rem;
   margin: 2px 0 0;
+}
+
+/* ============ Áreas (Home / Quem Somos) ============ */
+.area-card {
+  display: block;
+  height: 100%;
+  color: var(--ink);
+  text-decoration: none;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.area-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 40px rgba(27, 63, 110, 0.12);
+}
+.area-card .pub-cta {
+  display: inline-block;
+  margin-top: 6px;
+}
+.marcas-faixa-titulo {
+  margin: 44px 0 16px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.marcas-faixa {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 14px;
+}
+.marcas-faixa-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 12px 12px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  text-decoration: none;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+.marcas-faixa-item:hover {
+  border-color: var(--gold);
+  transform: translateY(-2px);
+}
+.marcas-faixa-item img {
+  width: 100%;
+  height: 90px;
+  object-fit: contain;
+}
+.marcas-faixa-item span {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--navy);
+  text-align: center;
+}
+
+/* ============ Marcas representadas ============ */
+.marca-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+.marca-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.marca-foto {
+  height: 280px;
+  background: #f6f4ef;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.marca-foto img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+.marca-thumbs {
+  display: flex;
+  gap: 8px;
+  padding: 10px 20px 0;
+}
+.marca-thumbs button {
+  width: 46px;
+  height: 46px;
+  padding: 2px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  background: #f6f4ef;
+  cursor: pointer;
+}
+.marca-thumbs button.on {
+  border-color: var(--gold);
+}
+.marca-thumbs img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+.marca-body {
+  padding: 16px 20px 22px;
+}
+.marca-origem {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 6px;
+}
+.marca-body h3 {
+  color: var(--navy);
+  margin: 0 0 8px;
+  font-size: 1.2rem;
+}
+.marca-body p {
+  margin-bottom: 10px;
+}
+
+/* ============ Parceiros ============ */
+.pub-cidade {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.pub-vantagem {
+  background: var(--paper-soft);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 0.9rem;
+}
+.pub-principal .pub-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.pub-principal .pub-card img {
+  height: 100%;
+  min-height: 300px;
+}
+.pub-principal .pub-body {
+  padding: 32px;
+  align-self: center;
+}
+.pub-principal .pub-body h3 {
+  font-size: 1.7rem;
+}
+@media (max-width: 760px) {
+  .pub-principal .pub-card {
+    grid-template-columns: 1fr;
+  }
+  .pub-principal .pub-card img {
+    min-height: 0;
+    height: 200px;
+  }
+}
+
+/* Menu com mais entradas: aperta o espaçamento em ecrãs intermédios */
+@media (min-width: 861px) and (max-width: 1100px) {
+  .nav {
+    gap: 20px;
+  }
+  .nav a,
+  .nav-drop-btn {
+    font-size: 0.9rem;
+  }
 }

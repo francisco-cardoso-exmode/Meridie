@@ -12,7 +12,7 @@ export default async function AdminPublicidade() {
     <div className="admin-container">
       <div className="admin-head">
         <div>
-          <h1>Publicidade</h1>
+          <h1>Parceiros & Publicidade</h1>
           <p className="admin-sub">
             Cards de patrocínio/parceiros (hotéis, restaurantes…). Aparecem na Home
             e na página <Link href="/publicidade" target="_blank" className="admin-link">/publicidade</Link>.
@@ -31,10 +31,13 @@ export default async function AdminPublicidade() {
             <div className="admin-row-main">
               <div className="admin-row-title">
                 {a.titulo}
+                {a.principal && <span className="tag-dest">PRINCIPAL</span>}
                 {a.mostrarHome && <span className="tag-dest">HOME</span>}
                 {a.ativo === false && <span className="tag-oculto">INATIVO</span>}
               </div>
-              <div className="admin-row-sub">{a.url || "sem link"}</div>
+              <div className="admin-row-sub">
+                {[a.categoria, a.cidade, a.url || "sem link"].filter(Boolean).join(" · ")}
+              </div>
             </div>
             <div className="admin-row-actions">
               <Link href={`/admin/publicidade/${a.slug}`} className="admin-link">Editar</Link>

@@ -365,9 +365,9 @@ export default function EmpreendimentoForm({ initial = null, regioesExistentes =
             <h3>{f.nome || "Nome do empreendimento"}</h3>
             <p className="prop-resumo">{f.resumo || "Resumo do empreendimento..."}</p>
             <div className="prop-specs">
-              <span>{f.quartos || 0} q</span>
-              <span>{f.casasBanho || 0} wc</span>
-              <span>{f.area || 0} m²</span>
+              {Number(f.quartos) > 0 && <span>{f.quartos} q</span>}
+              {Number(f.casasBanho) > 0 && <span>{f.casasBanho} wc</span>}
+              {Number(f.area) > 0 && <span>{f.area} m²</span>}
             </div>
             <div className="prop-foot">
               <div className="prop-price">

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Reveal from "@/components/Reveal";
+import AreasCards from "@/components/AreasCards";
 import { getConteudo } from "@/lib/conteudo";
 
 export const revalidate = 60;
@@ -7,7 +8,7 @@ export const revalidate = 60;
 export const metadata = {
   title: "Quem Somos",
   description:
-    "A Meridie Investments convergimos dois mercados, dois sistemas jurídicos e duas realidades fiscais num processo único, coordenado e transparente.",
+    "A Meridie Investments liga Portugal e o Brasil no imobiliário, na representação de bebidas e alimentação e na tecnologia — com o mesmo rigor e acompanhamento em cada área.",
 };
 
 const valores = [
@@ -34,6 +35,16 @@ export default async function QuemSomos() {
           <span className="eyebrow">Quem Somos</span>
           <h1>{c.heroTitulo}</h1>
           <p>{c.heroTexto}</p>
+        </div>
+      </section>
+
+      <section className="bg-soft">
+        <div className="container">
+          <Reveal className="section-head">
+            <span className="eyebrow">O nosso percurso</span>
+            <h2>Começámos no imobiliário. Hoje investimos onde encontramos valor.</h2>
+          </Reveal>
+          <AreasCards />
         </div>
       </section>
 
