@@ -32,14 +32,13 @@ export default function RegionMap({ mapa, pontos = [], nome }) {
       }).setView([mapa.lat, mapa.lng], mapa.zoom);
       mapRef.current = map;
 
-      L.tileLayer(
-        "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
-        {
-          attribution:
-            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
-          maxZoom: 19,
-        }
-      ).addTo(map);
+      // Tiles do OpenStreetMap: não exigem chave de API (os da CARTO passaram a
+      // exigir e mostravam "API KEY REQUIRED" em vez do mapa).
+      L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        maxZoom: 19,
+      }).addTo(map);
 
       pontos.forEach((p) => {
         const cor = CORES_PONTO[p.tipo] || "#1b3f6e";
