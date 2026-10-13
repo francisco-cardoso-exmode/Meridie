@@ -3536,3 +3536,19 @@ a.marca-card:hover {
     transform: none !important;
   }
 }
+
+/* Login do backoffice — "Esqueci-me da password" */
+.admin-login-link {
+  display: block;
+  margin: 14px auto 0;
+  background: none;
+  border: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.88rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.admin-login-link:hover {
+  color: var(--navy);
+}
