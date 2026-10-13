@@ -2,7 +2,7 @@ import Link from "next/link";
 
 // Card de uma marca representada (lista /marcas) — abre a página da marca.
 export default function MarcaCard({ marca: m }) {
-  const foto = m.imagens?.[0] || m.logo || m.produtos?.[0]?.imagem;
+  const foto = m.imagens?.[0] || m.produtos?.find((p) => p.imagem)?.imagem || m.logo;
   const n = m.produtos?.length || 0;
   return (
     <Link href={`/marcas/${m.slug}`} className="marca-card">
