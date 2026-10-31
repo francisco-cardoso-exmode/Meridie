@@ -31,6 +31,22 @@ const INDICES = [
   ["comparacoes_cache", { key: 1 }, { unique: true, name: "key_unica" }],
   ["comparacoes_cache", { criadoEm: 1 }, { expireAfterSeconds: 30 * DIA, name: "ttl_30_dias" }],
   ["contactos", { criadoEm: -1 }, { name: "criadoEm_desc" }],
+  // Alojamento Local
+  ["al_proprietarios", { email: 1 }, { unique: true, name: "email_unico" }],
+  ["al_equipa", { email: 1 }, { unique: true, name: "email_unico" }],
+  ["al_casas", { slug: 1 }, { unique: true, name: "slug_unico" }],
+  ["al_casas", { proprietarioId: 1 }, { name: "proprietario" }],
+  ["al_casas", { estado: 1, pais: 1, cidade: 1 }, { name: "estado_pais_cidade" }],
+  ["al_reservas", { casaSlug: 1, estado: 1, entrada: 1, saida: 1 }, { name: "casa_estado_datas" }],
+  ["al_reservas", { tokenHash: 1 }, { unique: true, sparse: true, name: "token_hospede" }],
+  ["al_reservas", { "pagamento.fornecedor": 1, "pagamento.referencia": 1 }, { sparse: true, name: "pagamento_ref" }],
+  ["al_reservas", { estado: 1, criadoEm: -1 }, { name: "estado_criadoEm" }],
+  ["al_tarefas", { data: 1, estado: 1, atribuidaA: 1 }, { name: "data_estado_atribuida" }],
+  ["al_tarefas", { reservaId: 1, tipo: 1 }, { unique: true, partialFilterExpression: { reservaId: { $type: "string" } }, name: "reserva_tipo_unico" }],
+  ["al_tarefas", { casaSlug: 1, estado: 1 }, { name: "casa_estado" }],
+  ["al_sessoes", { hash: 1 }, { unique: true, name: "hash_unico" }],
+  ["al_sessoes", { expiraEm: 1 }, { expireAfterSeconds: 0, name: "ttl" }],
+  ["al_acessos", { expiraEm: 1 }, { expireAfterSeconds: 0, name: "ttl" }],
 ];
 
 const c = new MongoClient(process.env.MONGODB_URI);
