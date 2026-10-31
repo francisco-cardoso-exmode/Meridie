@@ -49,9 +49,10 @@ export default async function Home({ params }) {
   const regioes = traduzLista(await allRegioes(), lang);
   const anuncios = traduzLista(await allAnuncios({ home: true }), lang);
   const marcas = traduzLista(await allMarcas({ home: true }), lang);
-  // Escolhidas no backoffice (Regiões → "Mostrar na página inicial" / "Banner").
-  const regioesDestaque = regioesHome(regioes);
-  const regiaoFooter = regiaoBannerHome(regioes);
+  // Escolhidas no backoffice (Regiões → "Mostrar na página inicial" / "Banner"),
+  // e só as que têm empreendimentos publicados (`todos` já só tem os visíveis).
+  const regioesDestaque = regioesHome(regioes, todos);
+  const regiaoFooter = regiaoBannerHome(regioes, todos);
 
   return (
     <>
