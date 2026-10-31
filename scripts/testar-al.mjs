@@ -17,6 +17,11 @@ import {
   simularCalculadora,
   moedaDe,
   formatarValor,
+  percentagemTaxaServico,
+  taxaServicoDe,
+  totalHospede,
+  podePagarOnline,
+  valorParaProprietario,
 } from "../lib/al/regras.js";
 
 test("datas", () => {
@@ -142,4 +147,24 @@ test("multi-país: moeda da casa e ganhos separados por moeda", () => {
     () => 10
   );
   assert.deepEqual(g.map((m) => [m.mes, m.moeda, m.proprietario]), [["2026-07", "BRL", 450], ["2026-07", "EUR", 90]]);
+});
+
+test("pagamentos: taxa de serviço, total do hóspede e parte do proprietário", () => {
+  assert.equal(percentagemTaxaServico("PT"), 2);
+  assert.equal(percentagemTaxaServico("BR"), 2.5);
+  assert.equal(percentagemTaxaServico("PT", { taxaServico: { PT: 0 } }), 0);
+  assert.equal(percentagemTaxaServico("XX"), 2);
+  assert.equal(taxaServicoDe(450, 50, 2), 10);
+  const r = { estado: "confirmada", origem: "direta", valor: 450, limpeza: 50, taxaServico: 10, pagamento: { estado: "nao_iniciado" } };
+  assert.equal(totalHospede(r), 510);
+  assert.equal(podePagarOnline(r), true);
+  assert.equal(podePagarOnline({ ...r, pagamento: { estado: "pendente" } }), true);
+  assert.equal(podePagarOnline({ ...r, pagamento: { estado: "pago" } }), false);
+  assert.equal(podePagarOnline({ ...r, estado: "pedido" }), false);
+  assert.equal(podePagarOnline({ ...r, origem: "airbnb" }), false);
+  assert.equal(podePagarOnline({ ...r, bloqueio: true }), false);
+  // Gestão: 18% da estadia para a Meridie, limpeza fica com a Meridie.
+  assert.equal(valorParaProprietario(r, 18, "gestao"), 369);
+  // Anúncio: 8% da estadia; o proprietário limpa e recebe a limpeza.
+  assert.equal(valorParaProprietario(r, 8, "anuncio"), 464);
 });

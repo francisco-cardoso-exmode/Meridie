@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Relatorio from "@/components/al/Relatorio";
 import ProblemaHospede from "@/components/al/ProblemaHospede";
+import PagarEstadia from "@/components/al/PagarEstadia";
 import { t, tf } from "@/lib/i18n";
 import { metaPrivada, dataCurta } from "@/lib/al/paginas";
 import { reservaPorToken } from "@/lib/al/reservas";
@@ -8,7 +9,8 @@ import { casaPorSlug } from "@/lib/al/casas";
 import { relatorioEntrada } from "@/lib/al/tarefas";
 import { getEmpresa } from "@/lib/config";
 import { whatsappHref, telHref } from "@/lib/contactoLinks";
-import { formatarValor } from "@/lib/al/regras";
+import { formatarValor, totalHospede, podePagarOnline } from "@/lib/al/regras";
+import { pagamentoDisponivel } from "@/lib/pagamentos";
 import { traduzDoc } from "@/lib/i18n/conteudo";
 
 export const dynamic = "force-dynamic";
@@ -23,8 +25,9 @@ export async function generateMetadata({ params }) {
  * Token inválido, reserva cancelada ou sem base → 404 (não diz qual).
  * Instruções de entrada e morada só com a reserva confirmada.
  */
-export default async function Estadia({ params }) {
+export default async function Estadia({ params, searchParams }) {
   const { lang, token } = await params;
+  const voltouDoPagamento = (await searchParams)?.pagamento === "ok";
   const T = (x) => t(lang, x);
   const r = await reservaPorToken(token).catch(() => null);
   if (!r) notFound();
@@ -37,6 +40,11 @@ export default async function Estadia({ params }) {
   const confirmada = r.estado === "confirmada";
   const wa = whatsappHref(empresa.telefone, tf(lang, "Olá! Tenho uma reserva em {casa} ({e} → {s}).", { casa: r.casaTitulo, e: r.entrada, s: r.saida }));
   const tel = telHref(empresa.telefone);
+  const moeda = r.moeda || "EUR";
+  const v = (x) => formatarValor(x, moeda, lang, { decimais: 2 });
+  const total = totalHospede(r);
+  const estadoPag = r.pagamento?.estado;
+  const pagar = podePagarOnline(r) && pagamentoDisponivel(r.pais);
 
   return (
     <div className="container al-pagina al-estreita">
@@ -57,19 +65,62 @@ export default async function Estadia({ params }) {
               <dd>{r.hospedes}</dd>
             </>
           ) : null}
-          {r.valor > 0 && r.origem === "direta" && (
+          {r.valor > 0 && (r.origem === "direta" || pagar) && (
             <>
               <dt>{T("Valor da estadia")}</dt>
+              <dd>{v(r.valor)}</dd>
+              {r.limpeza > 0 && (
+                <>
+                  <dt>{T("Limpeza")}</dt>
+                  <dd>{v(r.limpeza)}</dd>
+                </>
+              )}
+              {r.taxaServico > 0 && (
+                <>
+                  <dt>{T("Taxa de serviço")}</dt>
+                  <dd>{v(r.taxaServico)}</dd>
+                </>
+              )}
+              <dt>{T("Total")}</dt>
               <dd>
-                {formatarValor(r.valor, r.moeda || "EUR", lang, { decimais: 2 })}
-                {r.limpeza > 0 && ` + ${T("limpeza")} ${formatarValor(r.limpeza, r.moeda || "EUR", lang, { decimais: 2 })}`}
+                <strong>{v(total)}</strong>
               </dd>
+              {estadoPag === "pago" && (
+                <>
+                  <dt>{T("Pagamento")}</dt>
+                  <dd>✓ {T("Pago")}</dd>
+                </>
+              )}
+              {estadoPag === "reembolsado" && (
+                <>
+                  <dt>{T("Pagamento")}</dt>
+                  <dd>{T("Reembolsado")}</dd>
+                </>
+              )}
             </>
           )}
           <dt>{T("Estado")}</dt>
           <dd>{T(confirmada ? "Confirmada" : "Concluída")}</dd>
         </dl>
       </div>
+
+      {pagar && (
+        <div className="al-cartao">
+          {voltouDoPagamento || estadoPag === "pendente" ? (
+            <p>
+              {T(
+                voltouDoPagamento
+                  ? "Obrigado! Estamos a confirmar o pagamento — atualiza esta página daqui a um minuto. Se pagaste por Multibanco, a confirmação chega quando o pagamento for feito."
+                  : "Tens um pagamento iniciado. Se ainda não o concluíste, podes pagar outra vez aqui."
+              )}
+            </p>
+          ) : (
+            <p>{tf(lang, "Para garantir a reserva, faz o pagamento de {v}.", { v: v(total) })}</p>
+          )}
+          <PagarEstadia token={token} rotulo={tf(lang, "Pagar {v}", { v: v(total) })} />
+          <p className="al-nota">{T("Pagamento seguro pelo Stripe. Não guardamos os dados do teu cartão.")}</p>
+        </div>
+      )}
 
       {confirmada && casa && (casa.morada || casa.checkinInfo) && (
         <>

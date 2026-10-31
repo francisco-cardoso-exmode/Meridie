@@ -2,6 +2,8 @@ import L from "@/components/L";
 import Foto from "@/components/Foto";
 import NavProprietario from "@/components/al/NavProprietario";
 import ListaFiltravel from "@/components/admin/ListaFiltravel";
+import LigarRecebimentos from "@/components/al/LigarRecebimentos";
+import { estadoRecebimentos, recebimentosDisponiveis } from "@/lib/al/recebimentos";
 import { t, tf } from "@/lib/i18n";
 import { exigirProprietario, metaPrivada, dataCurta } from "@/lib/al/paginas";
 import { casasDoProprietario } from "@/lib/al/casas";
@@ -20,6 +22,9 @@ export default async function PainelProprietario({ params }) {
   const T = (x) => t(lang, x);
   const p = await exigirProprietario(lang);
   const casas = await casasDoProprietario(p.id);
+  // Recebimentos pelo Stripe: só com o Stripe ligado e casas em Portugal.
+  const comRecebimentos = recebimentosDisponiveis() && casas.some((c) => (c.pais || "PT") === "PT");
+  const receb = comRecebimentos ? await estadoRecebimentos(p) : null;
   const hoje = hojeLisboa();
   const proximas = casas.length
     ? (
@@ -103,6 +108,31 @@ export default async function PainelProprietario({ params }) {
             </div>
           );
         })()
+      )}
+
+      {receb && (
+        <>
+          <h2>{T("Recebimentos")}</h2>
+          <div className="al-cartao">
+            {receb.ativa ? (
+              <>
+                <p>✓ {T("A tua conta para recebimentos está ativa. Depois de cada estadia transferimos a tua parte para o IBAN que indicaste no Stripe.")}</p>
+                <LigarRecebimentos rotulo={T("Ver transferências e IBAN")} secundario />
+              </>
+            ) : (
+              <>
+                <p>
+                  {T(
+                    receb.ligada
+                      ? "Falta terminar o registo no Stripe (identidade e IBAN) para recebermos e transferirmos a tua parte de cada reserva."
+                      : "Para receberes a tua parte de cada reserva automaticamente, regista o teu IBAN no Stripe, o serviço de pagamentos que usamos. Demora uns 5 minutos — a Meridie nunca vê os teus dados bancários."
+                  )}
+                </p>
+                <LigarRecebimentos rotulo={T(receb.ligada ? "Continuar o registo" : "Ligar a minha conta bancária")} />
+              </>
+            )}
+          </div>
+        </>
       )}
 
       <h2>{T("Documentos")}</h2>

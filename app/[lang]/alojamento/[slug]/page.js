@@ -9,7 +9,9 @@ import { t, tf } from "@/lib/i18n";
 import { metaPagina, metaNaoEncontrado } from "@/lib/seo";
 import { traduzDoc } from "@/lib/i18n/conteudo";
 import { casaPublica } from "@/lib/al/casas";
-import { COMODIDADES, PAISES, hojeLisboa, moedaDe, formatarValor } from "@/lib/al/regras";
+import { COMODIDADES, PAISES, hojeLisboa, moedaDe, formatarValor, percentagemTaxaServico } from "@/lib/al/regras";
+import { getConfigAl } from "@/lib/al/config";
+import { pagamentoDisponivel } from "@/lib/pagamentos";
 
 export const revalidate = 60;
 
@@ -33,6 +35,9 @@ export default async function CasaPagina({ params }) {
   const c = traduzDoc(r.casa, lang);
   const hoje = hojeLisboa();
   const moeda = moedaDe(c);
+  const pais = c.pais || "PT";
+  const pagaOnline = pagamentoDisponivel(pais);
+  const pctTaxa = pagaOnline ? percentagemTaxaServico(pais, await getConfigAl()) : 0;
   const mapa = c.coordenadas ? { lat: c.coordenadas.lat, lng: c.coordenadas.lng, zoom: 14 } : null;
 
   return (
@@ -125,7 +130,7 @@ export default async function CasaPagina({ params }) {
             {c.limpeza > 0 && `${T("Limpeza")}: ${formatarValor(c.limpeza, moeda, lang)} · `}
             {c.estadiaMinima > 1 ? tf(lang, "Mínimo {n} noites", { n: c.estadiaMinima }) : T("Mínimo 1 noite")}
           </div>
-          <PedidoReserva casa={{ slug: c.slug, precoNoite: c.precoNoite, limpeza: c.limpeza, estadiaMinima: c.estadiaMinima, capacidade: c.capacidade, moeda }} ocupadas={r.ocupadas} hoje={hoje} />
+          <PedidoReserva casa={{ slug: c.slug, precoNoite: c.precoNoite, limpeza: c.limpeza, estadiaMinima: c.estadiaMinima, capacidade: c.capacidade, moeda }} pctTaxa={pctTaxa} pagaOnline={pagaOnline} ocupadas={r.ocupadas} hoje={hoje} />
         </aside>
       </div>
     </div>

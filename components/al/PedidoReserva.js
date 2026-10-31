@@ -4,13 +4,14 @@ import { useRef, useState } from "react";
 import { useT } from "@/components/LangProvider";
 import L from "@/components/L";
 import { resolverDesafio } from "@/lib/resolverDesafio";
-import { noitesEntre, erroDatas, formatarValor, somaDias } from "@/lib/al/regras";
+import { noitesEntre, erroDatas, formatarValor, somaDias, taxaServicoDe } from "@/lib/al/regras";
 
 /**
  * "Pedir reserva" na página de uma casa. Mostra a estimativa (noites ×
- * preço + limpeza) na moeda da casa. Sem pagamento: a equipa confirma.
+ * preço + limpeza + taxa de serviço) na moeda da casa. Não se paga aqui: a
+ * equipa confirma e o hóspede paga depois na página da estadia.
  */
-export default function PedidoReserva({ casa, ocupadas = [], hoje }) {
+export default function PedidoReserva({ casa, ocupadas = [], hoje, pctTaxa = 0, pagaOnline = false }) {
   const { t, tf, lang } = useT();
   const inicio = useRef(Date.now());
   const [f, setF] = useState({ entrada: "", saida: "", hospedes: 2, nome: "", email: "", telefone: "", mensagem: "", website: "" });
@@ -19,6 +20,8 @@ export default function PedidoReserva({ casa, ocupadas = [], hoje }) {
 
   const noites = noitesEntre(f.entrada, f.saida);
   const moeda = casa.moeda || "EUR";
+  const estadia = noites * (casa.precoNoite || 0);
+  const taxa = taxaServicoDe(estadia, casa.limpeza, pctTaxa);
   const ocupado = new Set(ocupadas);
   let conflito = false;
   for (let i = 0; i < noites; i++) if (ocupado.has(somaDias(f.entrada, i))) conflito = true;
@@ -65,17 +68,28 @@ export default function PedidoReserva({ casa, ocupadas = [], hoje }) {
         <div className="al-estimativa">
           <div>
             {tf("{n} noites × {p}", { n: noites, p: formatarValor(casa.precoNoite, moeda, lang) })}
-            <strong>{formatarValor(noites * casa.precoNoite, moeda, lang)}</strong>
+            <strong>{formatarValor(estadia, moeda, lang)}</strong>
           </div>
           {casa.limpeza > 0 && (
             <div>
               {t("Limpeza")} <strong>{formatarValor(casa.limpeza, moeda, lang)}</strong>
             </div>
           )}
+          {taxa > 0 && (
+            <div>
+              {t("Taxa de serviço")} <strong>{formatarValor(taxa, moeda, lang, { decimais: 2 })}</strong>
+            </div>
+          )}
           <div className="total">
-            {t("Total estimado")} <strong>{formatarValor(noites * casa.precoNoite + (casa.limpeza || 0), moeda, lang)}</strong>
+            {t("Total estimado")} <strong>{formatarValor(estadia + (casa.limpeza || 0) + taxa, moeda, lang, { decimais: taxa > 0 ? 2 : 0 })}</strong>
           </div>
-          <small>{t("Taxa turística, se aplicável, à parte. Sem pagamento agora.")}</small>
+          <small>
+            {t(
+              pagaOnline
+                ? "Taxa turística, se aplicável, à parte. Não pagas nada agora: pagas online depois de confirmarmos a disponibilidade."
+                : "Taxa turística, se aplicável, à parte. Sem pagamento agora."
+            )}
+          </small>
         </div>
       )}
       {invalido && <p className="al-msg erro">{t(invalido)}</p>}

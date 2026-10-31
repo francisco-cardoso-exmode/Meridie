@@ -16,6 +16,7 @@ export function BotaoAcao({ url, body, rotulo, confirmar, classe = "admin-link",
     setEstado({ a: "loading", msg: "", link: "" });
     const r = await pedidoAdmin(url, { body });
     if (!r.ok) return setEstado({ a: "erro", msg: r.erro, link: "" });
+    if (r.aviso) window.alert(r.aviso);
     if (r.link) {
       setEstado({ a: "ok", msg: r.emailEnviado ? "Link enviado ao hóspede por email." : "Copia o link e envia ao hóspede:", link: r.link });
       return;
@@ -332,6 +333,15 @@ export function DefinicoesAl({ config }) {
         <label>
           Gestão completa reduzida <small>2+ casas ou comprou através da Meridie</small> {num("planos", "reduzida")}
         </label>
+      </div>
+      <h3>Taxa de serviço do hóspede (%)</h3>
+      <p className="admin-sub">
+        Somada ao total das reservas diretas (estadia + limpeza) e igual para qualquer forma de pagamento — cobre parte do custo dos pagamentos. 0 =
+        sem taxa.
+      </p>
+      <div className="admin-form-grid">
+        <label>Portugal {num("taxaServico", "PT")}</label>
+        <label>Brasil {num("taxaServico", "BR")}</label>
       </div>
       {estado.msg && <div className={`form-msg ${estado.a === "erro" ? "erro" : "ok"}`}>{estado.msg}</div>}
       <div className="admin-form-actions">
