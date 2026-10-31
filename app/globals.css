@@ -3878,7 +3878,7 @@ a.marca-card:hover {
 .nav .troca-idioma a:hover {
   color: var(--gold-light);
 }
-@media (max-width: 860px) {
+@media (max-width: 1100px) {
   .nav .troca-idioma {
     margin-top: 12px;
   }
@@ -4687,4 +4687,110 @@ a.an-calor-cel:focus-visible,
   .an-campos .an-campo-curto { flex: 1 1 calc(50% - 6px); }
   .an-campos .an-campo-curto select { width: 100%; }
   .an-inter-tipos .an-chip { padding: 5px 10px; font-size: 0.8rem; }
+}
+
+/* Home — bloco do alojamento local (para proprietários) */
+.al-home {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 40px 44px;
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 28px;
+  align-items: center;
+}
+.al-home h2 { margin: 6px 0 10px; }
+.al-home p { color: var(--muted); margin: 0; }
+.al-home-botoes { display: flex; flex-direction: column; gap: 12px; align-items: stretch; }
+.al-home-botoes .btn { text-align: center; justify-content: center; }
+@media (max-width: 860px) {
+  .al-home { grid-template-columns: 1fr; padding: 28px 22px; }
+}
+
+/* Menu do topo com 8 entradas: nada parte em duas linhas e o espaço encolhe com o ecrã. */
+.nav > a,
+.nav-drop-btn {
+  white-space: nowrap;
+}
+@media (min-width: 861px) {
+  .nav {
+    gap: clamp(12px, 1.6vw, 28px);
+  }
+}
+@media (min-width: 861px) and (max-width: 1100px) {
+  .nav a,
+  .nav-drop-btn {
+    font-size: 0.84rem;
+  }
+}
+
+/* Página das casas: secção "Como funciona a reserva" */
+.al-pagina .al-passos .section-head h2 {
+  font-size: 1.8rem;
+  margin: 8px 0 10px;
+}
+
+/* Com 8 entradas, o menu passa a hambúrguer abaixo de 1100px (antes: 860px). */
+@media (max-width: 1100px) {
+  .nav-toggle {
+    display: inline-flex;
+  }
+  .nav {
+    position: absolute;
+    top: 72px;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    background: rgba(15, 31, 56, 0.98);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 12px 24px 20px;
+    display: none;
+  }
+  .nav.open {
+    display: flex;
+  }
+  .nav a {
+    width: 100%;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  /* No telemóvel o submenu fica sempre aberto, indentado */
+  .nav-drop {
+    width: 100%;
+  }
+  .nav-drop-btn {
+    padding: 12px 0 4px;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    cursor: default;
+  }
+  .nav-drop-btn span {
+    display: none;
+  }
+  .nav-drop-menu {
+    position: static;
+    display: flex;
+    padding: 0;
+    background: none;
+    border: none;
+    box-shadow: none;
+  }
+  .nav-drop-menu a {
+    padding: 12px 0 12px 14px;
+  }
+}
+/* No cartão claro da home, o botão de contorno é azul (o normal é branco, para fundos escuros). */
+.al-home .btn-outline {
+  color: var(--navy);
+  border-color: var(--navy);
+}
+.al-home .btn-outline:hover {
+  border-color: var(--gold);
+  color: var(--gold);
 }

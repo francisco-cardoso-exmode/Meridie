@@ -19,6 +19,14 @@ const LINKS = [
       { href: "/como-funciona", label: "Como Funciona" },
     ],
   },
+  {
+    label: "Alojamento",
+    sub: [
+      // "Casas para férias" só aparece com pelo menos uma casa publicada (sem página vazia).
+      { href: "/alojamento", label: "Casas para férias", soComCasas: true },
+      { href: "/inscreve-a-tua-casa", label: "Inscreve a tua casa" },
+    ],
+  },
   { href: "/representacoes", label: "Representações" },
   ...(TECNOLOGIA_VISIVEL ? [{ href: "/tecnologia", label: "Tecnologia" }] : []),
   { href: "/publicidade", label: "Parceiros" },
@@ -26,7 +34,7 @@ const LINKS = [
   { href: "/contactos", label: "Contactar", destaque: true },
 ];
 
-export default function Header() {
+export default function Header({ temCasas = false }) {
   const { t } = useT();
   const [hidden, setHidden] = useState(false);
   const [open, setOpen] = useState(false);
@@ -66,7 +74,7 @@ export default function Header() {
                   {t(l.label)} <span aria-hidden="true">▾</span>
                 </button>
                 <div className="nav-drop-menu">
-                  {l.sub.map((s) => (
+                  {l.sub.filter((s) => temCasas || !s.soComCasas).map((s) => (
                     <L key={s.href} href={s.href} onClick={() => setOpen(false)}>
                       {t(s.label)}
                     </L>

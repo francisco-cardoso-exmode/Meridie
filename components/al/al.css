@@ -217,3 +217,15 @@ body.al-equipa { background: var(--paper-soft); }
 .lf-barra input, .lf-barra select { min-height: 40px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 15px; font-family: inherit; }
 .lf-barra input { flex: 1 1 220px; }
 .lf-contagem { color: var(--muted); font-size: 0.85rem; margin-left: auto; }
+
+/* Secções explicativas ("Como funciona a reserva", "Como recebes") */
+.al-passos { margin-top: 56px; }
+.container > .al-passos:first-child { margin-top: 0; }
+.al-passos .section-head { margin-bottom: 24px; }
+.al-passos .grid-4 { grid-template-columns: repeat(4, 1fr); }
+.al-passos .card h3 { margin: 12px 0 8px; font-size: 1.05rem; }
+.al-passos .card p { margin: 0; color: var(--muted); font-size: 0.93rem; line-height: 1.55; }
+.al-passo-num { color: var(--gold, #c89b3c); }
+.al-passos-nota { margin-top: 16px; text-align: center; }
+@media (max-width: 1000px) { .al-passos .grid-4 { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px) { .al-passos .grid-4 { grid-template-columns: 1fr; } }

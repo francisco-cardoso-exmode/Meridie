@@ -4,6 +4,8 @@ import Calculadora from "@/components/al/Calculadora";
 import { t } from "@/lib/i18n";
 import { metaPagina } from "@/lib/seo";
 import { getConfigAl } from "@/lib/al/config";
+import PassosAl from "@/components/al/PassosAl";
+import { getConteudo } from "@/lib/conteudo";
 
 export const revalidate = 300;
 
@@ -18,7 +20,7 @@ export async function generateMetadata({ params }) {
 export default async function InscreveCasa({ params }) {
   const { lang } = await params;
   const T = (x) => t(lang, x);
-  const { planos } = await getConfigAl();
+  const [{ planos }, c] = await Promise.all([getConfigAl(), getConteudo("alojamento", lang)]);
 
   const vantagens = [
     ["📸", "Inspeção fotográfica a cada estadia", "Antes de cada entrada e depois de cada saída, a nossa equipa fotografa todas as divisões. Vês tudo na tua área — e o hóspede vê o estado em que recebeu a casa."],
@@ -132,7 +134,13 @@ export default async function InscreveCasa({ params }) {
         </div>
       </section>
 
-      <section className="bg-soft" id="calculadora">
+      <section className="bg-soft">
+        <div className="container">
+          <PassosAl eyebrow={c.recebesEyebrow} titulo={c.recebesTitulo} texto={c.recebesTexto} passos={c.passosRecebes} />
+        </div>
+      </section>
+
+      <section id="calculadora">
         <div className="container">
           <div className="section-head">
             <span className="eyebrow">{T("Estimativa")}</span>

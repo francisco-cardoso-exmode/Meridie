@@ -14,6 +14,7 @@ import Analytics from "@/components/Analytics";
 import TrackVisita from "@/components/TrackVisita";
 import CookieConsent from "@/components/CookieConsent";
 import { CONSENT_PADRAO } from "@/lib/consentimento";
+import { haCasasPublicadas } from "@/lib/al/casas";
 import { SITE_URL, SITE_NAME } from "@/lib/site";
 
 // Fonte serif dos títulos (liga ao logo). Igual em todos os dispositivos.
@@ -63,7 +64,7 @@ export default async function RootLayout({ children, params }) {
   const { lang } = await params;
   if (!ehLang(lang)) notFound();
   // Cotação EUR→BRL do momento; no browser é revalidada (ver CambioProvider).
-  const cambio = await getCambio();
+  const [cambio, temCasas] = await Promise.all([getCambio(), haCasasPublicadas()]);
 
   return (
     <html lang={LOCALE[lang]} className={spectral.variable}>
@@ -91,7 +92,7 @@ export default async function RootLayout({ children, params }) {
               <a href="#conteudo" className="skip-link">
                 {t(lang, "Saltar para o conteúdo")}
               </a>
-              <Header />
+              <Header temCasas={temCasas} />
               <main id="conteudo" tabIndex={-1}>
                 {children}
               </main>

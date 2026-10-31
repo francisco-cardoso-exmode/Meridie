@@ -6,6 +6,9 @@ import { metaPagina } from "@/lib/seo";
 import { traduzLista } from "@/lib/i18n/conteudo";
 import { casasPublicadas, cidadesComCasas } from "@/lib/al/casas";
 import { PAISES, paisValido, dataValida, hojeLisboa, moedaDe } from "@/lib/al/regras";
+import PassosAl, { passosDaReserva } from "@/components/al/PassosAl";
+import { getConteudo } from "@/lib/conteudo";
+import { pagamentoDisponivel } from "@/lib/pagamentos";
 
 export async function generateMetadata({ params, searchParams }) {
   const { lang } = await params;
@@ -32,7 +35,7 @@ export default async function Alojamento({ params, searchParams }) {
     saida: dataValida(sp.saida) ? sp.saida : "",
     hospedes: /^\d{1,2}$/.test(sp.hospedes || "") ? sp.hospedes : "",
   };
-  const [casas, cidades] = await Promise.all([casasPublicadas(f), cidadesComCasas()]);
+  const [casas, cidades, c] = await Promise.all([casasPublicadas(f), cidadesComCasas(), getConteudo("alojamento", lang)]);
   const lista = traduzLista(casas, lang);
   const hoje = hojeLisboa();
   const qs = f.entrada && f.saida ? `?entrada=${f.entrada}&saida=${f.saida}${f.hospedes ? `&hospedes=${f.hospedes}` : ""}` : "";
@@ -119,6 +122,14 @@ export default async function Alojamento({ params, searchParams }) {
           ))}
         </div>
       )}
+
+      <PassosAl
+        eyebrow={c.reservaEyebrow}
+        titulo={c.reservaTitulo}
+        texto={c.reservaTexto}
+        passos={passosDaReserva(c, pagamentoDisponivel("PT"))}
+        nota={c.reservaNota}
+      />
 
       <div className="cta-band al-cta">
         <h2>{T("Tens uma casa?")}</h2>

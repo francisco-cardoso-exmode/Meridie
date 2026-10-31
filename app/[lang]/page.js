@@ -193,6 +193,27 @@ export default async function Home({ params }) {
         </div>
       </section>
 
+      {/* Alojamento local — para proprietários */}
+      <section className="bg-soft">
+        <div className="container">
+          <Reveal className="al-home">
+            <div>
+              <span className="eyebrow">{c.alEyebrow}</span>
+              <h2>{c.alTitulo}</h2>
+              <p>{c.alTexto}</p>
+            </div>
+            <div className="al-home-botoes">
+              <L href="/inscreve-a-tua-casa" className="btn btn-primary">
+                {c.alBotao}
+              </L>
+              <L href="/inscreve-a-tua-casa#calculadora" className="btn btn-outline">
+                {c.alBotao2}
+              </L>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
       {/* Banner regional pré-footer */}
       {regiaoFooter && (
         <section className="bg-soft">
