@@ -7,9 +7,13 @@ import { referenciaDe } from "@/lib/empreendimentos";
 import CompareToggle from "@/components/compare/CompareToggle";
 import { useT } from "@/components/LangProvider";
 import Foto from "@/components/Foto";
+import { formataIntervalo, eUm } from "@/lib/intervalo";
 
 export default function EmpreendimentoCard({ e }) {
   const { t } = useT();
+  // Número ou intervalo ("1–3"); vazio/0 não aparece.
+  const quartos = formataIntervalo(e.quartos);
+  const banhos = formataIntervalo(e.casasBanho);
   // O card inteiro é clicável através do link do título (::after estica-o por
   // cima do card) — assim o botão "Comparar" não fica dentro do <a>.
   return (
@@ -36,10 +40,10 @@ export default function EmpreendimentoCard({ e }) {
         </h3>
         <p className="prop-resumo">{e.resumo}</p>
         <div className="prop-specs">
-          {Number(e.quartos) > 0 && (
-            <span><Icon name="bed" size={16} /> {e.quartos} {Number(e.quartos) === 1 ? t("quarto") : t("quartos")}</span>
+          {quartos && (
+            <span><Icon name="bed" size={16} /> {quartos} {eUm(e.quartos) ? t("quarto") : t("quartos")}</span>
           )}
-          {Number(e.casasBanho) > 0 && <span><Icon name="bath" size={16} /> {e.casasBanho}</span>}
+          {banhos && <span><Icon name="bath" size={16} /> {banhos}</span>}
           {Number(e.area) > 0 && <span><Icon name="ruler" size={16} /> {e.area} m²</span>}
         </div>
         <div className="prop-foot">

@@ -9,6 +9,7 @@ import ImageUploader from "@/components/admin/ImageUploader";
 import VideoUploader from "@/components/admin/VideoUploader";
 import { referenciaDe } from "@/lib/empreendimentos";
 import PrecoDual from "@/components/PrecoDual";
+import { normalizaIntervalo, formataIntervalo } from "@/lib/intervalo";
 
 const linhasParaArray = (s) =>
   (s || "")
@@ -73,8 +74,9 @@ export default function EmpreendimentoForm({ initial = null, regioesExistentes =
     preco: initial?.preco ?? "",
     precoMax: initial?.precoMax ?? "",
     moeda: initial?.moeda || "EUR",
-    quartos: initial?.quartos ?? 1,
-    casasBanho: initial?.casasBanho ?? 1,
+    // Texto: número ou intervalo ("1-3"); os registos antigos têm números.
+    quartos: String(initial?.quartos ?? 1),
+    casasBanho: String(initial?.casasBanho ?? 1),
     area: initial?.area ?? "",
     estado: initial?.estado || "Em construção",
     destaque: initial?.destaque ?? false,
@@ -117,8 +119,9 @@ export default function EmpreendimentoForm({ initial = null, regioesExistentes =
       preco: Number(f.preco) || 0,
       moeda: f.moeda,
       precoTipo: f.precoTipo,
-      quartos: Number(f.quartos) || 0,
-      casasBanho: Number(f.casasBanho) || 0,
+      // Normalizados (e validados) no servidor — lib/intervalo.js.
+      quartos: f.quartos.trim(),
+      casasBanho: f.casasBanho.trim(),
       area: Number(f.area) || 0,
       estado: f.estado,
       destaque: !!f.destaque,
@@ -260,11 +263,13 @@ export default function EmpreendimentoForm({ initial = null, regioesExistentes =
         )}
         <label>
           Quartos
-          <input type="number" value={f.quartos} onChange={set("quartos")} />
+          <input value={f.quartos} onChange={set("quartos")} inputMode="numeric" placeholder="ex.: 2 ou 1-3" />
+          <AjudaIntervalo v={f.quartos} />
         </label>
         <label>
           Casas de banho
-          <input type="number" value={f.casasBanho} onChange={set("casasBanho")} />
+          <input value={f.casasBanho} onChange={set("casasBanho")} inputMode="numeric" placeholder="ex.: 2 ou 1-3" />
+          <AjudaIntervalo v={f.casasBanho} />
         </label>
         <label>
           Área (m²)
@@ -373,8 +378,8 @@ export default function EmpreendimentoForm({ initial = null, regioesExistentes =
             <h3>{f.nome || "Nome do empreendimento"}</h3>
             <p className="prop-resumo">{f.resumo || "Resumo do empreendimento..."}</p>
             <div className="prop-specs">
-              {Number(f.quartos) > 0 && <span>{f.quartos} q</span>}
-              {Number(f.casasBanho) > 0 && <span>{f.casasBanho} wc</span>}
+              {formataIntervalo(f.quartos) && <span>{formataIntervalo(f.quartos)} q</span>}
+              {formataIntervalo(f.casasBanho) && <span>{formataIntervalo(f.casasBanho)} wc</span>}
               {Number(f.area) > 0 && <span>{f.area} m²</span>}
             </div>
             <div className="prop-foot">
@@ -409,4 +414,13 @@ export default function EmpreendimentoForm({ initial = null, regioesExistentes =
       </aside>
     </div>
   );
+}
+
+// Dica por baixo de quartos/casas de banho: o formato e como vai ficar.
+function AjudaIntervalo({ v }) {
+  const r = normalizaIntervalo(v);
+  if (r.erro) return <small style={{ color: "#b4564b" }}>Formato inválido — ex.: 2 ou 1-3</small>;
+  const fica = formataIntervalo(r.valor);
+  if (fica && r.valor !== v.trim()) return <small>Ex.: 2 ou 1-3 · vai ficar: {fica}</small>;
+  return <small>Ex.: 2 ou 1-3</small>;
 }

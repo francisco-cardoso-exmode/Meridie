@@ -30,6 +30,8 @@ export default function AdminAjuda() {
           <li><strong>Tipologias</strong>: cada tipo de unidade com o seu preço, no formato <code>nome | área | preço</code>
             (área/preço opcionais) — ideal para lotes e blocos.</li>
           <li><strong>Proximidades</strong>: opcionais, um item por linha — aparecem na página do imóvel.</li>
+          <li><strong>Quartos</strong> e <strong>Casas de banho</strong>: um número (<code>2</code>) ou um intervalo
+            (<code>1-3</code> — ex.: um empreendimento com T1 a T3) → aparece <strong>&quot;1–3&quot;</strong>.</li>
         </ul>
         <pre>T1 | 52 m² | 220000
 T2 | 78 m² | 310000

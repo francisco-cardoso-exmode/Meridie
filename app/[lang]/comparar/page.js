@@ -9,6 +9,7 @@ import { t, tf } from "@/lib/i18n";
 import { metaPagina } from "@/lib/seo";
 import { traduzDoc, traduzLista } from "@/lib/i18n/conteudo";
 import Foto from "@/components/Foto";
+import { formataIntervalo } from "@/lib/intervalo";
 
 export const revalidate = 60;
 
@@ -94,8 +95,9 @@ export default async function CompararPage({ params, searchParams }) {
     { k: "Tipologia", v: (x) => T(x.tipo) || "—" },
     { k: "Estado", v: (x) => T(x.estado) || "—" },
     { k: "Finalidade", v: (x) => T(x.finalidade) || "—" },
-    { k: "Quartos", v: (x) => x.quartos ?? "—" },
-    { k: "Casas de banho", v: (x) => x.casasBanho ?? "—" },
+    // Número ou intervalo ("1–3").
+    { k: "Quartos", v: (x) => formataIntervalo(x.quartos) || "—" },
+    { k: "Casas de banho", v: (x) => formataIntervalo(x.casasBanho) || "—" },
     { k: "Área", v: (x) => (x.area ? `${x.area} m²` : "—") },
     { k: "Tipologias", v: tipologiasTxt },
   ];

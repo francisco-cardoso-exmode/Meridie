@@ -24,6 +24,7 @@ import { getEmpresa } from "@/lib/config";
 import ContactosDiretos from "@/components/ContactosDiretos";
 import { metaPagina, metaNaoEncontrado, urlPublica, jsonLd } from "@/lib/seo";
 import { traduzDoc, traduzLista } from "@/lib/i18n/conteudo";
+import { intervalo, formataIntervalo, eUm } from "@/lib/intervalo";
 
 export const revalidate = 60;
 export const dynamicParams = true;
@@ -71,6 +72,23 @@ export default async function PaginaEmpreendimento({ params }) {
   const empresa = await getEmpresa();
   const urlPagina = urlPublica(lang, `/empreendimentos/${e.slug}`);
 
+  // Quartos/casas de banho: número ou intervalo ("1-3" → mín./máx.).
+  const quartos = formataIntervalo(e.quartos);
+  const banhos = formataIntervalo(e.casasBanho);
+  const propriedade = (name, v) => {
+    const i = intervalo(v);
+    if (!i || i.max <= 0) return [];
+    return [
+      i.min === i.max
+        ? { "@type": "PropertyValue", name, value: i.min }
+        : { "@type": "PropertyValue", name, minValue: i.min, maxValue: i.max },
+    ];
+  };
+  const propriedades = [
+    ...propriedade("numberOfBedrooms", e.quartos),
+    ...propriedade("numberOfBathroomsTotal", e.casasBanho),
+  ];
+
   const ld = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -80,6 +98,7 @@ export default async function PaginaEmpreendimento({ params }) {
     category: e.tipo,
     image: Array.isArray(e.imagens) ? e.imagens : undefined,
     url: urlPagina,
+    ...(propriedades.length ? { additionalProperty: propriedades } : {}),
     ...(e.precoTipo !== "consulta" && e.preco
       ? {
           offers: {
@@ -148,15 +167,15 @@ export default async function PaginaEmpreendimento({ params }) {
 
               <div className="spec-row">
                 {/* Só as caixas com valor (como no card). */}
-                {Number(e.quartos) > 0 && (
+                {quartos && (
                   <div className="spec-box">
-                    <div className="v">{e.quartos}</div>
-                    <div className="l">{Number(e.quartos) === 1 ? T("Quarto") : T("Quartos")}</div>
+                    <div className="v">{quartos}</div>
+                    <div className="l">{eUm(e.quartos) ? T("Quarto") : T("Quartos")}</div>
                   </div>
                 )}
-                {Number(e.casasBanho) > 0 && (
+                {banhos && (
                   <div className="spec-box">
-                    <div className="v">{e.casasBanho}</div>
+                    <div className="v">{banhos}</div>
                     <div className="l">{T("Casas de banho")}</div>
                   </div>
                 )}

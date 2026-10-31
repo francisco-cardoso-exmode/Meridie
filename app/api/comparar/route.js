@@ -10,6 +10,7 @@ import {
   PAIS_LABEL,
 } from "@/lib/empreendimentos";
 import { getTaxaEurBrl } from "@/lib/cambio";
+import { formataIntervalo } from "@/lib/intervalo";
 import { dentroDoLimite, ipDe } from "@/lib/rateLimit";
 
 export const maxDuration = 30;
@@ -46,7 +47,8 @@ function descreve(e, n, regiao, taxa) {
     `Localização: ${zonaLabel(e)}, ${PAIS_LABEL[e.pais] || e.pais}`,
     `Tipologia: ${e.tipo || "—"} · Finalidade: ${e.finalidade || "—"} · Estado: ${e.estado || "—"}`,
     `Preço: ${precoTxt(e, taxa)}`,
-    `Quartos: ${e.quartos ?? "?"} · Casas de banho: ${e.casasBanho ?? "?"} · Área: ${e.area ? e.area + " m²" : "?"}`,
+    // Número ou intervalo ("1–3" = há unidades de 1 a 3).
+    `Quartos: ${formataIntervalo(e.quartos) || "?"} · Casas de banho: ${formataIntervalo(e.casasBanho) || "?"} · Área: ${e.area ? e.area + " m²" : "?"}`,
     `Tipologias disponíveis: ${tipologiasStr(e)}`,
     linhas(e.caracteristicas) && `Características: ${e.caracteristicas.join(", ")}`,
     linhas(e.proximidades) && `Proximidades: ${e.proximidades.join(", ")}`,

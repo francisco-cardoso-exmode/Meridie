@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getDb } from "@/lib/mongodb";
 import { isAdmin } from "@/lib/adminAuth";
 import { criar } from "@/lib/crudAdmin";
+import { validarIntervalos } from "@/lib/intervalo";
 
 export const dynamic = "force-dynamic";
 // A tradução para inglês corre em segundo plano depois de responder.
@@ -21,5 +22,7 @@ export async function GET() {
 export async function POST(request) {
   return criar(request, "empreendimentos", {
     msgDuplicado: "Já existe um empreendimento com esse slug.",
+    // Quartos/casas de banho: "2" ou "1-3" (lib/intervalo.js).
+    validar: validarIntervalos,
   });
 }
