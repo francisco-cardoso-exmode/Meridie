@@ -10,10 +10,11 @@ import {
   PAIS_LABEL,
 } from "@/lib/empreendimentos";
 import { getTaxaEurBrl } from "@/lib/cambio";
+import { dentroDoLimite, ipDe } from "@/lib/rateLimit";
 
 export const maxDuration = 30;
 
-const MODEL = "claude-haiku-4-5";
+const MODEL = "claude-haiku-5-5";
 const CACHE_DIAS = 30;
 
 const linhas = (a) => (Array.isArray(a) && a.length ? a : null);
@@ -82,14 +83,25 @@ REGRAS OBRIGATÓRIAS:
 
 FORMATO: parágrafos curtos e, quando útil, bullets a começar por "- ". Destaca a negrito com **texto**. NÃO uses tabelas, títulos markdown (#) nem linhas separadoras (---). Máximo ~180 palavras. Direto e útil, sem encher.`;
 
+// Mensagem genérica para o visitante — o detalhe fica só no log do servidor.
+const ERRO_GENERICO = "Erro ao gerar a análise.";
+
 export async function POST(request) {
   try {
-    const { a: slugA, b: slugB, lang } = await request.json();
+    const corpo = await request.json().catch(() => null);
+    const { a: s1, b: s2, lang } = corpo || {};
+    if (typeof s1 !== "string" || typeof s2 !== "string" || !s1 || !s2) {
+      return Response.json({ erro: "Empreendimentos não encontrados." }, { status: 404 });
+    }
     const emIngles = lang === "en";
+
+    // Ordem fixa: A×B e B×A são a mesma comparação (e a mesma entrada de cache).
+    const [slugA, slugB] = [s1, s2].sort();
     const a = await empreendimentoBySlug(slugA);
     const b = await empreendimentoBySlug(slugB);
 
-    if (!a || !b) {
+    // Empreendimentos ocultos (publicado === false) não existem para o público.
+    if (!a || !b || a.publicado === false || b.publicado === false) {
       return Response.json({ erro: "Empreendimentos não encontrados." }, { status: 404 });
     }
     if (!comparaveis(a, b)) {
@@ -121,58 +133,73 @@ export async function POST(request) {
       .digest("hex");
 
     // Cache: a mesma comparação (e mesmos dados) não volta a chamar a IA.
-    let db = null;
-    if (process.env.MONGODB_URI) {
-      try {
-        db = await getDb();
-        const cached = await db.collection("comparacoes_cache").findOne({ key });
-        const ttl = Date.now() - CACHE_DIAS * 24 * 60 * 60 * 1000;
-        if (cached?.analise && cached.criadoEm?.getTime?.() > ttl) {
-          return Response.json({ analise: cached.analise, cache: true });
-        }
-      } catch {
-        db = null;
+    // Sem cache não se chama a IA — sem ela, cada visita seria uma chamada paga.
+    let db;
+    try {
+      if (!process.env.MONGODB_URI) throw new Error("MONGODB_URI não definido");
+      db = await getDb();
+      const cached = await db.collection("comparacoes_cache").findOne({ key });
+      const ttl = Date.now() - CACHE_DIAS * 24 * 60 * 60 * 1000;
+      if (cached?.analise && cached.criadoEm?.getTime?.() > ttl) {
+        return Response.json({ analise: cached.analise, cache: true });
       }
+    } catch (err) {
+      console.error("comparar: cache indisponível:", err?.message || err);
+      return Response.json({ erro: ERRO_GENERICO }, { status: 503 });
     }
 
     if (!process.env.ANTHROPIC_API_KEY) {
+      console.error("comparar: falta ANTHROPIC_API_KEY");
+      return Response.json({ erro: ERRO_GENERICO }, { status: 503 });
+    }
+
+    // Só se limita o que chega à IA (as respostas em cache são grátis).
+    if (!(await dentroDoLimite(`comparar:${ipDe(request)}`, 10, 60 * 60))) {
       return Response.json(
-        { erro: "Análise por IA ainda não configurada (falta ANTHROPIC_API_KEY)." },
-        { status: 503 }
+        { erro: "Demasiados pedidos. Tenta novamente mais tarde." },
+        { status: 429 }
       );
     }
 
-    const client = new Anthropic();
+    const client = new Anthropic({ timeout: 20000, maxRetries: 1 });
     const msg = await client.messages.create({
       model: MODEL,
-      max_tokens: 700,
+      // O Haiku 5.5 pensa por omissão e o raciocínio conta para max_tokens:
+      // esforço baixo e margem suficiente para não cortar a resposta (~180 palavras).
+      max_tokens: 2000,
+      output_config: { effort: "low" },
       system: SISTEMA,
       messages: [{ role: "user", content: conteudo }],
     });
+    if (msg.stop_reason === "refusal") {
+      console.error("comparar: pedido recusado pelo modelo", msg.stop_details?.category);
+      return Response.json({ erro: ERRO_GENERICO }, { status: 502 });
+    }
     const analise = (msg.content || [])
       .map((blk) => (blk.type === "text" ? blk.text : ""))
       .join("")
       .trim();
 
-    if (!analise) {
-      return Response.json({ erro: "A IA não devolveu resposta." }, { status: 502 });
+    if (!analise || msg.stop_reason === "max_tokens") {
+      console.error("comparar: resposta vazia ou cortada", msg.stop_reason);
+      return Response.json({ erro: ERRO_GENERICO }, { status: 502 });
     }
 
-    if (db) {
-      try {
-        await db
-          .collection("comparacoes_cache")
-          .updateOne(
-            { key },
-            { $set: { key, analise, criadoEm: new Date() } },
-            { upsert: true }
-          );
-      } catch {}
+    try {
+      await db
+        .collection("comparacoes_cache")
+        .updateOne(
+          { key },
+          { $set: { key, analise, criadoEm: new Date() } },
+          { upsert: true }
+        );
+    } catch (err) {
+      console.error("comparar: falha a guardar em cache:", err?.message || err);
     }
 
     return Response.json({ analise });
   } catch (err) {
     console.error("comparar:", err?.message || err);
-    return Response.json({ erro: "Erro ao gerar a análise." }, { status: 500 });
+    return Response.json({ erro: ERRO_GENERICO }, { status: 500 });
   }
 }
