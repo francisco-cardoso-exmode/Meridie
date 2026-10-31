@@ -47,6 +47,10 @@ export async function middleware(request) {
     return NextResponse.next();
   }
 
+  // App da equipa do Alojamento Local (só PT, layout próprio em app/equipa):
+  // não passa pelos idiomas. Cada página valida a sessão no servidor.
+  if (pathname === "/equipa" || pathname.startsWith("/equipa/")) return NextResponse.next();
+
   // Idiomas: "/pt/..." não existe para fora (redireciona para a raiz);
   // "/en/brands" → interno "/en/marcas"; o resto → interno "/pt/...".
   if (pathname === "/pt" || pathname.startsWith("/pt/")) {

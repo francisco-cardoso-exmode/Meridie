@@ -233,6 +233,27 @@ node scripts/migrar-representacoes.mjs --aplicar  # grava</pre>
             cartões — e a tua correção mantém-se até mudares o português.</li>
         </ul>
       </section>
+      <section className="ajuda-bloco">
+        <h2>Alojamento Local (AL)</h2>
+        <p>
+          Proprietários inscrevem as casas em <code>/proprietario</code>; os hóspedes pedem reserva em <code>/alojamento</code>; a equipa de
+          terreno faz inspeções e limpezas em <code>/equipa</code> (no telemóvel). Tudo se gere em <strong>Alojamento</strong>.
+        </p>
+        <ul>
+          <li><strong>Casas</strong>: o proprietário cria e envia para análise → <strong>Aprovar</strong> → <strong>Publicar</strong>.
+            Para publicar: em Portugal, n.º de Registo AL; no Brasil, a confirmação de que o condomínio permite locação por temporada; e
+            sempre título, cidade, preço, capacidade e uma foto. A moeda vem do país (EUR/BRL).</li>
+          <li><strong>Reservas</strong>: os pedidos do site chegam por email. <strong>Confirmar</strong> verifica sobreposições, cria as
+            inspeções de entrada e de saída e envia ao hóspede o link pessoal da estadia. Reservas do Airbnb/Booking criam-se em
+            <strong> + Nova reserva</strong> (se o email for o mascarado da plataforma, copia o link e envia-o pela app da plataforma).</li>
+          <li><strong>Tarefas</strong>: atribui cada inspeção a alguém da equipa (ou deixa por atribuir — qualquer um a pode pegar).
+            Uma inspeção de entrada concluída aparece ao hóspede e ao proprietário; um <strong>dano</strong> manda email à equipa.</li>
+          <li><strong>Equipa</strong>: contas próprias (não entram no backoffice). Desativar termina as sessões.</li>
+          <li><strong>Definições</strong>: comissão das plataformas (aprox.) e % de cada plano — entram nos ganhos dos proprietários e na
+            calculadora de <code>/inscreve-a-tua-casa</code>.</li>
+          <li>Ainda sem pagamento online nem sincronização com o Airbnb/Booking.</li>
+        </ul>
+      </section>
     </div>
   );
 }
