@@ -1,6 +1,7 @@
 "use client";
 
 import { useT } from "@/components/LangProvider";
+import Foto from "@/components/Foto";
 
 // Card de publicidade/anúncio (hotel, restaurante, parceiro, ou região/cidade).
 export default function AnuncioCard({ anuncio: a }) {
@@ -13,7 +14,7 @@ export default function AnuncioCard({ anuncio: a }) {
       rel="noopener"
       className="pub-card"
     >
-      {a.imagem && <img src={a.imagem} alt={a.titulo} loading="lazy" width={800} height={500} />}
+      {a.imagem && <Foto src={a.imagem} alt={a.titulo} width={800} height={500} sizes="(max-width: 760px) 100vw, 600px" />}
       <div className="pub-body">
         <span className="rb-tag">{t(a.categoria || "Publicidade")}</span>
         <h3>{a.titulo}</h3>

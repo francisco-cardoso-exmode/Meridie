@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useCompare } from "@/components/compare/CompareProvider";
 import { useT } from "@/components/LangProvider";
+import Foto from "@/components/Foto";
 
 
 export default function CompareBar() {
@@ -38,7 +39,7 @@ export default function CompareBar() {
         <div className="cb-itens">
           {itens.map((it, i) => (
             <span className="cb-chip" key={it.slug}>
-              {it.imagem && <img src={it.imagem} alt="" width={34} height={34} loading="lazy" />}
+              {it.imagem && <Foto src={it.imagem} alt="" width={34} height={34} />}
               <span className="cb-chip-txt">
                 <strong>{it.nome}</strong>
                 <small>{[it.cidade, it.zona].filter(Boolean).join(" · ")}</small>

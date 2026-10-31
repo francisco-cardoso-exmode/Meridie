@@ -6,6 +6,7 @@ import PrecoDual from "@/components/PrecoDual";
 import { referenciaDe } from "@/lib/empreendimentos";
 import CompareToggle from "@/components/compare/CompareToggle";
 import { useT } from "@/components/LangProvider";
+import Foto from "@/components/Foto";
 
 export default function EmpreendimentoCard({ e }) {
   const { t } = useT();
@@ -15,7 +16,7 @@ export default function EmpreendimentoCard({ e }) {
     <article className="prop-card">
       <div className="prop-media">
         {e.imagens?.[0] && (
-          <img src={e.imagens[0]} alt="" loading="lazy" width={640} height={400} />
+          <Foto src={e.imagens[0]} alt="" fill sizes="(max-width: 700px) 100vw, (max-width: 1100px) 50vw, 400px" />
         )}
         <div className="prop-badges">
           <span className="badge gold">{t(e.tipo)}</span>

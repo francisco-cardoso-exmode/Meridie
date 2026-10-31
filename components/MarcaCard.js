@@ -2,6 +2,7 @@
 
 import L from "@/components/L";
 import { useT } from "@/components/LangProvider";
+import Foto from "@/components/Foto";
 
 // Card de uma marca representada (lista /marcas) — abre a página da marca.
 export default function MarcaCard({ marca: m }) {
@@ -10,7 +11,7 @@ export default function MarcaCard({ marca: m }) {
   const n = m.produtos?.length || 0;
   return (
     <L href={`/marcas/${m.slug}`} className="marca-card">
-      <div className="marca-foto">{foto && <img src={foto} alt={m.nome} loading="lazy" width={600} height={600} />}</div>
+      <div className="marca-foto">{foto && <Foto src={foto} alt={m.nome} width={600} height={600} sizes="(max-width: 700px) 100vw, 400px" />}</div>
       <div className="marca-body">
         {m.origem && <span className="marca-origem">{m.origem}</span>}
         <h3>{m.nome}</h3>

@@ -1611,6 +1611,10 @@ body.com-compare-bar {
   .gallery {
     grid-template-columns: 1fr;
   }
+  /* fotos laterais com next/image fill: sem altura própria ao empilhar */
+  .gallery .side > div {
+    aspect-ratio: 16 / 10;
+  }
   .value-table .vrow {
     grid-template-columns: 1fr;
   }
@@ -3506,6 +3510,9 @@ a.marca-card:hover {
   justify-content: center;
   overflow: hidden;
 }
+.marca-galeria-main {
+  position: relative; /* next/image fill */
+}
 .marca-galeria-main img {
   max-width: 100%;
   max-height: 100%;
@@ -3609,7 +3616,11 @@ a.marca-card:hover {
   align-items: center;
   justify-content: center;
 }
+.ficha-foto {
+  position: relative; /* next/image fill */
+}
 .ficha-foto img {
+  padding: 6px; /* fill ignora o padding do contentor */
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
