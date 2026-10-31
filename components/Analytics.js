@@ -2,38 +2,59 @@
 
 import Script from "next/script";
 import { useEffect, useState } from "react";
+import {
+  lerConsentimento,
+  revogarAnalytics,
+  EVENTO_CONSENTIMENTO,
+} from "@/lib/consentimento";
 
-// Google Analytics 4 (gratuito). Só carrega se:
-//  - NEXT_PUBLIC_GA_ID estiver definido (ex.: G-XXXXXXXXXX), e
-//  - o visitante tiver ACEITE os cookies (RGPD).
+// Google Analytics 4 (gratuito), com Consent Mode v2:
+//  - o consentimento começa "denied" (definido no HTML, antes de o GA carregar);
+//  - o gtag.js só é carregado se NEXT_PUBLIC_GA_ID existir e o visitante
+//    tiver ACEITE os cookies (RGPD);
+//  - se depois rejeitar, o consentimento passa a "denied" e os cookies _ga*
+//    são apagados.
+// O "default: denied" é escrito no HTML pelo layout (CONSENT_PADRAO, em
+// lib/consentimento.js), antes de qualquer script do GA.
+
 export default function Analytics() {
   const id = process.env.NEXT_PUBLIC_GA_ID;
   const [consentido, setConsentido] = useState(false);
 
   useEffect(() => {
-    const ver = () =>
-      setConsentido(localStorage.getItem("meridie_consent") === "accept");
+    const ver = () => {
+      const ok = lerConsentimento() === "accept";
+      setConsentido(ok);
+      if (!ok) {
+        revogarAnalytics(id);
+      } else if (id && typeof window.gtag === "function") {
+        // Voltou a aceitar na mesma visita (o gtag.js já estava carregado).
+        window[`ga-disable-${id}`] = false;
+        window.gtag("consent", "update", { analytics_storage: "granted" });
+      }
+    };
     ver();
-    window.addEventListener("meridie-consent", ver);
-    return () => window.removeEventListener("meridie-consent", ver);
-  }, []);
+    window.addEventListener(EVENTO_CONSENTIMENTO, ver);
+    return () => window.removeEventListener(EVENTO_CONSENTIMENTO, ver);
+  }, [id]);
 
   if (!id || !consentido) return null;
 
   return (
     <>
-      <Script
-        src={`https://www.googletagmanager.com/gtag/js?id=${id}`}
-        strategy="afterInteractive"
-      />
       <Script id="ga4-init" strategy="afterInteractive">
         {`
           window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
+          window.gtag = window.gtag || function(){dataLayer.push(arguments);};
+          gtag('consent', 'update', { analytics_storage: 'granted' });
           gtag('js', new Date());
           gtag('config', '${id}');
         `}
       </Script>
+      <Script
+        src={`https://www.googletagmanager.com/gtag/js?id=${id}`}
+        strategy="afterInteractive"
+      />
     </>
   );
 }

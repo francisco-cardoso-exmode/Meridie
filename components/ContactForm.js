@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import L from "@/components/L";
 import { enviarEvento } from "@/components/Track";
 import { useT } from "@/components/LangProvider";
 
@@ -8,6 +9,12 @@ export default function ContactForm({ assuntoInicial = "", origem = "contacto" }
   const { t, lang } = useT();
   const [estado, setEstado] = useState({ a: "idle", msg: "" });
   const interesseFeito = useRef(false);
+  // Momento em que o formulário apareceu — o servidor rejeita envios
+  // instantâneos (bots), junto com o campo-armadilha "website".
+  const montadoEm = useRef(0);
+  useEffect(() => {
+    montadoEm.current = Date.now();
+  }, []);
 
   // Primeira interação com o formulário = sinal de interesse.
   function marcarInteresse() {
@@ -27,6 +34,9 @@ export default function ContactForm({ assuntoInicial = "", origem = "contacto" }
       assunto: form.assunto.value,
       mensagem: form.mensagem.value,
       lang,
+      ref: origem,
+      website: form.website.value,
+      t: montadoEm.current ? Date.now() - montadoEm.current : 0,
     };
 
     try {
@@ -35,7 +45,7 @@ export default function ContactForm({ assuntoInicial = "", origem = "contacto" }
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(dados),
       });
-      const json = await res.json();
+      const json = await res.json().catch(() => ({}));
 
       if (res.ok && json.ok) {
         setEstado({
@@ -80,13 +90,25 @@ export default function ContactForm({ assuntoInicial = "", origem = "contacto" }
         <textarea id="mensagem" name="mensagem" rows={6} required placeholder={t("Escreve a tua mensagem...")} />
       </div>
 
-      {estado.a === "ok" && <div className="form-msg ok">{estado.msg}</div>}
-      {estado.a === "erro" && <div className="form-msg erro">{estado.msg}</div>}
+      {/* Campo-armadilha para bots: invisível e fora da navegação por teclado. */}
+      <div className="campo-armadilha" aria-hidden="true">
+        <label htmlFor={`website-${origem}`}>Website</label>
+        <input id={`website-${origem}`} name="website" type="text" tabIndex={-1} autoComplete="off" defaultValue="" />
+      </div>
+
+      <div className="form-status" role="status" aria-live="polite">
+        {estado.a === "ok" && <div className="form-msg ok">{estado.msg}</div>}
+        {estado.a === "erro" && <div className="form-msg erro">{estado.msg}</div>}
+      </div>
 
       <div className="field full">
         <button type="submit" className="btn btn-primary" disabled={estado.a === "loading"}>
           {estado.a === "loading" ? t("A enviar...") : t("Enviar mensagem")}
         </button>
+        <p className="form-privacidade">
+          {t("Ao enviar, aceitas que usemos estes dados para te responder, conforme a")}{" "}
+          <L href="/privacidade">{t("Política de Privacidade")}</L>.
+        </p>
       </div>
     </form>
   );
