@@ -17,6 +17,7 @@ const LINKS = [
   { href: "/admin/assinatura", label: "Assinatura" },
   { href: "/admin/definicoes", label: "Definições" },
   { href: "/admin/utilizadores", label: "Utilizadores" },
+  { href: "/admin/alojamento", label: "Alojamento" },
   { href: "/admin/ajuda", label: "Ajuda" },
 ];
 
