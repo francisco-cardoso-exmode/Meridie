@@ -4,35 +4,17 @@ import L from "@/components/L";
 import Reveal from "@/components/Reveal";
 import Icon from "@/components/Icon";
 import { TECNOLOGIA_VISIVEL } from "@/lib/flags";
-import { useT } from "@/components/LangProvider";
 
-// Cartões das áreas de negócio da Meridie (Home e Quem Somos).
+// Cartões das áreas de negócio da Meridie (Home e Quem Somos). Os textos vêm
+// da página "Áreas de negócio" do backoffice (`textos` = getConteudo("areas")):
+// <área>Titulo, <área>Texto e <área>Cta.
 const AREAS = {
-  imobiliario: {
-    icon: "buildings",
-    titulo: "Imobiliário",
-    texto: "Investimento entre Portugal e o Brasil, com intermediação e assessoria jurídica e fiscal num único processo.",
-    href: "/empreendimentos",
-    cta: "Ver empreendimentos",
-  },
-  marcas: {
-    icon: "wine",
-    titulo: "Bebidas & Alimentação",
-    texto: "Representação de marcas com origem e carácter — vinhos, bebidas, conservas e azeite.",
-    href: "/marcas",
-    cta: "Conhecer as marcas",
-  },
-  tecnologia: {
-    icon: "monitor",
-    titulo: "Tecnologia",
-    texto: "Soluções tecnológicas de parceiros e desenvolvimento próprio, com acompanhamento na implementação.",
-    href: "/tecnologia",
-    cta: "Explorar tecnologia",
-  },
+  imobiliario: { icon: "buildings", href: "/empreendimentos" },
+  marcas: { icon: "wine", href: "/marcas" },
+  tecnologia: { icon: "monitor", href: "/tecnologia" },
 };
 
-export default function AreasCards({ areas: pedidas = ["imobiliario", "marcas", "tecnologia"] }) {
-  const { t } = useT();
+export default function AreasCards({ areas: pedidas = ["imobiliario", "marcas", "tecnologia"], textos }) {
   const areas = pedidas.filter((k) => k !== "tecnologia" || TECNOLOGIA_VISIVEL);
   return (
     <div className={`grid ${areas.length === 2 ? "grid-2" : "grid-3"}`}>
@@ -42,9 +24,9 @@ export default function AreasCards({ areas: pedidas = ["imobiliario", "marcas", 
           <Reveal key={k} delay={i * 0.1}>
             <L href={a.href} className="card area-card">
               <div className="icon"><Icon name={a.icon} /></div>
-              <h3>{t(a.titulo)}</h3>
-              <p>{t(a.texto)}</p>
-              <span className="pub-cta">{t(a.cta)} →</span>
+              <h3>{textos[`${k}Titulo`]}</h3>
+              <p>{textos[`${k}Texto`]}</p>
+              <span className="pub-cta">{textos[`${k}Cta`]} →</span>
             </L>
           </Reveal>
         );

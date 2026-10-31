@@ -26,17 +26,12 @@ export default async function PaginaTecnologia({ params }) {
   const T = (x) => t(lang, x);
   if (!TECNOLOGIA_VISIVEL) notFound();
   const c = await getConteudo("tecnologia", lang);
-  const cards = [
-    ["share", c.card1Titulo, c.card1Texto],
-    ["code", c.card2Titulo, c.card2Texto],
-    ["check", c.card3Titulo, c.card3Texto],
-  ];
 
   return (
     <>
       <section className="page-hero">
         <div className="container">
-          <span className="eyebrow">{T("Tecnologia")}</span>
+          <span className="eyebrow">{c.heroEyebrow}</span>
           <h1>{c.heroTitulo}</h1>
           <p>{c.heroTexto}</p>
         </div>
@@ -45,11 +40,11 @@ export default async function PaginaTecnologia({ params }) {
       <section>
         <div className="container">
           <div className="grid grid-3">
-            {cards.map(([icon, tit, d], i) => (
-              <Reveal className="card" key={icon} delay={i * 0.1}>
-                <div className="icon"><Icon name={icon} /></div>
-                <h3>{tit}</h3>
-                <p>{d}</p>
+            {c.cards.map((d, i) => (
+              <Reveal className="card" key={d.id} delay={i * 0.1}>
+                {d.icone && <div className="icon"><Icon name={d.icone} /></div>}
+                <h3>{d.titulo}</h3>
+                <p>{d.texto}</p>
               </Reveal>
             ))}
           </div>

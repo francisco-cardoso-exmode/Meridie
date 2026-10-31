@@ -10,11 +10,11 @@ import Foto from "@/components/Foto";
  * Os dois painéis começam ao meio; ao passar o rato por cima de um, esse
  * painel estica e revela o texto completo + CTA, enquanto o outro encolhe.
  * Interação 100% CSS (ver .hero-split em globals.css). Em mobile empilha.
+ * Os textos vêm da página Home do backoffice (`c` = getConteudo("home")).
  */
-export default function HeroSplit({
-  slogan = "Capital sem fronteiras. Investimento com precisão.",
-}) {
+export default function HeroSplit({ c }) {
   const { t } = useT();
+  const slogan = c.heroSlogan;
   return (
     <section className="hero-split" aria-label={t("Escolhe o teu mercado")}>
       <div className="hs-overlay-center">
@@ -36,13 +36,11 @@ export default function HeroSplit({
         />
         <div className="sp-content">
           <span className="flag"><Icon name="pin" size={24} /></span>
-          <h2>Portugal</h2>
-          <p className="sp-teaser">{t("Segurança jurídica europeia.")}</p>
+          <h2>{c.hsPtTitulo}</h2>
+          <p className="sp-teaser">{c.hsPtTeaser}</p>
           <div className="sp-more">
-            <p>
-              {t("Valorização consistente, residência no espaço Schengen e proteção patrimonial em Euro. Lisboa, Porto e Algarve.")}
-            </p>
-            <span className="btn btn-primary">{t("Explorar Portugal →")}</span>
+            <p>{c.hsPtTexto}</p>
+            <span className="btn btn-primary">{c.hsPtCta}</span>
           </div>
         </div>
       </L>
@@ -57,13 +55,11 @@ export default function HeroSplit({
         />
         <div className="sp-content">
           <span className="flag"><Icon name="pin" size={24} /></span>
-          <h2>{t("Brasil")}</h2>
-          <p className="sp-teaser">{t("Yields acima da média europeia.")}</p>
+          <h2>{c.hsBrTitulo}</h2>
+          <p className="sp-teaser">{c.hsBrTeaser}</p>
           <div className="sp-more">
-            <p>
-              {t("Mercado em expansão e preços competitivos, do litoral às grandes metrópoles. São Paulo, Rio, Nordeste e Sul.")}
-            </p>
-            <span className="btn btn-primary">{t("Explorar Brasil →")}</span>
+            <p>{c.hsBrTexto}</p>
+            <span className="btn btn-primary">{c.hsBrCta}</span>
           </div>
         </div>
       </L>

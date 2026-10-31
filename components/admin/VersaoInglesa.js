@@ -16,7 +16,9 @@ function rotulo(caminho) {
  * traduzível mostra o português (guardado) e a tradução, que se pode corrigir.
  * A tradução é feita automaticamente ao gravar; aqui só se afina.
  */
-export default function VersaoInglesa({ colecao, doc, en, onChange }) {
+// `rotulo` (opcional): nome legível de cada caminho, quando o formulário o sabe
+// (páginas: o nome do campo e a posição do item na lista).
+export default function VersaoInglesa({ colecao, doc, en, onChange, rotulo: rotuloForm }) {
   const [aberto, setAberto] = useState(false);
   const pt = achata(extrair(colecao, doc || {}));
   const plano = achata(en || {});
@@ -43,7 +45,7 @@ export default function VersaoInglesa({ colecao, doc, en, onChange }) {
           </p>
           {chaves.map((k) => (
             <label key={k} className="full versao-en-item">
-              <span className="versao-en-rotulo">{rotulo(k)}</span>
+              <span className="versao-en-rotulo">{rotuloForm?.(k) || rotulo(k)}</span>
               <span className="versao-en-pt">{pt[k]}</span>
               <textarea
                 rows={Math.min(6, Math.max(1, Math.ceil(pt[k].length / 90)))}

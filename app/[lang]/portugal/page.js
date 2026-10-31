@@ -10,6 +10,7 @@ import {
   tiposDe,
   finalidadesDe,
 } from "@/lib/store";
+import { getConteudo } from "@/lib/conteudo";
 import { t, tf } from "@/lib/i18n";
 import { metaPagina } from "@/lib/seo";
 import { traduzDoc, traduzLista } from "@/lib/i18n/conteudo";
@@ -28,6 +29,7 @@ export const revalidate = 60;
 export default async function PaginaPortugal({ params }) {
   const { lang } = await params;
   const T = (x) => t(lang, x);
+  const c = await getConteudo("portugal", lang);
   const empreendimentos = traduzLista(await allEmpreendimentos({ pais: "portugal" }), lang).map(cartaoEmpreendimento);
   const regioes = traduzLista(await allRegioes({ pais: "portugal", topo: true }), lang);
 
@@ -36,19 +38,17 @@ export default async function PaginaPortugal({ params }) {
       <MarketHero
         img="https://images.unsplash.com/photo-1555881400-74d7acaacd8b?auto=format&fit=crop&w=1600&q=72"
         alt={T("Lisboa, Portugal")}
-        eyebrow={T("Mercado Portugal")}
-        titulo={T("Investir em Portugal")}
+        eyebrow={c.heroEyebrow}
+        titulo={c.heroTitulo}
       >
-        {T("Estabilidade jurídica europeia, valorização consistente e a porta de entrada para a Europa. Lisboa, Porto, Algarve e Cascais.")}
+        {c.heroTexto}
       </MarketHero>
 
       <section style={{ paddingBottom: 40 }}>
         <div className="container">
           <Reveal className="section-head" style={{ marginBottom: 28 }}>
-            <h2 style={{ fontSize: "1.6rem" }}>{T("Porquê Portugal?")}</h2>
-            <p>
-              {T("Lisboa, Porto e Algarve oferecem mercados maduros, liquidez e procura internacional constante. O regime fiscal para novos residentes e a proteção patrimonial em Euro completam o cenário.")}
-            </p>
+            <h2 style={{ fontSize: "1.6rem" }}>{c.porqueTitulo}</h2>
+            <p>{c.porqueTexto}</p>
           </Reveal>
           <div className="region-grid">
             {regioes.map((r, i) => (

@@ -109,11 +109,25 @@ Praia de Iracema | praia | -3.719 | -38.512</pre>
       </section>
 
       <section className="ajuda-bloco">
-        <h2>4. Banners da Home</h2>
+        <h2>4. Regiões na Home e nas páginas Portugal/Brasil</h2>
         <p>
-          As <strong>regiões de topo</strong> (sem &quot;Pertence a&quot;) são as que podem aparecer como
-          banners na Home e nas páginas Portugal/Brasil. As zonas aparecem dentro da
-          página da sua região.
+          No fundo do formulário de cada região/zona escolhes o que aparece na página inicial:
+        </p>
+        <ul>
+          <li><strong>Mostrar na página inicial</strong>: o banner da região entra na secção
+            &quot;Explorar por região&quot;.</li>
+          <li><strong>Ordem na página inicial</strong>: o número mais baixo aparece primeiro (com a mesma
+            ordem, fica por ordem alfabética).</li>
+          <li><strong>Banner antes do rodapé</strong>: o banner grande no fim da Home. Se marcares várias,
+            vale a primeira pela ordem.</li>
+        </ul>
+        <div className="ajuda-aviso">
+          ⚠️ Uma região só aparece na Home se tiver <strong>pelo menos um empreendimento publicado</strong>
+          (ligado pela cidade/zona — ver ponto 2). Marcada mas sem imóveis, fica escondida até haver oferta.
+        </div>
+        <p>
+          As páginas <strong>Portugal</strong> e <strong>Brasil</strong> mostram todas as <strong>regiões de
+          topo</strong> (sem &quot;Pertence a&quot;) desse país. As zonas aparecem dentro da página da sua região.
         </p>
       </section>
 
@@ -163,7 +177,7 @@ Teor alcoólico | 12% vol.</pre>
           <li><strong>Ordem</strong> da marca: o número mais baixo aparece primeiro (0 = primeira).</li>
           <li><strong>Fotos de produto</strong>: ficam melhor em <strong>fundo branco</strong>, com a garrafa/lata centrada.</li>
           <li>Na página de cada marca, o visitante pode <strong>guardar as fichas em PDF</strong>.</li>
-          <li>Os textos das páginas <code>/marcas</code> e <code>/tecnologia</code> editam-se em <strong>Páginas</strong>.</li>
+          <li>Os textos das páginas <code>/marcas</code> e <code>/tecnologia</code> editam-se em <strong>Páginas</strong> (ver ponto 9).</li>
         </ul>
       </section>
 
@@ -176,6 +190,29 @@ Teor alcoólico | 12% vol.</pre>
           <li><strong>Comparador</strong>: o visitante escolhe <strong>dois imóveis do mesmo país</strong> (botão
             &quot;⇄ Comparar&quot;) — podem ser de cidades diferentes (ex.: Lisboa vs Porto) — e vê uma comparação
             lado a lado + uma <strong>análise por IA</strong> focada no investimento. Não compara Portugal com Brasil.</li>
+        </ul>
+      </section>
+
+      <section className="ajuda-bloco">
+        <h2>9. Páginas — textos, cartões e listas</h2>
+        <p>
+          Em <strong>Páginas</strong> editas todos os textos das páginas do site (Home, Quem Somos, Como
+          Funciona, Portugal, Brasil, Parcerias, Parceiros, FAQ, Contactos, Marcas…): títulos, pequenos
+          títulos por cima, textos de introdução e os <strong>cartões</strong>. O formulário está dividido
+          pelas secções da página, pela ordem em que aparecem.
+        </p>
+        <ul>
+          <li><strong>Listas</strong> (cartões, passos, valores, perguntas da FAQ…): <strong>+ Acrescentar</strong>
+            cria um item novo, <strong>↑ ↓</strong> mudam a ordem e <strong>Remover</strong> apaga-o. Os passos
+            são numerados sozinhos pela ordem.</li>
+          <li><strong>Ícone</strong>: escolhe na lista; ao lado vês como fica.</li>
+          <li><strong>FAQ</strong>: as perguntas seguidas com a mesma <strong>categoria</strong> (escrita igual)
+            ficam no mesmo grupo.</li>
+          <li><strong>Áreas de negócio (cartões)</strong>: os cartões Imobiliário / Bebidas &amp; Alimentação
+            que aparecem em Quem Somos.</li>
+          <li><strong>Inglês</strong>: ao gravar, os textos novos ou alterados são traduzidos automaticamente.
+            Em <strong>Versão inglesa</strong>, no fundo do formulário, podes corrigir cada texto — também os dos
+            cartões — e a tua correção mantém-se até mudares o português.</li>
         </ul>
       </section>
     </div>

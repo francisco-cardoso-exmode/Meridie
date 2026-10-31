@@ -32,7 +32,7 @@ export default async function PaginaMarcas({ params }) {
     <>
       <section className="page-hero">
         <div className="container">
-          <span className="eyebrow">{T("Bebidas & Alimentação")}</span>
+          <span className="eyebrow">{c.heroEyebrow}</span>
           <h1>{c.heroTitulo}</h1>
           <p>{c.heroTexto}</p>
         </div>
