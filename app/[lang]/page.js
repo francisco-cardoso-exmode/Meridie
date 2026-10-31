@@ -17,6 +17,7 @@ import AnuncioCard from "@/components/AnuncioCard";
 import AreasCards from "@/components/AreasCards";
 import MarcasFaixa from "@/components/MarcasFaixa";
 import { allMarcas } from "@/lib/marcas";
+import { allProdutos, marcasComProdutos } from "@/lib/representacoes";
 import { TECNOLOGIA_VISIVEL } from "@/lib/flags";
 import { t } from "@/lib/i18n";
 import { metaPagina, DESCRICAO_SITE } from "@/lib/seo";
@@ -44,7 +45,7 @@ export default async function Home({ params }) {
   const todos = traduzLista(await allEmpreendimentos(), lang).map(cartaoEmpreendimento);
   const regioes = traduzLista(await allRegioes(), lang);
   const anuncios = traduzLista(await allAnuncios({ home: true }), lang);
-  const marcas = traduzLista(await allMarcas({ home: true }), lang);
+  const marcas = marcasComProdutos(traduzLista(await allMarcas({ home: true }), lang), await allProdutos());
   // Escolhidas no backoffice (Regiões → "Mostrar na página inicial" / "Banner"),
   // e só as que têm empreendimentos publicados (`todos` já só tem os visíveis).
   const regioesDestaque = regioesHome(regioes, todos);
@@ -71,7 +72,7 @@ export default async function Home({ params }) {
               <p className="marcas-faixa-titulo">{c.marcasFaixaTitulo}</p>
               <MarcasFaixa marcas={marcas} />
               <div style={{ marginTop: 26 }}>
-                <L href="/marcas" className="btn btn-primary">{T("Conhecer as marcas")}</L>
+                <L href="/representacoes" className="btn btn-primary">{T("Conhecer as marcas")}</L>
               </div>
             </Reveal>
           )}

@@ -7,6 +7,7 @@ import Icon from "@/components/Icon";
 import { TECNOLOGIA_VISIVEL } from "@/lib/flags";
 import { useT } from "@/components/LangProvider";
 import TrocaIdioma from "@/components/TrocaIdioma";
+import PedidoBadge from "@/components/PedidoBadge";
 
 const LINKS = [
   {
@@ -18,7 +19,7 @@ const LINKS = [
       { href: "/como-funciona", label: "Como Funciona" },
     ],
   },
-  { href: "/marcas", label: "Marcas" },
+  { href: "/representacoes", label: "Representações" },
   ...(TECNOLOGIA_VISIVEL ? [{ href: "/tecnologia", label: "Tecnologia" }] : []),
   { href: "/publicidade", label: "Parceiros" },
   { href: "/quem-somos", label: "Quem Somos" },
@@ -83,6 +84,7 @@ export default function Header() {
               </L>
             )
           )}
+          <PedidoBadge onClick={() => setOpen(false)} />
           <TrocaIdioma onClick={() => setOpen(false)} />
         </nav>
       </div>

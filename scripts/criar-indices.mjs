@@ -34,6 +34,16 @@ const INDICES = [
   ["comparacoes_cache", { key: 1 }, { unique: true, name: "key_unica" }],
   ["comparacoes_cache", { criadoEm: 1 }, { expireAfterSeconds: 30 * DIA, name: "ttl_30_dias" }],
   ["contactos", { criadoEm: -1 }, { name: "criadoEm_desc" }],
+  // Representações comerciais, Tecnologia e pedidos de encomenda.
+  ["categorias", { slug: 1 }, { unique: true, name: "slug_unico" }],
+  ["categorias", { parent: 1, ordem: 1 }, { name: "parent_ordem" }],
+  ["produtos", { slug: 1 }, { unique: true, name: "slug_unico" }],
+  ["produtos", { categoria: 1, subcategoria: 1 }, { name: "categoria_subcategoria" }],
+  ["produtos", { marca: 1 }, { name: "marca" }],
+  ["solucoes", { slug: 1 }, { unique: true, name: "slug_unico" }],
+  ["pedidos", { criadoEm: -1 }, { name: "criadoEm_desc" }],
+  ["pedidos", { estado: 1, criadoEm: -1 }, { name: "estado_criadoEm" }],
+  ["pedidos", { referencia: 1 }, { unique: true, name: "referencia_unica" }],
 ];
 
 // Índices substituídos por outros que começam pelas mesmas chaves.

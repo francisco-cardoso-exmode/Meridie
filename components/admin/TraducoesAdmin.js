@@ -6,6 +6,9 @@ const NOMES = {
   empreendimentos: "Empreendimentos",
   regioes: "Regiões & Zonas",
   marcas: "Marcas",
+  categorias: "Categorias",
+  produtos: "Produtos",
+  solucoes: "Soluções tecnológicas",
   anuncios: "Parceiros",
   paginas: "Páginas",
 };

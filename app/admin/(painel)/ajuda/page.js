@@ -161,24 +161,42 @@ Praia de Iracema | praia | -3.719 | -38.512</pre>
       </section>
 
       <section className="ajuda-bloco">
-        <h2>7. Marcas (Bebidas &amp; Alimentação)</h2>
+        <h2>7. Representações comerciais, Tecnologia e Pedidos</h2>
+        <p>
+          A antiga área «Marcas» passou a <strong>Representações comerciais</strong> (<code>/representacoes</code>).
+          Os endereços antigos <code>/marcas</code> e <code>/marcas/nome-da-marca</code> (e os ingleses) redirecionam
+          sozinhos para os novos.
+        </p>
         <ul>
-          <li>Menu <strong>Marcas</strong>: cada marca tem nome, área (Bebidas / Alimentação / Tecnologia), linha de
-            origem, texto, link, fotos e logótipo. Aparece em <code>/marcas</code> e tem página própria
-            (<code>/marcas/nome-da-marca</code>).</li>
-          <li><strong>Produtos</strong>: em &quot;+ Acrescentar produto&quot; pões a foto, o nome, a descrição e a
-            <strong> ficha técnica</strong> — uma característica por linha, no formato <code>Etiqueta | valor</code>:</li>
+          <li><strong>Categorias</strong>: a árvore Categoria → Subcategoria (ex.: Bebidas → Vinho, Espumante, Gin;
+            Alimentação → Conservas, Azeite; Madeiras…). Só há dois níveis. <strong>↑ ↓</strong> mudam a ordem;
+            <strong>Apagar</strong> só funciona com a categoria vazia (sem subcategorias nem produtos).</li>
+          <li><strong>Produtos</strong>: nome, marca, categoria e subcategoria, fotos (a 1.ª é a principal — fundo
+            branco fica melhor), descrição curta e completa, <strong>ficha técnica</strong> (uma linha por
+            característica, <code>Etiqueta | valor</code>), preço <strong>ou</strong> «Preço sob consulta», unidade
+            (ex.: <em>garrafa 75 cl</em>, <em>caixa 6 un.</em>), quantidade mínima, disponível/indisponível e destaque.</li>
+          <li><strong>Marcas</strong>: continuam com a sua página (história, logótipo, galeria), agora em
+            <code>/representacoes/marcas/nome-da-marca</code>, com os produtos agrupados por categoria.</li>
+          <li><strong>Soluções</strong> (Tecnologia, <code>/tecnologia</code>): cada solução é
+            «Desenvolvemos» (produto próprio) ou «Representamos» (de um parceiro), com problema que resolve, para
+            quem, funcionalidades, imagens e vídeo, <strong>planos</strong> (valor ou sob consulta) e casos/testemunhos.
+            Os textos do topo da página continuam em Páginas → Tecnologia.</li>
+          <li><strong>Pedidos</strong>: o visitante junta produtos e quantidades ao pedido (fica guardado no browser,
+            com o atalho «Pedido» no menu) e envia o formulário — não há pagamento online. Os botões «Pedir
+            informação», «Pedir demonstração» e «Pedir proposta» fazem um pedido de um só item. Cada pedido guarda o
+            nome, o preço e a unidade do momento, envia email à equipa (destinatários de <strong>Definições</strong>)
+            e uma confirmação ao cliente. Em <strong>Pedidos</strong> mudas o estado (Novo, Em contacto, Proposta
+            enviada, Fechado, Cancelado), acrescentas notas internas e exportas para CSV (Excel).</li>
+          <li>Inglês: tudo o que gravas em Categorias, Produtos e Soluções é traduzido automaticamente, como no resto.</li>
         </ul>
-        <pre>Região | DOC Vinho Verde
-Castas | Loureiro, Arinto
-Teor alcoólico | 12% vol.</pre>
-        <ul>
-          <li>Os botões <strong>↑ ↓</strong> mudam a ordem dos produtos; <strong>Remover</strong> tira o produto.</li>
-          <li><strong>Ordem</strong> da marca: o número mais baixo aparece primeiro (0 = primeira).</li>
-          <li><strong>Fotos de produto</strong>: ficam melhor em <strong>fundo branco</strong>, com a garrafa/lata centrada.</li>
-          <li>Na página de cada marca, o visitante pode <strong>guardar as fichas em PDF</strong>.</li>
-          <li>Os textos das páginas <code>/marcas</code> e <code>/tecnologia</code> editam-se em <strong>Páginas</strong> (ver ponto 9).</li>
-        </ul>
+        <p><strong>Migração (uma vez, por quem gere o servidor):</strong> os produtos antigos estavam dentro de cada
+          marca. Até migrar, o site mostra-os na mesma (marcados «POR MIGRAR» em Produtos, sem edição). Para os passar
+          para Produtos:</p>
+        <pre>node scripts/criar-indices.mjs
+node scripts/migrar-representacoes.mjs            # mostra o plano
+node scripts/migrar-representacoes.mjs --aplicar  # grava</pre>
+        <p>Depois, revê em Produtos a categoria de cada um e põe os preços que quiseres mostrar (ficam todos «sob
+          consulta»).</p>
       </section>
 
       <section className="ajuda-bloco">
@@ -197,7 +215,7 @@ Teor alcoólico | 12% vol.</pre>
         <h2>9. Páginas — textos, cartões e listas</h2>
         <p>
           Em <strong>Páginas</strong> editas todos os textos das páginas do site (Home, Quem Somos, Como
-          Funciona, Portugal, Brasil, Parcerias, Parceiros, FAQ, Contactos, Marcas…): títulos, pequenos
+          Funciona, Portugal, Brasil, Parcerias, Parceiros, FAQ, Contactos, Representações comerciais, Tecnologia…): títulos, pequenos
           títulos por cima, textos de introdução e os <strong>cartões</strong>. O formulário está dividido
           pelas secções da página, pela ordem em que aparecem.
         </p>
@@ -208,7 +226,7 @@ Teor alcoólico | 12% vol.</pre>
           <li><strong>Ícone</strong>: escolhe na lista; ao lado vês como fica.</li>
           <li><strong>FAQ</strong>: as perguntas seguidas com a mesma <strong>categoria</strong> (escrita igual)
             ficam no mesmo grupo.</li>
-          <li><strong>Áreas de negócio (cartões)</strong>: os cartões Imobiliário / Bebidas &amp; Alimentação
+          <li><strong>Áreas de negócio (cartões)</strong>: os cartões Imobiliário / Representações comerciais / Tecnologia
             que aparecem em Quem Somos.</li>
           <li><strong>Inglês</strong>: ao gravar, os textos novos ou alterados são traduzidos automaticamente.
             Em <strong>Versão inglesa</strong>, no fundo do formulário, podes corrigir cada texto — também os dos
