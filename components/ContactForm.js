@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import L from "@/components/L";
 import { enviarEvento } from "@/components/Track";
 import { useT } from "@/components/LangProvider";
+import { resolverDesafio } from "@/lib/resolverDesafio";
 
 export default function ContactForm({ assuntoInicial = "", origem = "contacto" }) {
   const { t, lang } = useT();
@@ -16,8 +17,17 @@ export default function ContactForm({ assuntoInicial = "", origem = "contacto" }
     montadoEm.current = Date.now();
   }, []);
 
+  // Prova anti-bot: começa a ser calculada na primeira interação, para estar
+  // pronta (ou quase) quando a pessoa carregar em Enviar.
+  const prova = useRef(null);
+  function prepararProva() {
+    if (!prova.current) prova.current = resolverDesafio().catch(() => null);
+    return prova.current;
+  }
+
   // Primeira interação com o formulário = sinal de interesse.
   function marcarInteresse() {
+    prepararProva();
     if (interesseFeito.current) return;
     interesseFeito.current = true;
     enviarEvento("interesse", origem);
@@ -37,7 +47,10 @@ export default function ContactForm({ assuntoInicial = "", origem = "contacto" }
       ref: origem,
       website: form.website.value,
       t: montadoEm.current ? Date.now() - montadoEm.current : 0,
+      prova: await prepararProva(),
     };
+    // Cada desafio só serve uma vez: o próximo envio pede outro.
+    prova.current = null;
 
     try {
       const res = await fetch("/api/contacto", {

@@ -3,6 +3,7 @@ import { getDb } from "@/lib/mongodb";
 import { enviarEmailContacto, enviarConfirmacaoCliente } from "@/lib/mailer";
 import { dentroDoLimite, ipDe } from "@/lib/rateLimit";
 import { empreendimentoBySlug } from "@/lib/store";
+import { provaValida } from "@/lib/provaTrabalho";
 
 // O endpoint depende de serviços externos (MongoDB/SMTP) — nunca é pré-renderizado.
 export const dynamic = "force-dynamic";
@@ -77,6 +78,11 @@ export async function POST(request) {
     }
     if (!validarEmail(email)) {
       return erro("O email indicado não é válido.", 400);
+    }
+
+    // Anti-bot: o browser tem de ter resolvido o desafio (prova de trabalho).
+    if (!(await provaValida(dados.prova))) {
+      return erro("Não foi possível validar o envio. Recarrega a página e tenta novamente.", 400);
     }
 
     // Limite de envios por IP: 3 em 10 minutos e 10 por dia.
