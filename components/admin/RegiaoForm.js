@@ -6,6 +6,7 @@ import { slugify } from "@/lib/slug";
 import VersaoInglesa from "@/components/admin/VersaoInglesa";
 import Link from "next/link";
 import ImageUploader from "@/components/admin/ImageUploader";
+import { destaqueHome, bannerHome } from "@/lib/regioesHome";
 
 const linhas = (s) =>
   (s || "").split("\n").map((x) => x.trim()).filter(Boolean);
@@ -74,13 +75,18 @@ export default function RegiaoForm({ initial = null, regioesExistentes = [], pre
     mapaLng: initial?.mapa?.lng ?? "",
     mapaZoom: initial?.mapa?.zoom ?? 12,
     pontos: pontosParaTexto(initial?.pontos),
+    // Página inicial (sem valor gravado: o que o site mostra hoje).
+    destaqueHome: initial ? destaqueHome(initial) : false,
+    ordemHome: initial?.ordemHome ?? "",
+    bannerHome: initial ? bannerHome(initial) : false,
   });
 
   // Aviso ao sair com alterações por gravar.
   const [inicialJson] = useState(() => JSON.stringify(f));
   const libertar = useAvisoSaida(JSON.stringify(f) !== inicialJson || temEnEditado);
 
-  const set = (c) => (e) => setF((p) => ({ ...p, [c]: e.target.value }));
+  const set = (c) => (e) =>
+    setF((p) => ({ ...p, [c]: e.target.type === "checkbox" ? e.target.checked : e.target.value }));
 
   // Editor de cards de publicidade (com upload de imagem) — pelo id, não pela
   // posição (um upload que termina depois de apagar um card não vai parar ao errado).
@@ -127,6 +133,9 @@ export default function RegiaoForm({ initial = null, regioesExistentes = [], pre
         zoom: Number(f.mapaZoom) || 12,
       },
       pontos: textoParaPontos(f.pontos),
+      destaqueHome: !!f.destaqueHome,
+      ordemHome: f.ordemHome === "" ? null : Number(f.ordemHome),
+      bannerHome: !!f.bannerHome,
     };
     doc.parent = f.parent || ""; // enviar sempre (vazio = região de topo)
 
@@ -314,6 +323,21 @@ export default function RegiaoForm({ initial = null, regioesExistentes = [], pre
             + Adicionar card de publicidade
           </button>
         </div>
+      </div>
+
+      <div className="admin-form-grid">
+        <label className="check-inline">
+          <input type="checkbox" checked={f.destaqueHome} onChange={set("destaqueHome")} />
+          Mostrar na página inicial (secção &quot;Explorar por região&quot;)
+        </label>
+        <label>
+          Ordem na página inicial (1 aparece primeiro)
+          <input type="number" value={f.ordemHome} onChange={set("ordemHome")} placeholder="1" />
+        </label>
+        <label className="check-inline full">
+          <input type="checkbox" checked={f.bannerHome} onChange={set("bannerHome")} />
+          Banner antes do rodapé na página inicial (se houver várias, vale a primeira pela ordem)
+        </label>
       </div>
 
       {estado.a === "erro" && <div className="form-msg erro">{estado.msg}</div>}

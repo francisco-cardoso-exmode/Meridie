@@ -5,6 +5,7 @@ import Icon from "@/components/Icon";
 import EmpreendimentoCard from "@/components/EmpreendimentoCard";
 import RegionBanner from "@/components/RegionBanner";
 import { cartaoRegiao } from "@/lib/regioes";
+import { regioesHome, regiaoBannerHome } from "@/lib/regioesHome";
 import ListingsExplorer from "@/components/ListingsExplorer";
 import {
   empreendimentosDestaque,
@@ -48,11 +49,9 @@ export default async function Home({ params }) {
   const regioes = traduzLista(await allRegioes(), lang);
   const anuncios = traduzLista(await allAnuncios({ home: true }), lang);
   const marcas = traduzLista(await allMarcas({ home: true }), lang);
-  const pick = (s) => regioes.find((r) => r.slug === s);
-  const regioesDestaque = ["lisboa", "algarve", "sao-paulo", "rio-de-janeiro"]
-    .map(pick)
-    .filter(Boolean);
-  const regiaoFooter = pick("nordeste");
+  // Escolhidas no backoffice (Regiões → "Mostrar na página inicial" / "Banner").
+  const regioesDestaque = regioesHome(regioes);
+  const regiaoFooter = regiaoBannerHome(regioes);
 
   return (
     <>
