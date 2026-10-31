@@ -10,6 +10,8 @@ import VideoUploader from "@/components/admin/VideoUploader";
 import { referenciaDe } from "@/lib/empreendimentos";
 import PrecoDual from "@/components/PrecoDual";
 import { normalizaIntervalo, formataIntervalo } from "@/lib/intervalo";
+import TipologiasEditor from "@/components/admin/TipologiasEditor";
+import { normalizaTipologias } from "@/lib/tipologias";
 
 const linhasParaArray = (s) =>
   (s || "")
@@ -19,29 +21,6 @@ const linhasParaArray = (s) =>
 
 const arrayParaLinhas = (a) => (Array.isArray(a) ? a.join("\n") : "");
 
-// Tipologias estruturadas: "nome | área | preço" (área e preço opcionais).
-const tipologiasParaTexto = (t) =>
-  Array.isArray(t)
-    ? t
-        .map((x) =>
-          typeof x === "string"
-            ? x
-            : [x.nome, x.area, x.preco].filter((v) => v != null && v !== "").join(" | ")
-        )
-        .join("\n")
-    : "";
-const textoParaTipologias = (s) =>
-  (s || "")
-    .split("\n")
-    .map((l) => l.trim())
-    .filter(Boolean)
-    .map((l) => {
-      const [nome, area, preco] = l.split("|").map((x) => x.trim());
-      const o = { nome: nome || "" };
-      if (area) o.area = area;
-      if (preco && !isNaN(Number(preco))) o.preco = Number(preco);
-      return o;
-    });
 
 // Links: "etiqueta | url"
 const linksParaTexto = (a) =>
@@ -86,7 +65,7 @@ export default function EmpreendimentoForm({ initial = null, regioesExistentes =
     resumo: initial?.resumo || "",
     descricao: initial?.descricao || "",
     caracteristicas: arrayParaLinhas(initial?.caracteristicas),
-    tipologias: tipologiasParaTexto(initial?.tipologias),
+    tipologias: normalizaTipologias(initial?.tipologias),
     proximidades: arrayParaLinhas(initial?.proximidades),
     imagens: initial?.imagens || [],
     video: initial?.video || "",
@@ -140,7 +119,7 @@ export default function EmpreendimentoForm({ initial = null, regioesExistentes =
       video: f.video.trim(),
       siteUrl: f.siteUrl.trim(),
       links: textoParaLinks(f.links),
-      tipologias: textoParaTipologias(f.tipologias),
+      tipologias: normalizaTipologias(f.tipologias),
       proximidades: linhasParaArray(f.proximidades),
     };
 
@@ -301,14 +280,18 @@ export default function EmpreendimentoForm({ initial = null, regioesExistentes =
         Descrição
         <textarea rows={5} value={f.descricao} onChange={set("descricao")} />
       </label>
+      <div className="full" style={{ marginBottom: 18 }}>
+        <div className="admin-label">Tipologias e preços</div>
+        <TipologiasEditor
+          value={f.tipologias}
+          moeda={f.moeda}
+          onChange={(v) => setF((x) => ({ ...x, tipologias: v }))}
+        />
+      </div>
       <div className="admin-form-grid">
         <label>
           Características (uma por linha)
           <textarea rows={6} value={f.caracteristicas} onChange={set("caracteristicas")} />
-        </label>
-        <label>
-          Tipologias — <code>nome | área | preço</code> (um por linha; área/preço opcionais)
-          <textarea rows={6} value={f.tipologias} onChange={set("tipologias")} placeholder={"Studio | 28 m² · 1 vaga | 450000\n1 Suíte | plantas flexíveis"} />
         </label>
         <label>
           Proximidades (uma por linha, opcional)

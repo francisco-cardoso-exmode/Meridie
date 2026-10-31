@@ -6,14 +6,10 @@ import EmpreendimentoCard from "@/components/EmpreendimentoCard";
 import RegionBanner from "@/components/RegionBanner";
 import { cartaoRegiao } from "@/lib/regioes";
 import { regioesHome, regiaoBannerHome } from "@/lib/regioesHome";
-import ListingsExplorer from "@/components/ListingsExplorer";
 import {
   empreendimentosDestaque,
   allRegioes,
   allEmpreendimentos,
-  zonasDe,
-  tiposDe,
-  finalidadesDe,
 } from "@/lib/store";
 import { getConteudo } from "@/lib/conteudo";
 import { allAnuncios } from "@/lib/anuncios";
@@ -46,7 +42,6 @@ export default async function Home({ params }) {
   // Só os campos que os cards e o explorador usam (ver cartaoEmpreendimento).
   const destaques = traduzLista(await empreendimentosDestaque(6), lang).map(cartaoEmpreendimento);
   const todos = traduzLista(await allEmpreendimentos(), lang).map(cartaoEmpreendimento);
-  const paises = [...new Set(todos.map((e) => e.pais))];
   const regioes = traduzLista(await allRegioes(), lang);
   const anuncios = traduzLista(await allAnuncios({ home: true }), lang);
   const marcas = traduzLista(await allMarcas({ home: true }), lang);
@@ -129,30 +124,7 @@ export default async function Home({ params }) {
             >
               {T("Ver imóveis no Brasil")}
             </L>
-          </div>
-        </div>
-      </section>
-
-      {/* Filtro geral — toda a oferta */}
-      <section>
-        <div className="container">
-          <Reveal className="section-head">
-            <span className="eyebrow">{c.ofertaEyebrow}</span>
-            <h2>{c.ofertaTitulo}</h2>
-            <p>{c.ofertaTexto}</p>
-          </Reveal>
-          <ListingsExplorer
-            empreendimentos={todos}
-            zonas={zonasDe(todos)}
-            tipos={tiposDe(todos)}
-            finalidades={finalidadesDe(todos)}
-            paises={paises}
-            comBusca
-            comPais
-            colapsavel
-          />
-          <div style={{ marginTop: 28 }}>
-            <L href="/empreendimentos" className="btn btn-primary">
+            <L href="/empreendimentos" className="btn btn-outline">
               {T("Ver página de toda a oferta")}
             </L>
           </div>

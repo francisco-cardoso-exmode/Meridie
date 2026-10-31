@@ -1,15 +1,27 @@
 "use client";
 
 import { useState } from "react";
+import ListaFiltravel from "@/components/admin/ListaFiltravel";
 
 // Backoffice → Utilizadores: a minha password, lista, novo utilizador.
 export default function UtilizadoresAdmin({ lista, eu, definir }) {
   return (
     <>
       <MinhaPassword eu={eu} definir={definir} />
-      <div className="admin-list" style={{ marginTop: 28 }}>
-        {lista.map((u) => (
-          <div className="admin-row" key={u.email}>
+      <div style={{ marginTop: 28 }} />
+      <ListaFiltravel
+        placeholder="Pesquisar por nome ou email…"
+        facetas={[
+          { k: "password", label: "Password", opcoes: [{ v: "sim", label: "Com password" }, { v: "nao", label: "Sem password" }] },
+        ]}
+        ordens={[{ k: "nome", label: "Nome" }, { k: "email", label: "Email" }]}
+        itens={lista.map((u) => ({
+          id: u.email,
+          busca: `${u.nome || ""} ${u.email}`,
+          facetas: { password: u.temPassword ? "sim" : "nao" },
+          ordem: { nome: u.nome || u.email, email: u.email },
+          node: (
+          <div className="admin-row">
             <div className="admin-row-main">
               <div className="admin-row-title">
                 {u.nome || u.email}
@@ -22,8 +34,9 @@ export default function UtilizadoresAdmin({ lista, eu, definir }) {
               {u.email !== eu && <ApagarUtilizador email={u.email} nome={u.nome || u.email} />}
             </div>
           </div>
-        ))}
-      </div>
+          ),
+        }))}
+      />
       <NovoUtilizador />
     </>
   );

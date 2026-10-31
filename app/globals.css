@@ -4286,3 +4286,29 @@ a.an-bar-link:hover .an-bar-label { color: var(--navy); text-decoration: underli
 .an-pagina .an-filtros { padding: 14px 16px; }
 .an-filtros input,
 .an-filtros select { height: 36px; }
+
+/* ===== Listas filtráveis do backoffice ===== */
+.lf-barra { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 14px 0 16px; }
+.lf-barra input, .lf-barra select {
+  padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px;
+  font: inherit; font-size: 0.86rem; background: #fff; color: var(--ink); max-width: 100%;
+}
+.lf-busca { flex: 1 1 240px; min-width: 0; }
+.lf-limpar { background: none; border: none; color: var(--navy); text-decoration: underline; cursor: pointer; font: inherit; font-size: 0.86rem; }
+.lf-contagem { margin-left: auto; color: var(--muted); font-size: 0.82rem; font-variant-numeric: tabular-nums; }
+.lf-item { display: contents; }
+.lead-meta { margin-top: 8px; font-size: 0.8rem; color: var(--muted); display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+/* ===== Tipologias: estado (vendido/esgotado/reservado) e editor ===== */
+.tip-estado { display: inline-block; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; padding: 3px 8px; border-radius: 999px; margin-right: 8px; vertical-align: middle; }
+.tip-reservado { background: #fff4d6; color: #8a6100; }
+.tip-vendido, .tip-esgotado { background: #f1e3e3; color: #8a2a2a; margin-right: 0; }
+.tip-fora .tip-nome, .tip-fora .tip-area { opacity: 0.55; }
+.admin-label { font-weight: 600; font-size: 0.9rem; margin-bottom: 8px; }
+.tip-editor { display: flex; flex-direction: column; gap: 8px; }
+.tip-editor-row { display: grid; grid-template-columns: 1.2fr 1.4fr 0.9fr 1fr 1fr auto; gap: 6px; align-items: center; }
+.tip-editor-row input, .tip-editor-row select { padding: 8px; border: 1px solid var(--border); border-radius: 8px; font: inherit; font-size: 0.86rem; min-width: 0; }
+.tip-editor-acoes { display: flex; gap: 4px; }
+.tip-editor-acoes button { border: 1px solid var(--border); background: #fff; border-radius: 6px; padding: 6px 8px; cursor: pointer; }
+.tip-editor-acoes button:disabled { opacity: 0.35; cursor: default; }
+@media (max-width: 860px) { .tip-editor-row { grid-template-columns: 1fr 1fr; } .tip-editor-row > :nth-child(2) { grid-column: 1 / -1; } }

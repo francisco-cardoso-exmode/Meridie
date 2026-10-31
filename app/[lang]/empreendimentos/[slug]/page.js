@@ -1,4 +1,5 @@
 import L from "@/components/L";
+import { normalizaTipologia, indisponivel, ETIQUETA } from "@/lib/tipologias";
 import { notFound, permanentRedirect } from "next/navigation";
 import Reveal from "@/components/Reveal";
 import Icon from "@/components/Icon";
@@ -204,17 +205,23 @@ export default async function PaginaEmpreendimento({ params }) {
                   <h2 style={{ fontSize: "1.4rem", marginBottom: 12 }}>{T("Tipologias e preços")}</h2>
                   <div className="tipologias" style={{ marginBottom: 28 }}>
                     {e.tipologias.map((t, i) => {
-                      const o = typeof t === "string" ? { nome: t } : t;
+                      const o = normalizaTipologia(t);
+                      if (!o) return null;
+                      const fora = indisponivel(o);
+                      const etiqueta = ETIQUETA[o.disponibilidade];
                       return (
-                        <div className="tip-row" key={i}>
+                        <div className={`tip-row${fora ? " tip-fora" : ""}`} key={i}>
                           <span className="tip-icon"><Icon name="layers" size={18} /></span>
                           <span className="tip-nome">{o.nome}</span>
-                          {o.area && <span className="tip-area">{o.area}</span>}
+                          {o.area ? <span className="tip-area">{o.area}</span> : <span />}
                           <span className="tip-preco">
-                            {o.preco ? (
-                              <PrecoDual preco={o.preco} moeda={e.moeda} />
+                            {fora ? (
+                              <span className={`tip-estado tip-${o.disponibilidade}`}>{T(etiqueta)}</span>
                             ) : (
-                              T("Sob consulta")
+                              <>
+                                {etiqueta && <span className={`tip-estado tip-${o.disponibilidade}`}>{T(etiqueta)}</span>}
+                                {o.precoTipo === "valor" ? <PrecoDual preco={o.preco} moeda={e.moeda} /> : T("Sob consulta")}
+                              </>
                             )}
                           </span>
                         </div>

@@ -5,6 +5,7 @@ import { thumbUrl } from "@/lib/format";
 import DeleteButton from "@/components/admin/DeleteButton";
 import AvisoSemBase from "@/components/admin/AvisoSemBase";
 import { leAdmin } from "@/lib/leituraAdmin";
+import ListaFiltravel from "@/components/admin/ListaFiltravel";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Regiões & Zonas" };
@@ -27,9 +28,27 @@ export default async function AdminRegioes() {
       </div>
 
       <AvisoSemBase mostrar={semBase} />
-      <div className="admin-list">
-        {lista.map((r) => (
-          <div className="admin-row" key={r.slug}>
+      <ListaFiltravel
+        placeholder="Pesquisar por nome, cidade, zona…"
+        facetas={[
+          { k: "pais", label: "País" },
+          { k: "nivel", label: "Tipo", opcoes: [{ v: "regiao", label: "Regiões" }, { v: "zona", label: "Zonas" }] },
+          { k: "parent", label: "Região-mãe" },
+          { k: "home", label: "Página inicial", opcoes: [{ v: "sim", label: "Na página inicial" }, { v: "nao", label: "Fora da página inicial" }] },
+        ]}
+        ordens={[{ k: "nome", label: "Nome" }, { k: "pais", label: "País" }]}
+        itens={lista.map((r) => ({
+          id: r.slug,
+          busca: [r.nome, r.slug, ...(r.cidades || []), ...(r.zonas || []), mapaNome[r.parent]].filter(Boolean).join(" "),
+          facetas: {
+            pais: PAIS_LABEL[r.pais] || r.pais,
+            nivel: r.parent ? "zona" : "regiao",
+            parent: r.parent ? mapaNome[r.parent] || r.parent : "",
+            home: r.destaqueHome ? "sim" : "nao",
+          },
+          ordem: { nome: r.nome, pais: `${PAIS_LABEL[r.pais] || r.pais} ${r.nome}` },
+          node: (
+          <div className="admin-row">
             <div className="admin-thumb" style={{ backgroundImage: `url(${thumbUrl(r.imagem) || ""})` }} />
             <div className="admin-row-main">
               <div className="admin-row-title">
@@ -50,8 +69,9 @@ export default async function AdminRegioes() {
               <DeleteButton slug={r.slug} nome={r.nome} endpoint="regioes" />
             </div>
           </div>
-        ))}
-      </div>
+          ),
+        }))}
+      />
     </div>
   );
 }

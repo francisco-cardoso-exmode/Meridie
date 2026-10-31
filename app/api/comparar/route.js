@@ -1,4 +1,5 @@
 import { createHash } from "crypto";
+import { normalizaTipologia } from "@/lib/tipologias";
 import Anthropic from "@anthropic-ai/sdk";
 import { getDb } from "@/lib/mongodb";
 import { empreendimentoBySlug, regiaoDoEmpreendimento } from "@/lib/store";
@@ -61,8 +62,19 @@ function descreve(e, n, regiao, taxa) {
 function tipologiasStr(e) {
   if (!Array.isArray(e.tipologias) || !e.tipologias.length) return "—";
   return e.tipologias
+    .map(normalizaTipologia)
+    .filter(Boolean)
     .map((x) =>
-      [x.nome, x.area && `${x.area} m²`, x.preco && formatarPreco(x.preco, e.moeda)]
+      [
+        x.nome,
+        x.area,
+        x.disponibilidade === "vendido" || x.disponibilidade === "esgotado"
+          ? x.disponibilidade
+          : x.precoTipo === "valor"
+            ? formatarPreco(x.preco, e.moeda)
+            : "preço sob consulta",
+        x.disponibilidade === "reservado" && "reservado",
+      ]
         .filter(Boolean)
         .join(" — ")
     )

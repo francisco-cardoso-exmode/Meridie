@@ -10,6 +10,7 @@ import { metaPagina } from "@/lib/seo";
 import { traduzDoc, traduzLista } from "@/lib/i18n/conteudo";
 import Foto from "@/components/Foto";
 import { formataIntervalo } from "@/lib/intervalo";
+import { normalizaTipologia, indisponivel, ETIQUETA } from "@/lib/tipologias";
 
 export const revalidate = 60;
 
@@ -26,11 +27,13 @@ export async function generateMetadata({ params }) {
 const lista = (arr) => (Array.isArray(arr) && arr.length ? arr : null);
 
 // Tipologias podem vir como texto ("T2") ou objeto ({ nome, area, preco }).
-function tipologiasTxt(e) {
+function tipologiasTxt(e, lang) {
   if (!Array.isArray(e.tipologias) || !e.tipologias.length) return "—";
   return (
     e.tipologias
-      .map((t) => (typeof t === "string" ? t : t?.nome))
+      .map(normalizaTipologia)
+      .filter(Boolean)
+      .map((x) => (indisponivel(x) ? `${x.nome} (${t(lang, ETIQUETA[x.disponibilidade])})` : x.nome))
       .filter(Boolean)
       .join(", ") || "—"
   );
@@ -99,7 +102,7 @@ export default async function CompararPage({ params, searchParams }) {
     { k: "Quartos", v: (x) => formataIntervalo(x.quartos) || "—" },
     { k: "Casas de banho", v: (x) => formataIntervalo(x.casasBanho) || "—" },
     { k: "Área", v: (x) => (x.area ? `${x.area} m²` : "—") },
-    { k: "Tipologias", v: tipologiasTxt },
+    { k: "Tipologias", v: (x) => tipologiasTxt(x, lang) },
   ];
 
   return (

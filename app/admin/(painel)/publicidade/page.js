@@ -4,6 +4,7 @@ import { thumbUrl } from "@/lib/format";
 import DeleteButton from "@/components/admin/DeleteButton";
 import AvisoSemBase from "@/components/admin/AvisoSemBase";
 import { leAdmin } from "@/lib/leituraAdmin";
+import ListaFiltravel from "@/components/admin/ListaFiltravel";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Publicidade" };
@@ -27,12 +28,30 @@ export default async function AdminPublicidade() {
       </div>
 
       <AvisoSemBase mostrar={semBase} />
-      <div className="admin-list">
-        {!semBase && lista.length === 0 && (
-          <div className="empty-state"><p>Ainda não há anúncios. Cria o primeiro.</p></div>
-        )}
-        {lista.map((a) => (
-          <div className="admin-row" key={a.slug}>
+      {!semBase && lista.length === 0 && (
+        <div className="empty-state"><p>Ainda não há anúncios. Cria o primeiro.</p></div>
+      )}
+      <ListaFiltravel
+        placeholder="Pesquisar por título, categoria, cidade…"
+        facetas={[
+          { k: "categoria", label: "Categoria" },
+          { k: "cidade", label: "Cidade" },
+          { k: "ativo", label: "Estado", opcoes: [{ v: "ativo", label: "Ativos" }, { v: "inativo", label: "Inativos" }] },
+          { k: "home", label: "Página inicial", opcoes: [{ v: "sim", label: "Na página inicial" }, { v: "nao", label: "Fora da página inicial" }] },
+        ]}
+        ordens={[{ k: "titulo", label: "Título" }, { k: "categoria", label: "Categoria" }]}
+        itens={lista.map((a) => ({
+          id: a.slug,
+          busca: [a.titulo, a.slug, a.categoria, a.cidade, a.url].filter(Boolean).join(" "),
+          facetas: {
+            categoria: a.categoria,
+            cidade: a.cidade,
+            ativo: a.ativo === false ? "inativo" : "ativo",
+            home: a.mostrarHome ? "sim" : "nao",
+          },
+          ordem: { titulo: a.titulo, categoria: `${a.categoria || ""} ${a.titulo}` },
+          node: (
+          <div className="admin-row">
             <div className="admin-thumb" style={{ backgroundImage: `url(${thumbUrl(a.imagem) || ""})` }} />
             <div className="admin-row-main">
               <div className="admin-row-title">
@@ -50,8 +69,9 @@ export default async function AdminPublicidade() {
               <DeleteButton slug={a.slug} nome={a.titulo} endpoint="anuncios" />
             </div>
           </div>
-        ))}
-      </div>
+          ),
+        }))}
+      />
     </div>
   );
 }
