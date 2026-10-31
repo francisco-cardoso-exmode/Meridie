@@ -4,7 +4,6 @@ import { useMemo, useState, useEffect } from "react";
 import EmpreendimentoCard from "@/components/EmpreendimentoCard";
 import { referenciaDe, PAIS_LABEL, precoEmEuros } from "@/lib/empreendimentos";
 import { useTaxaEurBrl } from "@/components/CambioProvider";
-import { TAXA_EUR_BRL_FALLBACK } from "@/lib/cambio";
 import { enviarEvento } from "@/components/Track";
 import { useT } from "@/components/LangProvider";
 
@@ -15,8 +14,9 @@ const ORDENACOES = {
   "area-desc": "Área (maior)",
 };
 
-// Faixas de preço. Em euros para Portugal (ou oferta mista: imóveis em R$
-// são convertidos); em reais quando só há imóveis no Brasil ou se filtra o Brasil.
+// Faixas de preço, sempre em euros (os investidores pensam em €; imóveis em R$
+// são convertidos ao câmbio do momento). No Brasil os valores são mais baixos,
+// por isso a oferta só do Brasil (ou com o filtro Brasil) tem faixas próprias.
 const FAIXAS_EUR = {
   "": "Qualquer preço",
   "0-200000": "Até 200.000 €",
@@ -27,11 +27,11 @@ const FAIXAS_EUR = {
 };
 const FAIXAS_BRL = {
   "": "Qualquer preço",
-  "r0-400000": "Até R$ 400 mil",
-  "r400000-700000": "R$ 400 mil – 700 mil",
-  "r700000-1000000": "R$ 700 mil – 1 milhão",
-  "r1000000-2000000": "R$ 1 – 2 milhões",
-  "r2000000-": "Mais de R$ 2 milhões",
+  "b0-70000": "Até 70.000 €",
+  "b70000-100000": "70.000 – 100.000 €",
+  "b100000-150000": "100.000 – 150.000 €",
+  "b150000-250000": "150.000 – 250.000 €",
+  "b250000-": "Mais de 250.000 €",
 };
 const FAIXAS = { ...FAIXAS_EUR, ...FAIXAS_BRL };
 
@@ -168,7 +168,6 @@ export default function ListingsExplorer({
   const resultados = useMemo(() => {
     const q = norm(f.texto);
     const precoEur = (e) => precoEmEuros(e, taxa);
-    const taxaBrl = Number(taxa) > 0 ? Number(taxa) : TAXA_EUR_BRL_FALLBACK;
     let lista = empreendimentos.filter((e) => {
       if (comPais && f.pais && e.pais !== f.pais) return false;
       if (f.zona && e.zona !== f.zona) return false;
@@ -177,9 +176,8 @@ export default function ListingsExplorer({
       if (f.estado && e.estado !== f.estado) return false;
       if (f.preco) {
         if (semPreco(e)) return false;
-        const emReais = f.preco.startsWith("r");
-        const [min, max] = f.preco.replace(/^r/, "").split("-").map(Number);
-        const v = emReais ? precoEur(e) * taxaBrl : precoEur(e);
+        const [min, max] = f.preco.replace(/^b/, "").split("-").map(Number);
+        const v = precoEur(e);
         if (min && v < min) return false;
         if (max && v > max) return false;
       }
@@ -288,15 +286,6 @@ export default function ListingsExplorer({
               <option value="">{tr("Todas as tipologias")}</option>
               {tipos.map((t) => (
                 <option key={t} value={t}>{tr(t)}</option>
-              ))}
-            </select>
-          </div>
-          <div className="filter">
-            <label htmlFor="f-fin">{tr("Finalidade")}</label>
-            <select id="f-fin" value={f.finalidade} onChange={setFiltro("finalidade")}>
-              <option value="">{tr("Qualquer")}</option>
-              {finalidades.map((x) => (
-                <option key={x} value={x}>{tr(x)}</option>
               ))}
             </select>
           </div>

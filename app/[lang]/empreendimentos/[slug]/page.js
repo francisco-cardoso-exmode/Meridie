@@ -25,7 +25,7 @@ import { getEmpresa } from "@/lib/config";
 import ContactosDiretos from "@/components/ContactosDiretos";
 import { metaPagina, metaNaoEncontrado, urlPublica, jsonLd } from "@/lib/seo";
 import { traduzDoc, traduzLista } from "@/lib/i18n/conteudo";
-import { intervalo, formataIntervalo, eUm } from "@/lib/intervalo";
+import { intervalo, formataIntervalo, eUm, formataQuartos } from "@/lib/intervalo";
 
 export const revalidate = 60;
 export const dynamicParams = true;
@@ -74,7 +74,7 @@ export default async function PaginaEmpreendimento({ params }) {
   const urlPagina = urlPublica(lang, `/empreendimentos/${e.slug}`);
 
   // Quartos/casas de banho: número ou intervalo ("1-3" → mín./máx.).
-  const quartos = formataIntervalo(e.quartos);
+  const quartos = e.tipo === "Terreno" ? "" : formataQuartos(e.quartos);
   const banhos = formataIntervalo(e.casasBanho);
   const propriedade = (name, v) => {
     const i = intervalo(v);

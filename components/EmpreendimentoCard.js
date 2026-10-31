@@ -7,12 +7,12 @@ import { referenciaDe } from "@/lib/empreendimentos";
 import CompareToggle from "@/components/compare/CompareToggle";
 import { useT } from "@/components/LangProvider";
 import Foto from "@/components/Foto";
-import { formataIntervalo, eUm } from "@/lib/intervalo";
+import { formataIntervalo, eUm, formataQuartos } from "@/lib/intervalo";
 
 export default function EmpreendimentoCard({ e }) {
   const { t } = useT();
   // Número ou intervalo ("1–3"); vazio/0 não aparece.
-  const quartos = formataIntervalo(e.quartos);
+  const quartos = e.tipo === "Terreno" ? "" : formataQuartos(e.quartos);
   const banhos = formataIntervalo(e.casasBanho);
   // O card inteiro é clicável através do link do título (::after estica-o por
   // cima do card) — assim o botão "Comparar" não fica dentro do <a>.
@@ -41,7 +41,7 @@ export default function EmpreendimentoCard({ e }) {
         <p className="prop-resumo">{e.resumo}</p>
         <div className="prop-specs">
           {quartos && (
-            <span><Icon name="bed" size={16} /> {quartos} {eUm(e.quartos) ? t("quarto") : t("quartos")}</span>
+            <span><Icon name="bed" size={16} /> {quartos === "T0" ? "T0" : `${quartos} ${eUm(e.quartos) ? t("quarto") : t("quartos")}`}</span>
           )}
           {banhos && <span><Icon name="bath" size={16} /> {banhos}</span>}
           {Number(e.area) > 0 && <span><Icon name="ruler" size={16} /> {e.area} m²</span>}
