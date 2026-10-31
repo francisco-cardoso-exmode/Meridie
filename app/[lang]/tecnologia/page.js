@@ -4,19 +4,21 @@ import Icon from "@/components/Icon";
 import { notFound } from "next/navigation";
 import { getConteudo } from "@/lib/conteudo";
 import { TECNOLOGIA_VISIVEL } from "@/lib/flags";
-import { t, tf, alternates } from "@/lib/i18n";
+import { t, tf } from "@/lib/i18n";
+import { metaPagina, metaNaoEncontrado } from "@/lib/seo";
 import { traduzDoc, traduzLista } from "@/lib/i18n/conteudo";
 
 export const revalidate = 60;
 
 export async function generateMetadata({ params }) {
   const { lang } = await params;
+  // Área escondida: a página dá 404, sem canonical nem "index".
+  if (!TECNOLOGIA_VISIVEL) return metaNaoEncontrado(lang);
   const c = await getConteudo("tecnologia", lang);
-  return {
-    title: t(lang, "Tecnologia"),
-    description: c.heroTexto,
-    alternates: alternates(lang, "/tecnologia"),
-  };
+  return metaPagina(lang, "/tecnologia", {
+    titulo: t(lang, "Tecnologia"),
+    descricao: c.heroTexto,
+  });
 }
 
 export default async function PaginaTecnologia({ params }) {

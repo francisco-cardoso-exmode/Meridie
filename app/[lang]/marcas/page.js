@@ -3,7 +3,8 @@ import Reveal from "@/components/Reveal";
 import MarcaCard from "@/components/MarcaCard";
 import { allMarcas, AREAS_MARCA } from "@/lib/marcas";
 import { getConteudo } from "@/lib/conteudo";
-import { t, tf, alternates } from "@/lib/i18n";
+import { t, tf } from "@/lib/i18n";
+import { metaPagina } from "@/lib/seo";
 import { traduzDoc, traduzLista } from "@/lib/i18n/conteudo";
 
 export const revalidate = 60;
@@ -11,11 +12,10 @@ export const revalidate = 60;
 export async function generateMetadata({ params }) {
   const { lang } = await params;
   const c = await getConteudo("marcas", lang);
-  return {
-    title: t(lang, "Marcas representadas"),
-    description: c.heroTexto,
-    alternates: alternates(lang, "/marcas"),
-  };
+  return metaPagina(lang, "/marcas", {
+    titulo: t(lang, "Marcas representadas"),
+    descricao: c.heroTexto,
+  });
 }
 
 export default async function PaginaMarcas({ params }) {

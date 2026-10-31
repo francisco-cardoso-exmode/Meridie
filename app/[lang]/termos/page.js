@@ -1,12 +1,15 @@
-import { t, tf, alternates } from "@/lib/i18n";
+import { t, tf } from "@/lib/i18n";
+import { metaPagina } from "@/lib/seo";
+
+// Revalida de hora a hora (o rodapé mostra dados da empresa do backoffice).
+export const revalidate = 3600;
 import { traduzDoc, traduzLista } from "@/lib/i18n/conteudo";
 export async function generateMetadata({ params }) {
   const { lang } = await params;
-  return {
-    title: t(lang, "Termos e Condições"),
-    description: t(lang, "Termos e condições de utilização do site da Meridie Investments."),
-    alternates: alternates(lang, "/termos"),
-  };
+  return metaPagina(lang, "/termos", {
+    titulo: t(lang, "Termos e Condições"),
+    descricao: t(lang, "Termos e condições de utilização do site da Meridie Investments."),
+  });
 }
 
 export default async function TermosPage({ params }) {

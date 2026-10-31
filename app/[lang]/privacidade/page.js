@@ -1,15 +1,15 @@
 import L from "@/components/L";
 import { getEmpresa } from "@/lib/config";
-import { t, tf, alternates } from "@/lib/i18n";
+import { t, tf } from "@/lib/i18n";
+import { metaPagina } from "@/lib/seo";
 import { traduzDoc, traduzLista } from "@/lib/i18n/conteudo";
 
 export async function generateMetadata({ params }) {
   const { lang } = await params;
-  return {
-    title: t(lang, "Política de Privacidade"),
-    description: t(lang, "Como a Meridie Investments recolhe, usa e protege os teus dados pessoais, e quais os teus direitos ao abrigo do RGPD."),
-    alternates: alternates(lang, "/privacidade"),
-  };
+  return metaPagina(lang, "/privacidade", {
+    titulo: t(lang, "Política de Privacidade"),
+    descricao: t(lang, "Como a Meridie Investments recolhe, usa e protege os teus dados pessoais, e quais os teus direitos ao abrigo do RGPD."),
+  });
 }
 
 export const dynamic = "force-dynamic";
@@ -19,9 +19,16 @@ export default async function PrivacidadePage({ params }) {
   const T = (x) => t(lang, x);
   const emp = await getEmpresa();
   const denom = emp.denominacao || "Meridie Investments";
-  const nif = emp.nif || t(lang, "[NIF a indicar]");
-  const morada = emp.morada || t(lang, "[morada a indicar]");
-  const email = emp.email || "geral@meridie.pt";
+  // Dados vazios no backoffice: a frase omite-os (nada de placeholders).
+  const nif = emp.nif || "";
+  const morada = emp.morada || "";
+  const email = emp.email || "";
+  // Contacto para exercer direitos: o email, ou o formulário se não houver.
+  const contacto = email ? (
+    <strong>{email}</strong>
+  ) : (
+    <L href="/contactos">{T("o nosso formulário de contacto")}</L>
+  );
   return (
     <div className="pagina-area">
       <div className="container legal">
@@ -34,8 +41,11 @@ export default async function PrivacidadePage({ params }) {
 
         <h2>{T("1. Responsável pelo tratamento")}</h2>
         <p>
-          {tf(lang, "{denom}, NIF {nif}, com sede em {morada}. Contacto para assuntos de privacidade:", { denom, nif, morada })}{" "}
-          <strong>{email}</strong>.
+          {denom}
+          {nif && tf(lang, ", NIF {nif}", { nif })}
+          {morada && tf(lang, ", com sede em {morada}", { morada })}
+          {T(". Contacto para assuntos de privacidade:")}{" "}
+          {contacto}.
         </p>
 
         <h2>{T("2. Que dados recolhemos")}</h2>
@@ -73,7 +83,7 @@ export default async function PrivacidadePage({ params }) {
 
         <h2>{T("6. Os teus direitos")}</h2>
         <p>
-          {T("Tens direito a aceder, retificar, apagar, limitar ou opor-te ao tratamento dos teus dados, bem como à portabilidade e a retirar o consentimento a qualquer momento. Para exercer estes direitos, contacta")}{" "}<strong>{email}</strong>{T(". Podes também apresentar reclamação à autoridade de controlo (em Portugal, a CNPD —")}{" "}
+          {T("Tens direito a aceder, retificar, apagar, limitar ou opor-te ao tratamento dos teus dados, bem como à portabilidade e a retirar o consentimento a qualquer momento. Para exercer estes direitos, contacta")}{" "}{contacto}{T(". Podes também apresentar reclamação à autoridade de controlo (em Portugal, a CNPD —")}{" "}
           <a href="https://www.cnpd.pt" target="_blank" rel="noopener">{T("www.cnpd.pt")}</a>).
         </p>
 

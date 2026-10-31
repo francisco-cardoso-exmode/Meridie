@@ -1,6 +1,12 @@
 import L from "@/components/L";
 
 // Página não encontrada (textos nos dois idiomas — o not-found não recebe params).
+// Nunca indexar nem herdar um canonical.
+export const metadata = {
+  title: "Página não encontrada · Page not found",
+  robots: { index: false, follow: false },
+};
+
 export default function NaoEncontrado() {
   return (
     <section className="page-hero" style={{ minHeight: "50vh" }}>

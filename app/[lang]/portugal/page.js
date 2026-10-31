@@ -1,6 +1,7 @@
 import MarketHero from "@/components/MarketHero";
 import Reveal from "@/components/Reveal";
 import RegionBanner from "@/components/RegionBanner";
+import { cartaoRegiao } from "@/lib/regioes";
 import ListingsExplorer from "@/components/ListingsExplorer";
 import {
   allEmpreendimentos,
@@ -9,16 +10,17 @@ import {
   tiposDe,
   finalidadesDe,
 } from "@/lib/store";
-import { t, tf, alternates } from "@/lib/i18n";
+import { t, tf } from "@/lib/i18n";
+import { metaPagina } from "@/lib/seo";
 import { traduzDoc, traduzLista } from "@/lib/i18n/conteudo";
+import { cartaoEmpreendimento } from "@/lib/empreendimentos";
 
 export async function generateMetadata({ params }) {
   const { lang } = await params;
-  return {
-    title: t(lang, "Investir em Portugal"),
-    description: t(lang, "Empreendimentos selecionados em Portugal — Lisboa, Porto, Algarve e Cascais. Segurança jurídica europeia e valorização consistente. Filtra por zona, tipo e finalidade."),
-    alternates: alternates(lang, "/portugal"),
-  };
+  return metaPagina(lang, "/portugal", {
+    titulo: t(lang, "Investir em Portugal"),
+    descricao: t(lang, "Empreendimentos selecionados em Portugal — Lisboa, Porto, Algarve e Cascais. Segurança jurídica europeia e valorização consistente. Filtra por zona, tipo e finalidade."),
+  });
 }
 
 export const revalidate = 60;
@@ -26,7 +28,7 @@ export const revalidate = 60;
 export default async function PaginaPortugal({ params }) {
   const { lang } = await params;
   const T = (x) => t(lang, x);
-  const empreendimentos = traduzLista(await allEmpreendimentos({ pais: "portugal" }), lang);
+  const empreendimentos = traduzLista(await allEmpreendimentos({ pais: "portugal" }), lang).map(cartaoEmpreendimento);
   const regioes = traduzLista(await allRegioes({ pais: "portugal", topo: true }), lang);
 
   return (
@@ -51,7 +53,7 @@ export default async function PaginaPortugal({ params }) {
           <div className="region-grid">
             {regioes.map((r, i) => (
               <Reveal key={r.slug} delay={(i % 2) * 0.1}>
-                <RegionBanner regiao={r} compact />
+                <RegionBanner regiao={cartaoRegiao(r)} compact />
               </Reveal>
             ))}
           </div>

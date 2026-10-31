@@ -2,18 +2,18 @@ import L from "@/components/L";
 import Reveal from "@/components/Reveal";
 import Icon from "@/components/Icon";
 import { getConteudo } from "@/lib/conteudo";
-import { t, tf, alternates } from "@/lib/i18n";
+import { t, tf } from "@/lib/i18n";
+import { metaPagina } from "@/lib/seo";
 import { traduzDoc, traduzLista } from "@/lib/i18n/conteudo";
 
 export const revalidate = 60;
 
 export async function generateMetadata({ params }) {
   const { lang } = await params;
-  return {
-    title: t(lang, "Como Funciona"),
-    description: t(lang, "O processo Meridie em 5 passos e os três pilares de serviço — intermediação imobiliária, assessoria fiscal e assessoria jurídica nos dois países."),
-    alternates: alternates(lang, "/como-funciona"),
-  };
+  return metaPagina(lang, "/como-funciona", {
+    titulo: t(lang, "Como Funciona"),
+    descricao: t(lang, "O processo Meridie em 5 passos e os três pilares de serviço — intermediação imobiliária, assessoria fiscal e assessoria jurídica nos dois países."),
+  });
 }
 
 const passos = [

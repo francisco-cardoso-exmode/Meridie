@@ -1,16 +1,19 @@
 import L from "@/components/L";
 import Reveal from "@/components/Reveal";
 import Accordion from "@/components/Accordion";
-import { t, tf, alternates } from "@/lib/i18n";
+import { t, tf } from "@/lib/i18n";
+import { metaPagina, jsonLd } from "@/lib/seo";
+
+// Revalida de hora a hora (o rodapé mostra dados da empresa do backoffice).
+export const revalidate = 3600;
 import { traduzDoc, traduzLista } from "@/lib/i18n/conteudo";
 
 export async function generateMetadata({ params }) {
   const { lang } = await params;
-  return {
-    title: t(lang, "Perguntas Frequentes"),
-    description: t(lang, "Respostas às dúvidas mais comuns sobre investir em imóveis entre Portugal e o Brasil — processo, fiscalidade, custos e honorários."),
-    alternates: alternates(lang, "/faq"),
-  };
+  return metaPagina(lang, "/faq", {
+    titulo: t(lang, "Perguntas Frequentes"),
+    descricao: t(lang, "Respostas às dúvidas mais comuns sobre investir em imóveis entre Portugal e o Brasil — processo, fiscalidade, custos e honorários."),
+  });
 }
 
 const categorias = [
@@ -70,8 +73,21 @@ const categorias = [
 export default async function FAQ({ params }) {
   const { lang } = await params;
   const T = (x) => t(lang, x);
+  // Dados estruturados FAQPage (as mesmas perguntas e respostas da página).
+  const ldFaq = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: categorias.flatMap((c) =>
+      c.itens.map((it) => ({
+        "@type": "Question",
+        name: T(it.q),
+        acceptedAnswer: { "@type": "Answer", text: T(it.a) },
+      }))
+    ),
+  };
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(ldFaq) }} />
       <section className="page-hero">
         <div className="container">
           <span className="eyebrow">{T("FAQ")}</span>

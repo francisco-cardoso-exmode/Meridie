@@ -1,14 +1,18 @@
 import L from "@/components/L";
-import { t, tf, alternates } from "@/lib/i18n";
+import { t, tf } from "@/lib/i18n";
+import { metaPagina } from "@/lib/seo";
+import GerirCookies from "@/components/GerirCookies";
+
+// Revalida de hora a hora (o rodapé mostra dados da empresa do backoffice).
+export const revalidate = 3600;
 import { traduzDoc, traduzLista } from "@/lib/i18n/conteudo";
 
 export async function generateMetadata({ params }) {
   const { lang } = await params;
-  return {
-    title: t(lang, "Política de Cookies"),
-    description: t(lang, "O que são cookies, quais a Meridie Investments utiliza e como podes gerir o teu consentimento."),
-    alternates: alternates(lang, "/cookies"),
-  };
+  return metaPagina(lang, "/cookies", {
+    titulo: t(lang, "Política de Cookies"),
+    descricao: t(lang, "O que são cookies, quais a Meridie Investments utiliza e como podes gerir o teu consentimento."),
+  });
 }
 
 export default async function CookiesPage({ params }) {
@@ -41,7 +45,10 @@ export default async function CookiesPage({ params }) {
 
         <h2>{T("Como gerir o consentimento")}</h2>
         <p>
-          {T("Podes")}{" "}<strong>{T("aceitar ou rejeitar")}</strong>{" "}{T("os cookies de análise no aviso que surge ao entrar. Para mudar de ideias mais tarde, limpa os dados do site no teu navegador (o aviso volta a aparecer) ou ajusta as definições de cookies do navegador. Também podes desativar cookies diretamente nas opções do teu browser.")}
+          {T("Podes")}{" "}<strong>{T("aceitar ou rejeitar")}</strong>{" "}{T("os cookies de análise no aviso que surge ao entrar. Podes mudar de ideias a qualquer momento em «Gerir cookies», no rodapé de todas as páginas (ou no botão abaixo): o aviso volta a aparecer e, se rejeitares, os cookies de análise já gravados são apagados. Também podes desativar cookies diretamente nas opções do teu browser.")}
+        </p>
+        <p>
+          <GerirCookies className="btn btn-primary" />
         </p>
 
         <p>

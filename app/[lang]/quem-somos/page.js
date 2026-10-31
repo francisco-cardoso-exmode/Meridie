@@ -2,18 +2,18 @@ import L from "@/components/L";
 import Reveal from "@/components/Reveal";
 import AreasCards from "@/components/AreasCards";
 import { getConteudo } from "@/lib/conteudo";
-import { t, tf, alternates } from "@/lib/i18n";
+import { t, tf } from "@/lib/i18n";
+import { metaPagina } from "@/lib/seo";
 import { traduzDoc, traduzLista } from "@/lib/i18n/conteudo";
 
 export const revalidate = 60;
 
 export async function generateMetadata({ params }) {
   const { lang } = await params;
-  return {
-    title: t(lang, "Quem Somos"),
-    description: t(lang, "A Meridie Investments liga Portugal e o Brasil no imobiliário, na representação de bebidas e alimentação — com o mesmo rigor e acompanhamento em cada área."),
-    alternates: alternates(lang, "/quem-somos"),
-  };
+  return metaPagina(lang, "/quem-somos", {
+    titulo: t(lang, "Quem Somos"),
+    descricao: t(lang, "A Meridie Investments liga Portugal e o Brasil no imobiliário, na representação de bebidas e alimentação — com o mesmo rigor e acompanhamento em cada área."),
+  });
 }
 
 const valores = [
