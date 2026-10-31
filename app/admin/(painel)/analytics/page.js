@@ -36,6 +36,7 @@ async function eventosAgg() {
     interesse: [],
     origem: [],
     paises: [],
+    porDia: [],
     total: 0,
   };
   try {
@@ -50,7 +51,8 @@ async function eventosAgg() {
           { $limit: limit },
         ])
         .toArray();
-    const [vistos, pesquisas, filtros, comparacoes, leads, interesse, origem, paises, total] =
+    const d30 = new Date(Date.now() - 30 * 864e5);
+    const [vistos, pesquisas, filtros, comparacoes, leads, interesse, origem, paises, total, porDia] =
       await Promise.all([
       top("empreendimento_visto"),
       top("pesquisa"),
@@ -68,8 +70,22 @@ async function eventosAgg() {
         ])
         .toArray(),
       col.countDocuments(),
+      // Visitas por dia: o evento "origem" é enviado uma vez por sessão.
+      col
+        .aggregate([
+          { $match: { tipo: "origem", criadoEm: { $gte: d30 } } },
+          {
+            $group: {
+              _id: {
+                $dateToString: { format: "%Y-%m-%d", date: "$criadoEm", timezone: "Europe/Lisbon" },
+              },
+              n: { $sum: 1 },
+            },
+          },
+        ])
+        .toArray(),
     ]);
-    return { vistos, pesquisas, filtros, comparacoes, leads, interesse, origem, paises, total };
+    return { vistos, pesquisas, filtros, comparacoes, leads, interesse, origem, paises, porDia, total };
   } catch {
     return vazio;
   }
@@ -94,6 +110,41 @@ function agrupar(lista, chave) {
     m[k] = (m[k] || 0) + 1;
   }
   return Object.entries(m).sort((a, b) => b[1] - a[1]);
+}
+
+// Últimos 30 dias (hora de Lisboa), com zeros nos dias sem visitas.
+function serieDiaria(porDia) {
+  const m = Object.fromEntries(porDia.map((x) => [x._id, x.n]));
+  const dias = [];
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date(Date.now() - i * 864e5).toLocaleDateString("en-CA", {
+      timeZone: "Europe/Lisbon",
+    });
+    dias.push([d, m[d] || 0]);
+  }
+  return dias;
+}
+
+function VisitasPorDia({ dias }) {
+  const max = Math.max(1, ...dias.map((d) => d[1]));
+  const fmt = (d) => d.slice(8, 10) + "/" + d.slice(5, 7);
+  return (
+    <div className="an-bloco" style={{ marginTop: 26 }}>
+      <h3>Visitas por dia (últimos 30 dias)</h3>
+      <div className="an-dias">
+        {dias.map(([d, n]) => (
+          <span className="an-dia" key={d} title={`${fmt(d)}: ${n} visita${n === 1 ? "" : "s"}`}>
+            <span className="an-dia-fill" style={{ height: `${(n / max) * 100}%` }} />
+          </span>
+        ))}
+      </div>
+      <div className="an-dias-eixo">
+        <span>{fmt(dias[0][0])}</span>
+        <span>máx. {max} / dia</span>
+        <span>{fmt(dias[dias.length - 1][0])}</span>
+      </div>
+    </div>
+  );
 }
 
 function precoMedio(lista, moeda) {
@@ -151,6 +202,13 @@ export default async function AdminAnalytics() {
   const leadsD = ev.leads.map((x) => [nomePorSlug[x._id] || x._id, x.n]);
   const interesseD = ev.interesse.map((x) => [nomePorSlug[x._id] || x._id, x.n]);
   const origemD = ev.origem.map((x) => [x._id, x.n]);
+  const dias = serieDiaria(ev.porDia);
+  const soma = (k) => dias.slice(-k).reduce((a, d) => a + d[1], 0);
+  const visitasStats = [
+    { n: soma(1), l: "Visitas hoje" },
+    { n: soma(7), l: "Visitas (7 dias)" },
+    { n: soma(30), l: "Visitas (30 dias)" },
+  ];
 
   const publicados = emp.filter((e) => e.publicado !== false);
   const ocultos = emp.length - publicados.length;
@@ -239,6 +297,16 @@ export default async function AdminAnalytics() {
           </p>
         </div>
       ) : (
+        <>
+        <div className="admin-stats an-stats" style={{ marginTop: 8 }}>
+          {visitasStats.map((s) => (
+            <div className="admin-stat" key={s.l}>
+              <div className="n">{s.n}</div>
+              <div className="l">{s.l}</div>
+            </div>
+          ))}
+        </div>
+        <VisitasPorDia dias={dias} />
         <div className="an-grid">
           <Breakdown titulo="De onde vêm (origem)" dados={origemD} />
           <Breakdown titulo="Empreendimentos mais vistos" dados={vistosD} />
@@ -249,6 +317,7 @@ export default async function AdminAnalytics() {
           <Breakdown titulo="Leads por empreendimento" dados={leadsD} />
           <Breakdown titulo="Visitantes por país" dados={paisesD} />
         </div>
+        </>
       )}
 
       <p className="email-note" style={{ marginTop: 24 }}>

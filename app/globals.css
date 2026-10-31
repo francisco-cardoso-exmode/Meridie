@@ -2921,6 +2921,10 @@ body:has(.admin-page) .site-footer {
 }
 .an-precos li:last-child { border-bottom: none; }
 .an-precos strong { color: var(--navy); }
+.an-dias { display: flex; align-items: flex-end; gap: 3px; height: 140px; }
+.an-dia { flex: 1; height: 100%; display: flex; align-items: flex-end; background: var(--paper-soft); border-radius: 4px; overflow: hidden; }
+.an-dia-fill { display: block; width: 100%; background: var(--gold); border-radius: 4px 4px 0 0; }
+.an-dias-eixo { display: flex; justify-content: space-between; margin-top: 8px; font-size: 0.78rem; color: var(--muted); }
 
 /* ===== Banner de cookies (RGPD) ===== */
 .cookie-bar {
