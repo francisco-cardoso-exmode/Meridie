@@ -10,7 +10,7 @@ import { TECNOLOGIA_VISIVEL } from "@/lib/flags";
 // <área>Titulo, <área>Texto e <área>Cta.
 const AREAS = {
   imobiliario: { icon: "buildings", href: "/empreendimentos" },
-  marcas: { icon: "wine", href: "/marcas" },
+  marcas: { icon: "wine", href: "/representacoes" },
   tecnologia: { icon: "monitor", href: "/tecnologia" },
 };
 

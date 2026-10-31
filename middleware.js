@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { paraInterno, caminho } from "@/lib/i18n";
+import { destinoLegado } from "@/lib/redirecionamentos";
 
 // Cookie da sessão do backoffice (ver lib/sessoes.js — não se importa aqui
 // porque o middleware corre no Edge, sem o driver do MongoDB).
@@ -54,6 +55,13 @@ export async function middleware(request) {
     return NextResponse.redirect(url, 308);
   }
   const { lang, interno } = paraInterno(pathname);
+  // Endereços antigos (ex.: /marcas/x → /representacoes/marcas/x): 301.
+  const legado = destinoLegado(interno);
+  if (legado) {
+    const url = request.nextUrl.clone();
+    url.pathname = caminho(lang, legado);
+    return NextResponse.redirect(url, 301);
+  }
   // Um caminho inglês escrito com o segmento português (/en/marcas) vai
   // para o endereço certo (/en/brands).
   if (lang === "en") {

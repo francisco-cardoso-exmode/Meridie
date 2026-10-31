@@ -60,7 +60,7 @@ export default async function Footer({ lang = "pt" }) {
                 <L href="/brasil">{T("Investir no Brasil")}</L>
               </li>
               <li>
-                <L href="/marcas">{T("Bebidas & Alimentação")}</L>
+                <L href="/representacoes">{T("Representações comerciais")}</L>
               </li>
               {TECNOLOGIA_VISIVEL && (
                 <li>

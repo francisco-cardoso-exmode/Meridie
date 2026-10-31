@@ -1,5 +1,8 @@
 import { allEmpreendimentos, allRegioes } from "@/lib/store";
 import { allMarcas } from "@/lib/marcas";
+import { allCategorias, allProdutos } from "@/lib/representacoes";
+import { allSolucoes } from "@/lib/solucoes";
+import { hrefCategoria, hrefMarca, hrefProduto, hrefSolucao } from "@/lib/catalogo";
 import { TECNOLOGIA_VISIVEL } from "@/lib/flags";
 import { urlPublica } from "@/lib/seo";
 
@@ -38,7 +41,8 @@ export default async function sitemap() {
     "/portugal",
     "/brasil",
     "/empreendimentos",
-    "/marcas",
+    "/representacoes",
+    "/representacoes/marcas",
     ...(TECNOLOGIA_VISIVEL ? ["/tecnologia"] : []),
     "/como-funciona",
     "/quem-somos",
@@ -59,6 +63,7 @@ export default async function sitemap() {
   let empreendimentos = [];
   let regioes = [];
   let marcas = [];
+  let catalogo = [];
   try {
     const [emps, regs] = await Promise.all([allEmpreendimentos(), allRegioes()]);
     empreendimentos = emps
@@ -72,11 +77,24 @@ export default async function sitemap() {
     marcas = (await allMarcas())
       .filter((m) => m.ativo !== false)
       .flatMap((m) =>
-        duas(`/marcas/${m.slug}`, { lastModified: dataDe(m), changeFrequency: "monthly", priority: 0.6 })
+        duas(hrefMarca(m.slug), { lastModified: dataDe(m), changeFrequency: "monthly", priority: 0.6 })
       );
+    // Representações: categorias de topo (as subcategorias são filtros) e produtos.
+    const [cats, produtos] = await Promise.all([allCategorias(), allProdutos()]);
+    catalogo = [
+      ...cats
+        .filter((c) => !c.parent && produtos.some((p) => p.categoria === c.slug))
+        .flatMap((c) => duas(hrefCategoria(c.slug), { lastModified: dataDe(c), changeFrequency: "weekly", priority: 0.6 })),
+      ...produtos.flatMap((p) =>
+        duas(hrefProduto(p), { lastModified: dataDe(p), changeFrequency: "weekly", priority: 0.6 })
+      ),
+      ...(TECNOLOGIA_VISIVEL ? await allSolucoes() : []).flatMap((s) =>
+        duas(hrefSolucao(s.slug), { lastModified: dataDe(s), changeFrequency: "monthly", priority: 0.6 })
+      ),
+    ];
   } catch {
     // Sem DB no build — só as páginas estáticas.
   }
 
-  return [...estaticas, ...empreendimentos, ...regioes, ...marcas];
+  return [...estaticas, ...empreendimentos, ...regioes, ...marcas, ...catalogo];
 }

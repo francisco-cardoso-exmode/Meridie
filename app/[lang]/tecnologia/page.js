@@ -1,12 +1,14 @@
 import L from "@/components/L";
 import Reveal from "@/components/Reveal";
 import Icon from "@/components/Icon";
+import SolucaoCard from "@/components/SolucaoCard";
 import { notFound } from "next/navigation";
 import { getConteudo } from "@/lib/conteudo";
+import { allSolucoes } from "@/lib/solucoes";
 import { TECNOLOGIA_VISIVEL } from "@/lib/flags";
-import { t, tf } from "@/lib/i18n";
+import { t } from "@/lib/i18n";
 import { metaPagina, metaNaoEncontrado } from "@/lib/seo";
-import { traduzDoc, traduzLista } from "@/lib/i18n/conteudo";
+import { traduzLista } from "@/lib/i18n/conteudo";
 
 export const revalidate = 60;
 
@@ -21,11 +23,18 @@ export async function generateMetadata({ params }) {
   });
 }
 
+// Secções do catálogo: soluções próprias primeiro, depois as de parceiros.
+const SECCOES = [
+  ["desenvolvemos", "Desenvolvemos", "Produtos próprios, desenhados e mantidos pela nossa equipa."],
+  ["representamos", "Representamos", "Soluções de parceiros que selecionámos e representamos comercialmente."],
+];
+
 export default async function PaginaTecnologia({ params }) {
   const { lang } = await params;
   const T = (x) => t(lang, x);
   if (!TECNOLOGIA_VISIVEL) notFound();
   const c = await getConteudo("tecnologia", lang);
+  const solucoes = traduzLista(await allSolucoes(), lang);
 
   return (
     <>
@@ -50,6 +59,28 @@ export default async function PaginaTecnologia({ params }) {
           </div>
         </div>
       </section>
+
+      {SECCOES.map(([tipo, titulo, texto], si) => {
+        const lista = solucoes.filter((s) => s.tipo === tipo);
+        if (!lista.length) return null;
+        return (
+          <section key={tipo} className={si % 2 ? undefined : "bg-soft"}>
+            <div className="container">
+              <Reveal className="section-head">
+                <span className="eyebrow">{T(titulo)}</span>
+                <h2>{T(texto)}</h2>
+              </Reveal>
+              <div className="marca-grid">
+                {lista.map((s, i) => (
+                  <Reveal key={s.slug} delay={(i % 3) * 0.08}>
+                    <SolucaoCard s={s} />
+                  </Reveal>
+                ))}
+              </div>
+            </div>
+          </section>
+        );
+      })}
 
       <section>
         <div className="container">
