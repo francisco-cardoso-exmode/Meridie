@@ -11,17 +11,24 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.106.0",
-    "@vercel/blob": "^2.5.0",
+    "@vercel/blob": "^2.8.2",
     "framer-motion": "^12.42.0",
     "leaflet": "^1.9.4",
     "mongodb": "^6.12.0",
-    "next": "^15.1.6",
-    "nodemailer": "^6.9.16",
+    "next": "^15.5.28",
+    "nodemailer": "^10.3.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "eslint": "^9.18.0",
     "eslint-config-next": "^15.1.6"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "overrides": {
+    "zod": "^4.6.6",
+    "postcss": "^8.5.32"
   }
 }
