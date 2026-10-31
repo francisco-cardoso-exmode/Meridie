@@ -4,6 +4,7 @@ import { useMemo, useState, useEffect } from "react";
 import EmpreendimentoCard from "@/components/EmpreendimentoCard";
 import { referenciaDe, PAIS_LABEL, precoEmEuros } from "@/lib/empreendimentos";
 import { useTaxaEurBrl } from "@/components/CambioProvider";
+import { TAXA_EUR_BRL_FALLBACK } from "@/lib/cambio";
 import { enviarEvento } from "@/components/Track";
 import { useT } from "@/components/LangProvider";
 
@@ -14,8 +15,9 @@ const ORDENACOES = {
   "area-desc": "Área (maior)",
 };
 
-// Faixas de preço (valor aproximado em €; imóveis em R$ são convertidos).
-const FAIXAS = {
+// Faixas de preço. Em euros para Portugal (ou oferta mista: imóveis em R$
+// são convertidos); em reais quando só há imóveis no Brasil ou se filtra o Brasil.
+const FAIXAS_EUR = {
   "": "Qualquer preço",
   "0-200000": "Até 200.000 €",
   "200000-400000": "200.000 – 400.000 €",
@@ -23,6 +25,15 @@ const FAIXAS = {
   "700000-1000000": "700.000 € – 1M €",
   "1000000-": "Mais de 1M €",
 };
+const FAIXAS_BRL = {
+  "": "Qualquer preço",
+  "r0-400000": "Até R$ 400 mil",
+  "r400000-700000": "R$ 400 mil – 700 mil",
+  "r700000-1000000": "R$ 700 mil – 1 milhão",
+  "r1000000-2000000": "R$ 1 – 2 milhões",
+  "r2000000-": "Mais de R$ 2 milhões",
+};
+const FAIXAS = { ...FAIXAS_EUR, ...FAIXAS_BRL };
 
 // Ordem canónica dos estados do imóvel (do mais inicial ao concluído).
 export const ESTADOS_ORDEM = [
@@ -81,6 +92,13 @@ export default function ListingsExplorer({
   const [aberto, setAberto] = useState(!colapsavel);
   // Câmbio do momento: os imóveis em R$ são convertidos para € ao filtrar/ordenar.
   const taxa = useTaxaEurBrl();
+
+  // Faixas em reais quando a oferta é só do Brasil (ou se filtrou o Brasil).
+  const soBrasil = empreendimentos.length > 0 && empreendimentos.every((e) => e.moeda === "BRL");
+  const faixas = soBrasil || f.pais === "brasil" ? FAIXAS_BRL : FAIXAS_EUR;
+  useEffect(() => {
+    if (f.preco && !(f.preco in faixas)) setF((prev) => ({ ...prev, preco: "" }));
+  }, [faixas, f.preco]);
 
   // Estados presentes nos dados, pela ordem canónica.
   const estados = ESTADOS_ORDEM.filter((s) =>
@@ -150,6 +168,7 @@ export default function ListingsExplorer({
   const resultados = useMemo(() => {
     const q = norm(f.texto);
     const precoEur = (e) => precoEmEuros(e, taxa);
+    const taxaBrl = Number(taxa) > 0 ? Number(taxa) : TAXA_EUR_BRL_FALLBACK;
     let lista = empreendimentos.filter((e) => {
       if (comPais && f.pais && e.pais !== f.pais) return false;
       if (f.zona && e.zona !== f.zona) return false;
@@ -158,8 +177,9 @@ export default function ListingsExplorer({
       if (f.estado && e.estado !== f.estado) return false;
       if (f.preco) {
         if (semPreco(e)) return false;
-        const [min, max] = f.preco.split("-").map(Number);
-        const v = precoEur(e);
+        const emReais = f.preco.startsWith("r");
+        const [min, max] = f.preco.replace(/^r/, "").split("-").map(Number);
+        const v = emReais ? precoEur(e) * taxaBrl : precoEur(e);
         if (min && v < min) return false;
         if (max && v > max) return false;
       }
@@ -294,7 +314,7 @@ export default function ListingsExplorer({
           <div className="filter">
             <label htmlFor="f-preco">{tr("Preço")}</label>
             <select id="f-preco" value={f.preco} onChange={setFiltro("preco")}>
-              {Object.entries(FAIXAS).map(([v, l]) => (
+              {Object.entries(faixas).map(([v, l]) => (
                 <option key={v} value={v}>{tr(l)}</option>
               ))}
             </select>

@@ -68,6 +68,7 @@ export default async function PaginaBrasil({ params }) {
               zonas={zonasDe(empreendimentos)}
               tipos={tiposDe(empreendimentos)}
               finalidades={finalidadesDe(empreendimentos)}
+              comBusca
             />
           </Reveal>
         </div>

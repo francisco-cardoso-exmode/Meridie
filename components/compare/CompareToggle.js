@@ -34,7 +34,7 @@ export default function CompareToggle({ e }) {
       title={ativo ? t("Remover da comparação") : t("Comparar este empreendimento")}
       onClick={() => toggle(item)}
     >
-      <span aria-hidden="true">{ativo ? "✓" : "="}</span>
+      <span aria-hidden="true">{ativo ? `✓ ${t("A comparar")}` : `⇄ ${t("Comparar")}`}</span>
     </button>
   );
 }
