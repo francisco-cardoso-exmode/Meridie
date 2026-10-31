@@ -4,14 +4,8 @@ import { useState } from "react";
 import VersaoInglesa from "@/components/admin/VersaoInglesa";
 import ImageUploader from "@/components/admin/ImageUploader";
 import { AREAS_MARCA } from "@/lib/areasMarca";
-
-const slugify = (s) =>
-  (s || "")
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/\p{Diacritic}/gu, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
+import { pedidoAdmin, useAvisoSaida, useEnEditado, novoId } from "@/lib/adminCliente";
+import { slugify } from "@/lib/slug";
 
 // Características: uma por linha, "Etiqueta | valor".
 const caracParaTexto = (c) => (Array.isArray(c) ? c.map(([k, v]) => `${k} | ${v}`).join("\n") : "");
@@ -25,7 +19,7 @@ const textoParaCarac = (t) =>
 export default function MarcaForm({ initial = null }) {
   const editing = !!initial;
   const [estado, setEstado] = useState({ a: "idle", msg: "" });
-  const [en, setEn] = useState(initial?.en || null);
+  const { enEditado, temEnEditado, enMostrado, mudarEn } = useEnEditado(initial?.en);
   const [f, setF] = useState({
     nome: initial?.nome || "",
     area: initial?.area || "bebidas",
@@ -34,21 +28,35 @@ export default function MarcaForm({ initial = null }) {
     url: initial?.url || "",
     logo: initial?.logo || "",
     imagens: initial?.imagens || [],
-    produtos: (initial?.produtos || []).map((p) => ({ ...p, caracTexto: caracParaTexto(p.caracteristicas) })),
+    // Cada produto tem um id estável (chave do React e da tradução, que assim
+    // acompanha o produto quando se reordena); os antigos, sem id, ficam com
+    // "i<posição>" — o servidor reconhece-os assim.
+    produtos: (initial?.produtos || []).map((p, i) => ({
+      ...p,
+      id: p.id || `i${i}`,
+      caracTexto: caracParaTexto(p.caracteristicas),
+    })),
     ordem: initial?.ordem ?? "",
     mostrarHome: initial?.mostrarHome ?? true,
     ativo: initial?.ativo !== false,
   });
+  // Aviso ao sair com alterações por gravar.
+  const [inicialJson] = useState(() => JSON.stringify(f));
+  const libertar = useAvisoSaida(JSON.stringify(f) !== inicialJson || temEnEditado);
+
   const set = (k) => (e) =>
     setF((p) => ({ ...p, [k]: e.target.type === "checkbox" ? e.target.checked : e.target.value }));
 
-  // Produtos: lista editável (nome, descrição, foto).
-  const setProd = (i, k, v) =>
-    setF((p) => ({ ...p, produtos: p.produtos.map((x, j) => (j === i ? { ...x, [k]: v } : x)) }));
+  // Produtos: lista editável (nome, descrição, foto) — pelo id, não pela posição.
+  const setProd = (id, k, v) =>
+    setF((p) => ({ ...p, produtos: p.produtos.map((x) => (x.id === id ? { ...x, [k]: v } : x)) }));
   const addProd = () =>
-    setF((p) => ({ ...p, produtos: [...p.produtos, { nome: "", descricao: "", imagem: "", caracTexto: "" }] }));
-  const delProd = (i) =>
-    setF((p) => ({ ...p, produtos: p.produtos.filter((_, j) => j !== i) }));
+    setF((p) => ({
+      ...p,
+      produtos: [...p.produtos, { id: novoId(), nome: "", descricao: "", imagem: "", caracTexto: "" }],
+    }));
+  const delProd = (id) =>
+    setF((p) => ({ ...p, produtos: p.produtos.filter((x) => x.id !== id) }));
   const moveProd = (i, d) =>
     setF((p) => {
       const l = [...p.produtos];
@@ -72,6 +80,7 @@ export default function MarcaForm({ initial = null }) {
       imagens: f.imagens,
       produtos: f.produtos
         .map((p) => ({
+          id: p.id,
           nome: p.nome.trim(),
           descricao: (p.descricao || "").trim(),
           imagem: p.imagem || "",
@@ -82,21 +91,17 @@ export default function MarcaForm({ initial = null }) {
       mostrarHome: !!f.mostrarHome,
       ativo: !!f.ativo,
     };
-    try {
-      const url = editing ? `/api/admin/marcas/${initial.slug}` : "/api/admin/marcas";
-      const res = await fetch(url, {
-        method: editing ? "PUT" : "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(en ? { ...doc, en } : doc),
-      });
-      const json = await res.json();
-      if (res.ok && json.ok) {
-        window.location.href = "/admin/marcas";
-      } else {
-        setEstado({ a: "erro", msg: json.erro || "Erro ao guardar." });
-      }
-    } catch {
-      setEstado({ a: "erro", msg: "Erro de ligação." });
+    const url = editing ? `/api/admin/marcas/${encodeURIComponent(initial.slug)}` : "/api/admin/marcas";
+    // Só as correções inglesas feitas nesta edição (o servidor junta-as).
+    const r = await pedidoAdmin(url, {
+      method: editing ? "PUT" : "POST",
+      body: temEnEditado ? { ...doc, enEditado } : doc,
+    });
+    if (r.ok) {
+      libertar();
+      window.location.href = "/admin/marcas";
+    } else {
+      setEstado({ a: "erro", msg: r.erro });
     }
   }
 
@@ -130,27 +135,27 @@ export default function MarcaForm({ initial = null }) {
         <span className="uf-label">Produtos ({f.produtos.length})</span>
         <div className="prod-editor">
           {f.produtos.map((p, i) => (
-            <div className="prod-editor-row" key={i}>
+            <div className="prod-editor-row" key={p.id}>
               <div className="prod-editor-foto">
                 <ImageUploader
                   multiple={false}
                   value={p.imagem ? [p.imagem] : []}
-                  onChange={(urls) => setProd(i, "imagem", urls[0] || "")}
+                  onChange={(urls) => setProd(p.id, "imagem", urls[0] || "")}
                 />
               </div>
               <div className="prod-editor-campos">
-                <input value={p.nome} onChange={(e) => setProd(i, "nome", e.target.value)} placeholder="Nome do produto" />
-                <textarea rows={3} value={p.descricao} onChange={(e) => setProd(i, "descricao", e.target.value)} placeholder="Descrição (opcional)" />
+                <input value={p.nome} onChange={(e) => setProd(p.id, "nome", e.target.value)} placeholder="Nome do produto" />
+                <textarea rows={3} value={p.descricao} onChange={(e) => setProd(p.id, "descricao", e.target.value)} placeholder="Descrição (opcional)" />
                 <textarea
                   rows={5}
                   value={p.caracTexto ?? ""}
-                  onChange={(e) => setProd(i, "caracTexto", e.target.value)}
+                  onChange={(e) => setProd(p.id, "caracTexto", e.target.value)}
                   placeholder={"Ficha técnica — uma linha por característica:\nRegião | Vinho Verde\nTeor alcoólico | 11,5% vol."}
                 />
                 <div className="prod-editor-acoes">
                   <button type="button" className="btn-ghost" onClick={() => moveProd(i, -1)} disabled={i === 0}>↑</button>
                   <button type="button" className="btn-ghost" onClick={() => moveProd(i, 1)} disabled={i === f.produtos.length - 1}>↓</button>
-                  <button type="button" className="admin-del" onClick={() => delProd(i)}>Remover</button>
+                  <button type="button" className="admin-del" onClick={() => delProd(p.id)}>Remover</button>
                 </div>
               </div>
             </div>
@@ -183,7 +188,7 @@ export default function MarcaForm({ initial = null }) {
         Ativa (visível no site)
       </label>
       {estado.a === "erro" && <div className="form-msg erro">{estado.msg}</div>}
-      {initial && <VersaoInglesa colecao="marcas" doc={initial} en={en} onChange={setEn} />}
+      {initial && <VersaoInglesa colecao="marcas" doc={initial} en={enMostrado} onChange={mudarEn} />}
       <div className="admin-form-actions">
         <button type="submit" className="btn btn-primary" disabled={estado.a === "loading"}>
           {estado.a === "loading" ? "A guardar..." : editing ? "Guardar" : "Criar marca"}

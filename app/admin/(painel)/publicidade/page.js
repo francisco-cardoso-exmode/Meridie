@@ -2,12 +2,17 @@ import Link from "next/link";
 import { allAnuncios } from "@/lib/anuncios";
 import { thumbUrl } from "@/lib/format";
 import DeleteButton from "@/components/admin/DeleteButton";
+import AvisoSemBase from "@/components/admin/AvisoSemBase";
+import { leAdmin } from "@/lib/leituraAdmin";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Publicidade" };
 
 export default async function AdminPublicidade() {
-  const lista = await allAnuncios({ todos: true });
+  const { dados: lista, semBase } = await leAdmin(
+    () => allAnuncios({ todos: true, estrito: true }),
+    []
+  );
   return (
     <div className="admin-container">
       <div className="admin-head">
@@ -21,8 +26,9 @@ export default async function AdminPublicidade() {
         <Link href="/admin/publicidade/novo" className="btn btn-primary">+ Novo</Link>
       </div>
 
+      <AvisoSemBase mostrar={semBase} />
       <div className="admin-list">
-        {lista.length === 0 && (
+        {!semBase && lista.length === 0 && (
           <div className="empty-state"><p>Ainda não há anúncios. Cria o primeiro.</p></div>
         )}
         {lista.map((a) => (
@@ -40,7 +46,7 @@ export default async function AdminPublicidade() {
               </div>
             </div>
             <div className="admin-row-actions">
-              <Link href={`/admin/publicidade/${a.slug}`} className="admin-link">Editar</Link>
+              <Link href={`/admin/publicidade/${encodeURIComponent(a.slug)}`} className="admin-link">Editar</Link>
               <DeleteButton slug={a.slug} nome={a.titulo} endpoint="anuncios" />
             </div>
           </div>

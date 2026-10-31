@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { pedidoAdmin } from "@/lib/adminCliente";
 
-export default function RedesForm({ inicial }) {
+// `bloqueado`: a leitura da base falhou — não gravar valores vazios por cima dos reais.
+export default function RedesForm({ inicial, bloqueado = false }) {
   const [f, setF] = useState({
     instagram: inicial?.instagram || "",
     linkedin: inicial?.linkedin || "",
@@ -12,22 +14,10 @@ export default function RedesForm({ inicial }) {
 
   async function guardar(e) {
     e.preventDefault();
+    if (bloqueado) return;
     setEstado({ a: "loading", msg: "" });
-    try {
-      const res = await fetch("/api/admin/redes", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(f),
-      });
-      const json = await res.json();
-      setEstado(
-        res.ok && json.ok
-          ? { a: "ok", msg: "Guardado. Aparece no footer de todas as páginas." }
-          : { a: "erro", msg: "Não foi possível guardar." }
-      );
-    } catch {
-      setEstado({ a: "erro", msg: "Erro de ligação." });
-    }
+    const r = await pedidoAdmin("/api/admin/redes", { body: f });
+    setEstado(r.ok ? { a: "ok", msg: "Guardado. Aparece no footer de todas as páginas." } : { a: "erro", msg: r.erro });
   }
 
   return (
@@ -43,7 +33,7 @@ export default function RedesForm({ inicial }) {
       {estado.a === "ok" && <div className="form-msg ok">{estado.msg}</div>}
       {estado.a === "erro" && <div className="form-msg erro">{estado.msg}</div>}
       <div className="admin-form-actions">
-        <button type="submit" className="btn btn-primary" disabled={estado.a === "loading"}>
+        <button type="submit" className="btn btn-primary" disabled={bloqueado || estado.a === "loading"}>
           {estado.a === "loading" ? "A guardar..." : "Guardar"}
         </button>
       </div>

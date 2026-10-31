@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { pedidoAdmin, useAvisoSaida, useEnEditado, novoId } from "@/lib/adminCliente";
+import { slugify } from "@/lib/slug";
 import VersaoInglesa from "@/components/admin/VersaoInglesa";
 import Link from "next/link";
 import ImageUploader from "@/components/admin/ImageUploader";
@@ -38,19 +40,11 @@ const textoParaDistancias = (s) =>
 
 const PUB_VAZIO = { titulo: "", texto: "", url: "", imagem: "" };
 
-const slugify = (s) =>
-  (s || "")
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/\p{Diacritic}/gu, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
-
 export default function RegiaoForm({ initial = null, regioesExistentes = [], prefill = null }) {
   const editing = !!initial;
   const pf = editing ? null : prefill;
   const [estado, setEstado] = useState({ a: "idle", msg: "" });
-  const [en, setEn] = useState(initial?.en || null);
+  const { enEditado, temEnEditado, enMostrado, mudarEn } = useEnEditado(initial?.en);
 
   const [f, setF] = useState({
     slug: initial?.slug || (pf?.nome ? slugify(pf.nome) : ""),
@@ -58,7 +52,11 @@ export default function RegiaoForm({ initial = null, regioesExistentes = [], pre
     pais: initial?.pais || "portugal",
     parent: initial?.parent || "",
     nivel: initial?.nivel || (initial?.parent ? "cidade" : "regiao"),
-    publicidade: Array.isArray(initial?.publicidade) ? initial.publicidade : [],
+    // Cada card tem um id estável (chave do React e da tradução); os antigos,
+    // sem id, ficam com "i<posição>" — o servidor reconhece-os assim.
+    publicidade: Array.isArray(initial?.publicidade)
+      ? initial.publicidade.map((p, i) => ({ ...p, id: p.id || `i${i}` }))
+      : [],
     imagem: initial?.imagem || "",
     tagline: initial?.tagline || "",
     descricao: initial?.descricao || "",
@@ -78,19 +76,23 @@ export default function RegiaoForm({ initial = null, regioesExistentes = [], pre
     pontos: pontosParaTexto(initial?.pontos),
   });
 
+  // Aviso ao sair com alterações por gravar.
+  const [inicialJson] = useState(() => JSON.stringify(f));
+  const libertar = useAvisoSaida(JSON.stringify(f) !== inicialJson || temEnEditado);
+
   const set = (c) => (e) => setF((p) => ({ ...p, [c]: e.target.value }));
 
-  // Editor de cards de publicidade (com upload de imagem).
-  const setPub = (i, campo, val) =>
-    setF((p) => {
-      const arr = [...p.publicidade];
-      arr[i] = { ...arr[i], [campo]: val };
-      return { ...p, publicidade: arr };
-    });
+  // Editor de cards de publicidade (com upload de imagem) — pelo id, não pela
+  // posição (um upload que termina depois de apagar um card não vai parar ao errado).
+  const setPub = (id, campo, val) =>
+    setF((p) => ({
+      ...p,
+      publicidade: p.publicidade.map((x) => (x.id === id ? { ...x, [campo]: val } : x)),
+    }));
   const addPub = () =>
-    setF((p) => ({ ...p, publicidade: [...p.publicidade, { ...PUB_VAZIO }] }));
-  const removePub = (i) =>
-    setF((p) => ({ ...p, publicidade: p.publicidade.filter((_, j) => j !== i) }));
+    setF((p) => ({ ...p, publicidade: [...p.publicidade, { ...PUB_VAZIO, id: novoId() }] }));
+  const removePub = (id) =>
+    setF((p) => ({ ...p, publicidade: p.publicidade.filter((x) => x.id !== id) }));
 
   const possiveisPais = regioesExistentes.filter(
     (r) => !r.parent && r.slug !== f.slug
@@ -128,23 +130,23 @@ export default function RegiaoForm({ initial = null, regioesExistentes = [], pre
     };
     doc.parent = f.parent || ""; // enviar sempre (vazio = região de topo)
 
-    try {
-      const url = editing ? `/api/admin/regioes/${initial.slug}` : "/api/admin/regioes";
-      const res = await fetch(url, {
-        method: editing ? "PUT" : "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(en ? { ...doc, en } : doc),
-      });
-      const json = await res.json();
-      if (res.ok && json.ok) {
-        window.location.href = "/admin/regioes";
-      } else {
-        setEstado({ a: "erro", msg: json.erro || "Erro ao guardar." });
-      }
-    } catch {
-      setEstado({ a: "erro", msg: "Erro de ligação." });
+    const url = editing
+      ? `/api/admin/regioes/${encodeURIComponent(initial.slug)}`
+      : "/api/admin/regioes";
+    // Só as correções inglesas feitas nesta edição (o servidor junta-as).
+    const r = await pedidoAdmin(url, {
+      method: editing ? "PUT" : "POST",
+      body: temEnEditado ? { ...doc, enEditado } : doc,
+    });
+    if (r.ok) {
+      libertar();
+      window.location.href = "/admin/regioes";
+    } else {
+      setEstado({ a: "erro", msg: r.erro });
     }
   }
+
+  const slugFinal = slugify(f.slug);
 
   return (
     <div className="form-layout">
@@ -153,6 +155,7 @@ export default function RegiaoForm({ initial = null, regioesExistentes = [], pre
         <label>
           Slug (URL) {editing && <small>— não editável</small>}
           <input value={f.slug} onChange={set("slug")} required readOnly={editing} placeholder="ex: fortaleza" />
+          {!editing && f.slug && slugFinal !== f.slug && <small>Vai ficar: {slugFinal || "—"}</small>}
         </label>
         <label>
           Nome
@@ -270,22 +273,22 @@ export default function RegiaoForm({ initial = null, regioesExistentes = [], pre
       <div className="full">
         <span className="uf-label">Publicidade — cards de patrocínio / parceiros</span>
         <div className="pub-editor">
-          {f.publicidade.map((p, i) => (
-            <div className="pub-edit-card" key={i}>
+          {f.publicidade.map((p) => (
+            <div className="pub-edit-card" key={p.id}>
               <div className="pub-edit-fields">
                 <input
                   value={p.titulo || ""}
-                  onChange={(e) => setPub(i, "titulo", e.target.value)}
+                  onChange={(e) => setPub(p.id, "titulo", e.target.value)}
                   placeholder="Título (ex.: Hotel Meireles)"
                 />
                 <input
                   value={p.texto || ""}
-                  onChange={(e) => setPub(i, "texto", e.target.value)}
+                  onChange={(e) => setPub(p.id, "texto", e.target.value)}
                   placeholder="Texto curto (ex.: Estadia com desconto)"
                 />
                 <input
                   value={p.url || ""}
-                  onChange={(e) => setPub(i, "url", e.target.value)}
+                  onChange={(e) => setPub(p.id, "url", e.target.value)}
                   placeholder="Link (https://...)"
                 />
                 <div className="uploader-field">
@@ -293,14 +296,14 @@ export default function RegiaoForm({ initial = null, regioesExistentes = [], pre
                   <ImageUploader
                     multiple={false}
                     value={p.imagem ? [p.imagem] : []}
-                    onChange={(urls) => setPub(i, "imagem", urls[0] || "")}
+                    onChange={(urls) => setPub(p.id, "imagem", urls[0] || "")}
                   />
                 </div>
               </div>
               <button
                 type="button"
                 className="pub-edit-x"
-                onClick={() => removePub(i)}
+                onClick={() => removePub(p.id)}
                 aria-label="Remover card"
               >
                 ×
@@ -314,7 +317,7 @@ export default function RegiaoForm({ initial = null, regioesExistentes = [], pre
       </div>
 
       {estado.a === "erro" && <div className="form-msg erro">{estado.msg}</div>}
-      {initial && <VersaoInglesa colecao="regioes" doc={initial} en={en} onChange={setEn} />}
+      {initial && <VersaoInglesa colecao="regioes" doc={initial} en={enMostrado} onChange={mudarEn} />}
       <div className="admin-form-actions">
         <button type="submit" className="btn btn-primary" disabled={estado.a === "loading"}>
           {estado.a === "loading" ? "A guardar..." : editing ? "Guardar alterações" : "Criar"}
@@ -335,7 +338,7 @@ export default function RegiaoForm({ initial = null, regioesExistentes = [], pre
           {f.parent ? "É uma zona (pertence a uma região)." : "É uma região de topo (pode ser banner)."}
         </p>
         {editing && (
-          <Link href={`/regioes/${initial.slug}`} target="_blank" className="btn-ver-site">
+          <Link href={`/regioes/${encodeURIComponent(initial.slug)}`} target="_blank" className="btn-ver-site">
             Ver página completa no site ↗
           </Link>
         )}

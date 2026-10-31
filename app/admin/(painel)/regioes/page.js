@@ -3,12 +3,14 @@ import { allRegioes } from "@/lib/store";
 import { PAIS_LABEL } from "@/lib/empreendimentos";
 import { thumbUrl } from "@/lib/format";
 import DeleteButton from "@/components/admin/DeleteButton";
+import AvisoSemBase from "@/components/admin/AvisoSemBase";
+import { leAdmin } from "@/lib/leituraAdmin";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Regiões & Zonas" };
 
 export default async function AdminRegioes() {
-  const lista = await allRegioes();
+  const { dados: lista, semBase } = await leAdmin(() => allRegioes({ estrito: true }), []);
   const mapaNome = Object.fromEntries(lista.map((r) => [r.slug, r.nome]));
 
   return (
@@ -24,6 +26,7 @@ export default async function AdminRegioes() {
         <Link href="/admin/regioes/novo" className="btn btn-primary">+ Nova</Link>
       </div>
 
+      <AvisoSemBase mostrar={semBase} />
       <div className="admin-list">
         {lista.map((r) => (
           <div className="admin-row" key={r.slug}>
@@ -42,8 +45,8 @@ export default async function AdminRegioes() {
               </div>
             </div>
             <div className="admin-row-actions">
-              <Link href={`/regioes/${r.slug}`} target="_blank" className="admin-link">Ver</Link>
-              <Link href={`/admin/regioes/${r.slug}`} className="admin-link">Editar</Link>
+              <Link href={`/regioes/${encodeURIComponent(r.slug)}`} target="_blank" className="admin-link">Ver</Link>
+              <Link href={`/admin/regioes/${encodeURIComponent(r.slug)}`} className="admin-link">Editar</Link>
               <DeleteButton slug={r.slug} nome={r.nome} endpoint="regioes" />
             </div>
           </div>

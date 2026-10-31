@@ -2,13 +2,23 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import AnuncioForm from "@/components/admin/AnuncioForm";
 import { anuncioBySlug } from "@/lib/anuncios";
+import AvisoSemBase from "@/components/admin/AvisoSemBase";
+import { leAdmin } from "@/lib/leituraAdmin";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Editar anúncio" };
 
 export default async function EditarAnuncio({ params }) {
   const { slug } = await params;
-  const a = await anuncioBySlug(slug);
+  const { dados: a, semBase } = await leAdmin(() => anuncioBySlug(slug, { estrito: true }), null);
+  if (semBase) {
+    return (
+      <div className="admin-container">
+        <Link href="/admin/publicidade" className="admin-back">← Voltar</Link>
+        <AvisoSemBase />
+      </div>
+    );
+  }
   if (!a) notFound();
   return (
     <div className="admin-container">

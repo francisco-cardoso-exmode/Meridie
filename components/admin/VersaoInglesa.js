@@ -26,7 +26,8 @@ export default function VersaoInglesa({ colecao, doc, en, onChange }) {
 
   function mudar(k, v) {
     const novo = { ...plano, [k]: v };
-    onChange(desachata(novo));
+    // 2.º argumento: o mapa plano (mantém os campos esvaziados, "").
+    onChange(desachata(novo), novo);
   }
 
   return (

@@ -1,29 +1,28 @@
 import { allEmpreendimentos, allRegioes } from "@/lib/store";
 import { getDb } from "@/lib/mongodb";
 import { formatarPreco, PAIS_LABEL } from "@/lib/empreendimentos";
+import { leAdmin } from "@/lib/leituraAdmin";
+import AvisoSemBase from "@/components/admin/AvisoSemBase";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Analytics" };
 
 async function contagensDb() {
   const vazio = { leads: 0, leads7: 0, leads30: 0, comparacoes: 0, anuncios: 0, paginas: 0 };
-  try {
-    const db = await getDb();
-    const agora = Date.now();
-    const d7 = new Date(agora - 7 * 864e5);
-    const d30 = new Date(agora - 30 * 864e5);
-    const [leads, leads7, leads30, comparacoes, anuncios, paginas] = await Promise.all([
-      db.collection("contactos").countDocuments(),
-      db.collection("contactos").countDocuments({ criadoEm: { $gte: d7 } }),
-      db.collection("contactos").countDocuments({ criadoEm: { $gte: d30 } }),
-      db.collection("comparacoes_cache").countDocuments(),
-      db.collection("anuncios").countDocuments(),
-      db.collection("paginas").countDocuments(),
-    ]);
-    return { leads, leads7, leads30, comparacoes, anuncios, paginas };
-  } catch {
-    return vazio;
-  }
+  if (!process.env.MONGODB_URI) return vazio;
+  const db = await getDb();
+  const agora = Date.now();
+  const d7 = new Date(agora - 7 * 864e5);
+  const d30 = new Date(agora - 30 * 864e5);
+  const [leads, leads7, leads30, comparacoes, anuncios, paginas] = await Promise.all([
+    db.collection("contactos").countDocuments(),
+    db.collection("contactos").countDocuments({ criadoEm: { $gte: d7 } }),
+    db.collection("contactos").countDocuments({ criadoEm: { $gte: d30 } }),
+    db.collection("comparacoes_cache").countDocuments(),
+    db.collection("anuncios").countDocuments(),
+    db.collection("paginas").countDocuments(),
+  ]);
+  return { leads, leads7, leads30, comparacoes, anuncios, paginas };
 }
 
 async function eventosAgg() {
@@ -39,56 +38,53 @@ async function eventosAgg() {
     porDia: [],
     total: 0,
   };
-  try {
-    const db = await getDb();
-    const col = db.collection("eventos");
-    const top = (tipo, limit = 8) =>
-      col
-        .aggregate([
-          { $match: { tipo } },
-          { $group: { _id: "$valor", n: { $sum: 1 } } },
-          { $sort: { n: -1 } },
-          { $limit: limit },
-        ])
-        .toArray();
-    const d30 = new Date(Date.now() - 30 * 864e5);
-    const [vistos, pesquisas, filtros, comparacoes, leads, interesse, origem, paises, total, porDia] =
-      await Promise.all([
-      top("empreendimento_visto"),
-      top("pesquisa"),
-      top("filtro"),
-      top("comparacao"),
-      top("lead_enviada"),
-      top("interesse"),
-      top("origem", 12),
-      col
-        .aggregate([
-          { $match: { pais: { $nin: [null, ""] } } },
-          { $group: { _id: "$pais", n: { $sum: 1 } } },
-          { $sort: { n: -1 } },
-          { $limit: 12 },
-        ])
-        .toArray(),
-      col.countDocuments(),
-      // Visitas por dia: o evento "origem" é enviado uma vez por sessão.
-      col
-        .aggregate([
-          { $match: { tipo: "origem", criadoEm: { $gte: d30 } } },
-          {
-            $group: {
-              _id: {
-                $dateToString: { format: "%Y-%m-%d", date: "$criadoEm", timezone: "Europe/Lisbon" },
-              },
-              n: { $sum: 1 },
+  if (!process.env.MONGODB_URI) return vazio;
+  const db = await getDb();
+  const col = db.collection("eventos");
+  const top = (tipo, limit = 8) =>
+    col
+      .aggregate([
+        { $match: { tipo } },
+        { $group: { _id: "$valor", n: { $sum: 1 } } },
+        { $sort: { n: -1 } },
+        { $limit: limit },
+      ])
+      .toArray();
+  const d30 = new Date(Date.now() - 30 * 864e5);
+  const [vistos, pesquisas, filtros, comparacoes, leads, interesse, origem, paises, total, porDia] =
+    await Promise.all([
+    top("empreendimento_visto"),
+    top("pesquisa"),
+    top("filtro"),
+    top("comparacao"),
+    top("lead_enviada"),
+    top("interesse"),
+    top("origem", 12),
+    col
+      .aggregate([
+        { $match: { pais: { $nin: [null, ""] } } },
+        { $group: { _id: "$pais", n: { $sum: 1 } } },
+        { $sort: { n: -1 } },
+        { $limit: 12 },
+      ])
+      .toArray(),
+    col.countDocuments(),
+    // Visitas por dia: o evento "origem" é enviado uma vez por sessão.
+    col
+      .aggregate([
+        { $match: { tipo: "origem", criadoEm: { $gte: d30 } } },
+        {
+          $group: {
+            _id: {
+              $dateToString: { format: "%Y-%m-%d", date: "$criadoEm", timezone: "Europe/Lisbon" },
             },
+            n: { $sum: 1 },
           },
-        ])
-        .toArray(),
-    ]);
-    return { vistos, pesquisas, filtros, comparacoes, leads, interesse, origem, paises, porDia, total };
-  } catch {
-    return vazio;
-  }
+        },
+      ])
+      .toArray(),
+  ]);
+  return { vistos, pesquisas, filtros, comparacoes, leads, interesse, origem, paises, porDia, total };
 }
 
 const PAIS_COD = {
@@ -184,12 +180,26 @@ function Breakdown({ titulo, dados, total }) {
 }
 
 export default async function AdminAnalytics() {
-  const [emp, reg, db, ev] = await Promise.all([
-    allEmpreendimentos({ todos: true }),
-    allRegioes(),
-    contagensDb(),
-    eventosAgg(),
-  ]);
+  // Se a base falhar, mostra o aviso em vez de zeros/dados de exemplo.
+  const { dados, semBase } = await leAdmin(
+    () =>
+      Promise.all([
+        allEmpreendimentos({ todos: true, estrito: true }),
+        allRegioes({ estrito: true }),
+        contagensDb(),
+        eventosAgg(),
+      ]),
+    null
+  );
+  if (semBase) {
+    return (
+      <div className="admin-container">
+        <h1>Analytics</h1>
+        <AvisoSemBase />
+      </div>
+    );
+  }
+  const [emp, reg, db, ev] = dados;
 
   const nomePorSlug = Object.fromEntries(emp.map((e) => [e.slug, e.nome]));
   const vistosD = ev.vistos.map((x) => [nomePorSlug[x._id] || x._id, x.n]);
