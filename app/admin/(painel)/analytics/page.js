@@ -15,17 +15,41 @@ import {
   NOME_GRANULARIDADE,
   NOME_DISPOSITIVO,
   DIAS_LONGOS,
-  SEM_CIDADE,
+  DIAS_GRELHA,
+  DIAS_SEMANA,
+  TIPOS_EVENTO,
+  temFiltros,
+  lerTipos,
+  lerPagina,
+  alternarTipo,
+  vistasRelogio,
+  resumoHorario,
+  ocorrenciasDia,
+  rotuloHorario,
+  descricaoPeriodo,
+  dataHoraLisboa,
+  detalheEvento,
 } from "@/lib/analytics";
-import { obterAnalytics, contagensConteudo } from "@/lib/analyticsDados";
+import { obterAnalytics, obterInteracoes, contagensConteudo } from "@/lib/analyticsDados";
 import Filtros from "@/components/admin/analytics/Filtros";
-import { Evolucao, TabelaSerie, MapaCalor } from "@/components/admin/analytics/Graficos";
+import { Evolucao, TabelaSerie, MapaCalor, ColunasClicaveis } from "@/components/admin/analytics/Graficos";
 import { Kpis, Ranking } from "@/components/admin/analytics/Quadros";
+import { PainelHorario } from "@/components/admin/analytics/Horario";
+import { Interacoes } from "@/components/admin/analytics/Interacoes";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Analytics" };
 
 const BASE = "/admin/analytics";
+const PLURAL_DIAS = [
+  "segundas-feiras",
+  "terças-feiras",
+  "quartas-feiras",
+  "quintas-feiras",
+  "sextas-feiras",
+  "sábados",
+  "domingos",
+];
 
 function agrupar(lista, chave) {
   const m = {};
@@ -91,13 +115,19 @@ export default async function AdminAnalytics({ searchParams }) {
   const sp = (await searchParams) || {};
   const periodo = resolverPeriodo(sp);
   const filtros = lerFiltros(sp);
+  const tipos = lerTipos(sp);
+  const paginaPedida = lerPagina(sp);
   // Estado atual dos filtros (para os links manterem o resto).
   const atual = {
     periodo: periodo.preset,
     de: periodo.preset === "pers" ? periodo.de : "",
     ate: periodo.preset === "pers" ? periodo.ate : "",
     ...filtros,
+    tipos: tipos.join(","),
+    p: paginaPedida > 1 ? paginaPedida : "",
   };
+  const ligar = (mudar) => BASE + qs(atual, mudar);
+  const comHorario = filtros.dia != null || filtros.hora != null;
 
   // Se a base falhar, mostra o aviso em vez de zeros/dados de exemplo.
   const { dados, semBase } = await leAdmin(
@@ -107,6 +137,7 @@ export default async function AdminAnalytics({ searchParams }) {
         allRegioes({ estrito: true }),
         contagensConteudo(),
         obterAnalytics(periodo, filtros),
+        obterInteracoes(periodo, filtros, { tipos, pagina: paginaPedida }),
       ]),
     null
   );
@@ -118,7 +149,7 @@ export default async function AdminAnalytics({ searchParams }) {
       </div>
     );
   }
-  const [emp, reg, db, ev] = dados;
+  const [emp, reg, db, ev, inter] = dados;
   const agora = new Date();
 
   const nomePorSlug = Object.fromEntries(emp.map((e) => [e.slug, e.nome]));
@@ -159,7 +190,7 @@ export default async function AdminAnalytics({ searchParams }) {
   const gran = periodo.granularidade;
   const picosV = calcPicos(ev.serie.visitas, 3);
   const picosP = calcPicos(ev.serie.paginas, 3);
-  const picoHora = picoGrelha(ev.calor);
+  const picoHora = picoGrelha(ev.calorTodo);
 
   // ---- Rankings ----
   const linhasPaises = ev.paises.map((x) => ({
@@ -170,8 +201,9 @@ export default async function AdminAnalytics({ searchParams }) {
     href: x._id ? BASE + qs(atual, { pais: x._id, cidade: null }) : undefined,
     ativo: filtros.pais && filtros.pais === x._id,
   }));
-  const linhasCidades = ev.cidades.map((x) => {
-    const cidade = x._id.cidade || SEM_CIDADE;
+  // "(sem cidade)" não entra na lista — fica numa nota por baixo.
+  const linhasCidades = ev.cidades.filter((x) => x._id.cidade).map((x) => {
+    const cidade = x._id.cidade;
     return {
       k: `${x._id.pais}|${cidade}`,
       rotulo: filtros.pais ? cidade : `${cidade} · ${x._id.pais ? nomePais(x._id.pais) : "?"}`,
@@ -207,11 +239,17 @@ export default async function AdminAnalytics({ searchParams }) {
     n: x.n,
   }));
   const vistosPor = Object.fromEntries(ev.vistos.map((x) => [x._id, x.n]));
-  const linhasVistos = ev.vistos.map((x) => ({ k: x._id, rotulo: nomeEmp(x._id), n: x.n }));
+  // Clicar num empreendimento filtra a página toda por ele (clicar outra vez tira).
+  const filtroImovel = (slug) =>
+    nomePorSlug[slug]
+      ? { href: ligar({ imovel: filtros.imovel === slug ? null : slug }), ativo: filtros.imovel === slug }
+      : {};
+  const linhasVistos = ev.vistos.map((x) => ({ k: x._id, rotulo: nomeEmp(x._id), n: x.n, ...filtroImovel(x._id) }));
   const linhasLeads = ev.leads.map((x) => ({
     k: x._id,
     rotulo: nomeEmp(x._id),
     n: x.n,
+    ...filtroImovel(x._id),
     extra: vistosPor[x._id] ? `· ${percentagem(x.n, vistosPor[x._id]).toLocaleString("pt-PT")}% de ${vistosPor[x._id]} vistas` : "",
   }));
   const simples = (lista, nome = (v) => v) => lista.map((x) => ({ k: String(x._id), rotulo: nome(x._id), n: x.n }));
@@ -220,9 +258,74 @@ export default async function AdminAnalytics({ searchParams }) {
     return `${nomeEmp(s1)} vs ${nomeEmp(s2)}`;
   });
 
+  const linhasInteresse = ev.interesse.map((x) => ({
+    k: x._id,
+    rotulo: nomeEmp(x._id),
+    n: x.n,
+    ...filtroImovel(x._id),
+  }));
+
+  // ---- Quando visitam: grelha sem dia/hora; cada gráfico ignora só a sua dimensão ----
+  const { porDia, porHora } = vistasRelogio(ev.calorTodo, filtros);
+  const ligarHorario = (mudar) => {
+    const escolhe = Object.values(mudar).some((v) => v != null);
+    return ligar(mudar) + (escolhe ? "#an-horario" : "");
+  };
+  const itensDia = porDia.map((n, i) => {
+    const sel = filtros.dia === i + 1;
+    return { rotulo: DIAS_GRELHA[i], longo: DIAS_SEMANA[i], n, sel, href: ligarHorario({ dia: sel ? null : i + 1 }) };
+  });
+  const itensHora = porHora.map((n, h) => {
+    const sel = filtros.hora === h;
+    return { rotulo: `${h}h`, longo: `${h}h–${h + 1}h`, n, sel, href: ligarHorario({ hora: sel ? null : h }) };
+  });
+
+  // ---- Painel do horário escolhido ----
+  let painel = null;
+  if (comHorario) {
+    const oc = ocorrenciasDia(periodo, filtros.dia);
+    painel = {
+      titulo: rotuloHorario(filtros.dia, filtros.hora),
+      periodoTxt: descricaoPeriodo(periodo),
+      resumo: resumoHorario(ev.calorTodo, filtros, oc),
+      ocorrenciasTxt:
+        filtros.dia != null
+          ? `Em ${oc} ${oc === 1 ? DIAS_SEMANA[filtros.dia - 1].toLowerCase() : PLURAL_DIAS[filtros.dia - 1]} do período`
+          : `Em ${oc} dia${oc === 1 ? "" : "s"} do período`,
+      limparHref: ligar({ dia: null, hora: null }),
+      quadros: [
+        { titulo: "Países", linhas: linhasPaises, total: visitas || undefined },
+        { titulo: "Cidades", linhas: linhasCidades, total: visitas || undefined },
+        { titulo: "Páginas vistas", linhas: linhasPaginas, total: paginasV || undefined },
+        { titulo: "Empreendimentos vistos", linhas: linhasVistos },
+        { titulo: "Dispositivos", linhas: linhasDisp },
+      ],
+    };
+  }
+
+  // ---- Interações (registo) ----
+  const linhasInter = inter.itens.map((e, i) => ({
+    k: `${inter.skip + i}`,
+    quando: e.criadoEm ? dataHoraLisboa(new Date(e.criadoEm)) : "—",
+    tipoCod: e.tipo,
+    tipo: TIPOS_EVENTO[e.tipo] || e.tipo,
+    detalhe: detalheEvento(e, { nomeEmp }),
+    pagina: e.caminho ? rotuloPagina(e.caminho) : "",
+    local: [e.cidade, e.pais ? nomePais(e.pais) : ""].filter(Boolean).join(", "),
+    dispositivo: NOME_DISPOSITIVO[e.dispositivo] || "",
+    origem: e.fonte || (e.tipo === "origem" ? e.valor : ""),
+  }));
+  const ligarTipo = (cod) =>
+    ligar({ tipos: cod == null ? null : alternarTipo(tipos, cod) || null }) + "#an-interacoes";
+  const ligarPagina = (n) => ligar({ p: n }) + "#an-interacoes";
+
   const opcoes = {
     paises: ev.opcoesPais,
-    cidades: [...new Set(ev.cidades.map((x) => x._id.cidade || SEM_CIDADE))],
+    imoveis: emp
+      .map((e) => e.slug)
+      .filter(Boolean)
+      .sort((a, b) => nomeEmp(a).localeCompare(nomeEmp(b), "pt")),
+    cidades: [...new Set(ev.cidades.map((x) => x._id.cidade).filter(Boolean))],
     paginas: ev.paginas.map((x) => x._id),
     fontes: ev.fontes.map((x) => x._id),
   };
@@ -266,7 +369,9 @@ export default async function AdminAnalytics({ searchParams }) {
         Visitas e atividade no site, anónimas (sem cookies nem IP guardado). Hora de Lisboa.
       </p>
 
-      <Filtros atual={atual} periodo={periodo} opcoes={opcoes} rotuloPagina={rotuloPagina} />
+      <Filtros atual={atual} periodo={periodo} opcoes={opcoes} rotuloPagina={rotuloPagina} nomeEmp={nomeEmp} />
+
+      {painel && <PainelHorario {...painel} paginas={paginasV} leads={leads} />}
 
       <p className="an-resumo">
         <strong>{descPeriodo}</strong> · {periodo.nDias} dia{periodo.nDias === 1 ? "" : "s"},{" "}
@@ -278,6 +383,14 @@ export default async function AdminAnalytics({ searchParams }) {
             site por essa página.
           </>
         )}
+        {filtros.imovel && (
+          <>
+            <br />
+            Com um empreendimento escolhido, contam os eventos da página dele e os que o referem
+            (vistas, interesse, comparações, leads); &laquo;visitas&raquo; são as que entraram no site
+            pela página dele.
+          </>
+        )}
       </p>
 
       <Kpis itens={kpis} />
@@ -285,8 +398,8 @@ export default async function AdminAnalytics({ searchParams }) {
       {totalEventos === 0 && (
         <div className="an-bloco an-vazio">
           <p className="muted">
-            Sem atividade registada neste período{Object.keys(filtros).length ? " com estes filtros" : ""}.
-            Experimenta um período maior{Object.keys(filtros).length ? " ou tira filtros" : ""}. Os
+            Sem atividade registada neste período{temFiltros(filtros) ? " com estes filtros" : ""}.
+            Experimenta um período maior{temFiltros(filtros) ? " ou tira filtros" : ""}. Os
             dados vão aparecendo à medida que as pessoas visitam o site.
           </p>
         </div>
@@ -346,9 +459,25 @@ export default async function AdminAnalytics({ searchParams }) {
 
       <section className="an-secao">
         <h2>Quando visitam</h2>
-        <p className="admin-sub an-sub">Visitas por dia da semana e hora (Lisboa), no período escolhido.</p>
+        <p className="admin-sub an-sub">
+          Visitas por dia da semana e hora (Lisboa), no período e com os outros filtros. Clica numa
+          célula para ver esse horário em detalhe (a página toda passa a mostrar só esse horário);
+          clica num dia ou numa hora para escolher só esse dia ou essa hora. A grelha e os gráficos
+          mostram sempre a semana toda, com o que escolheste realçado.
+        </p>
         <div className="an-bloco">
-          <MapaCalor grelha={ev.calor} />
+          <MapaCalor grelha={ev.calorTodo} ligar={ligar} sel={{ dia: filtros.dia, hora: filtros.hora }} />
+        </div>
+        <div className="an-evo-par an-relogio">
+          <ColunasClicaveis
+            titulo={`Visitas por dia da semana${filtros.hora != null ? ` · ${filtros.hora}h–${filtros.hora + 1}h` : ""}`}
+            itens={itensDia}
+          />
+          <ColunasClicaveis
+            titulo={`Visitas por hora do dia${filtros.dia != null ? ` · ${DIAS_SEMANA[filtros.dia - 1].toLowerCase()}` : ""}`}
+            itens={itensHora}
+            eixo={(h) => h % 3 === 0}
+          />
         </div>
       </section>
 
@@ -371,6 +500,11 @@ export default async function AdminAnalytics({ searchParams }) {
             nota="visitas · % · páginas vistas"
             linhas={linhasCidades}
             total={visitas || undefined}
+            rodape={
+              ev.semCidade > 0 && !filtros.cidade
+                ? `${ev.semCidade.toLocaleString("pt-PT")} visita${ev.semCidade === 1 ? "" : "s"} sem cidade identificada (anteriores a 31/10/2026 ou sem localização)`
+                : null
+            }
           />
           <Ranking titulo="Origem (de onde chegam)" linhas={linhasFontes} total={visitas || undefined} />
           <Ranking titulo="Dispositivos" linhas={linhasDisp} />
@@ -381,7 +515,11 @@ export default async function AdminAnalytics({ searchParams }) {
         <h2>O que vêem</h2>
         <div className="an-grid">
           <Ranking titulo="Páginas mais vistas" linhas={linhasPaginas} total={paginasV || undefined} />
-          <Ranking titulo="Empreendimentos mais vistos" linhas={linhasVistos} />
+          <Ranking
+            titulo="Empreendimentos mais vistos"
+            nota="clica num empreendimento para filtrar por ele"
+            linhas={linhasVistos}
+          />
           <Ranking
             titulo="Leads por empreendimento"
             nota="leads · % das leads · conversão sobre as vistas"
@@ -389,11 +527,29 @@ export default async function AdminAnalytics({ searchParams }) {
             total={leads || undefined}
           />
           <Ranking titulo="Idioma das páginas vistas" linhas={linhasIdiomas} />
-          <Ranking titulo="Interesse por empreendimento" linhas={simples(ev.interesse, nomeEmp)} />
+          <Ranking titulo="Interesse por empreendimento" linhas={linhasInteresse} />
           <Ranking titulo="Pesquisas mais feitas" linhas={simples(ev.pesquisas)} />
           <Ranking titulo="Filtros mais usados" linhas={simples(ev.filtros)} />
           <Ranking titulo="Comparações mais feitas" linhas={linhasComparacoes} />
         </div>
+      </section>
+
+      <section className="an-secao" id="an-interacoes">
+        <h2>Interações</h2>
+        <p className="admin-sub an-sub">
+          Cada evento registado, com todos os filtros de cima (incluindo o horário). Escolhe um ou
+          mais tipos para ver só esses.
+        </p>
+        <Interacoes
+          linhas={linhasInter}
+          total={inter.total}
+          pagina={inter.pagina}
+          paginas={inter.paginas}
+          porPagina={inter.porPagina}
+          tipos={tipos}
+          ligarTipo={ligarTipo}
+          ligarPagina={ligarPagina}
+        />
       </section>
 
       <details className="an-conteudo">

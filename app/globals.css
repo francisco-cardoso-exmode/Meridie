@@ -4286,3 +4286,113 @@ a.an-bar-link:hover .an-bar-label { color: var(--navy); text-decoration: underli
 .an-pagina .an-filtros { padding: 14px 16px; }
 .an-filtros input,
 .an-filtros select { height: 36px; }
+
+/* ===== Analytics — interações (horário, cruzar filtros, registo) ===== */
+#an-horario,
+#an-interacoes { scroll-margin-top: 90px; }
+
+/* Mapa de calor clicável: só a grelha faz scroll na horizontal (não a página) */
+.an-calor { overflow: visible; min-width: 0; }
+.an-calor-scroll { overflow-x: auto; overscroll-behavior-x: contain; padding: 3px; margin: -3px; }
+.an-calor-horas span { text-align: center; }
+.an-calor-eixo {
+  display: block;
+  border-radius: 4px;
+  color: var(--muted);
+  text-align: center;
+  text-decoration: none;
+  line-height: 1.6;
+}
+.an-calor-horas .an-calor-eixo { font-size: 0.64rem; font-variant-numeric: tabular-nums; }
+.an-calor-dia .an-calor-eixo { text-align: left; padding-left: 3px; }
+.an-calor-eixo:hover { background: var(--paper-soft); color: var(--navy); text-decoration: underline; }
+.an-calor-eixo.ativo { background: var(--navy); color: #fff; }
+a.an-calor-cel:focus-visible,
+.an-calor-eixo:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; position: relative; z-index: 1; }
+.an-calor.com-sel .an-calor-grid .an-calor-cel:not(.realce) { opacity: 0.5; }
+.an-calor-grid .an-calor-cel.realce { box-shadow: inset 0 0 0 1px var(--gold); }
+.an-calor-grid .an-calor-cel.sel { outline: 2px solid var(--ink); outline-offset: 0; box-shadow: inset 0 0 0 2px #fff; }
+.an-calor-escala { flex-wrap: wrap; }
+.an-calor-dica { margin-left: auto; }
+
+/* Colunas por dia da semana / hora (clicáveis) */
+.an-relogio { margin-top: 18px; }
+.an-dim a.an-col { color: inherit; text-decoration: none; }
+.an-dim.com-sel .an-col:not(.sel) .an-col-bar { opacity: 0.38; }
+.an-dim .an-col.sel { background: rgba(27, 63, 110, 0.08); }
+.an-dim .an-col.sel .an-col-bar { box-shadow: 0 0 0 2px var(--ink); }
+.an-key-sel { width: 10px; height: 10px; border-radius: 3px; background: var(--navy-light); box-shadow: 0 0 0 2px var(--ink); }
+.an-evo-x span.ativo { color: var(--ink); font-weight: 700; }
+
+/* Painel do horário escolhido */
+.an-horario {
+  margin: 0 0 18px;
+  padding: 16px 18px;
+  border: 1px solid var(--gold);
+  border-radius: 14px;
+  background: #fffaf0;
+}
+.an-pagina .an-horario { padding: 16px 18px; }
+.an-horario-topo { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.an-horario-rot {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 2px;
+}
+.an-horario h2 { font-size: 1.2rem; margin: 0; }
+.an-horario h2 .muted { font-weight: 500; font-size: 0.95rem; }
+.an-horario-nums {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin: 14px 0 0;
+}
+.an-horario-nums > div { background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; }
+.an-horario-nums dt { font-size: 0.78rem; font-weight: 600; color: var(--muted); }
+.an-horario-nums dd { margin: 2px 0 0; font-size: 1.5rem; font-weight: 700; color: var(--navy); font-variant-numeric: tabular-nums; }
+.an-horario-nums dd.an-horario-comp { font-size: 0.95rem; line-height: 1.3; }
+.an-horario-nums dd.an-horario-nota { font-size: 0.75rem; font-weight: 500; color: var(--muted); }
+.an-horario-oc { font-size: 0.85rem; margin: 10px 0 0; }
+.an-horario .an-grid { margin-top: 14px; }
+.an-horario .an-bloco { background: #fff; }
+
+.an-bloco-rodape { font-size: 0.78rem; color: var(--muted); margin: 10px 0 0; }
+
+/* Registo de interações */
+.an-inter-tipos { display: flex; flex-wrap: wrap; gap: 6px; }
+.an-inter-conta { font-size: 0.85rem; margin: 12px 0 8px; }
+.an-inter-conta strong { color: var(--ink); }
+.an-inter-wrap { max-height: 640px; margin-top: 0; }
+.an-inter-tabela th,
+.an-inter-tabela td { text-align: left; font-size: 0.84rem; }
+.an-inter-tabela th[scope="row"] { font-weight: 500; }
+.an-inter-txt { max-width: 260px; overflow: hidden; text-overflow: ellipsis; }
+.an-tipo {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--paper-soft);
+  border: 1px solid var(--border);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--navy);
+}
+.an-tipo-lead_enviada { background: #fbf3e2; border-color: var(--gold); }
+.an-inter-pags { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px; margin-top: 12px; font-size: 0.85rem; }
+.an-chip-off { opacity: 0.45; cursor: default; }
+.an-chip-off:hover { border-color: var(--border); }
+.an-campos .an-campo-curto select { width: 150px; }
+
+@media (max-width: 640px) {
+  .an-horario,
+  .an-pagina .an-horario { padding: 14px; }
+  .an-horario-nums { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .an-horario-nums dd { font-size: 1.25rem; }
+  .an-calor-dica { margin-left: 0; flex-basis: 100%; }
+  .an-campos .an-campo-curto { flex: 1 1 calc(50% - 6px); }
+  .an-campos .an-campo-curto select { width: 100%; }
+  .an-inter-tipos .an-chip { padding: 5px 10px; font-size: 0.8rem; }
+}
