@@ -30,6 +30,9 @@ export default function UtilizadoresAdmin({ lista, eu, definir }) {
 }
 
 function MinhaPassword({ eu, definir }) {
+  // Password atual: obrigatória para mudar uma password existente; quem
+  // acabou de entrar pelo link do email não precisa dela.
+  const [atual, setAtual] = useState("");
   const [password, setPassword] = useState("");
   const [estado, setEstado] = useState({ a: "idle", msg: "" });
 
@@ -48,11 +51,12 @@ function MinhaPassword({ eu, definir }) {
     const res = await fetch("/api/admin/conta", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ password }),
+      body: JSON.stringify({ password, atual }),
     }).catch(() => null);
     const json = res ? await res.json().catch(() => ({})) : {};
     if (res?.ok && json.ok) {
       setPassword("");
+      setAtual("");
       setEstado({ a: "ok", msg: "Password guardada. A partir de agora entras com o teu email e esta password." });
     } else {
       setEstado({ a: "erro", msg: json.erro || "Não foi possível guardar." });
@@ -65,8 +69,21 @@ function MinhaPassword({ eu, definir }) {
         {definir ? "Define a tua password" : "A minha password"}
       </h2>
       <p className="admin-sub" style={{ margin: 0 }}>
-        {eu} — mínimo 8 caracteres.
+        {eu} — mínimo 8 caracteres. Ao mudar a password, as tuas sessões noutros
+        dispositivos terminam.
       </p>
+      {!definir && (
+        <label className="full">
+          Password atual
+          <input
+            type="password"
+            value={atual}
+            onChange={(e) => setAtual(e.target.value)}
+            autoComplete="current-password"
+            placeholder="Vazio se ainda não tens password"
+          />
+        </label>
+      )}
       <label className="full">
         Nova password
         <input
@@ -74,6 +91,7 @@ function MinhaPassword({ eu, definir }) {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           minLength={8}
+          maxLength={200}
           required
           autoFocus={definir}
           autoComplete="new-password"
@@ -126,6 +144,7 @@ function NovoUtilizador() {
           value={f.password}
           onChange={set("password")}
           minLength={8}
+          maxLength={200}
           autoComplete="new-password"
           placeholder="Vazio: a pessoa define-a com 'Esqueci-me da password'"
         />
