@@ -43,9 +43,9 @@ export function Kpis({ itens }) {
 /**
  * Ranking com barras, número e % do total. Cada linha pode ser um link que
  * aplica um filtro (ex.: clicar num país mostra as cidades desse país).
- * linhas: [{ k, rotulo, n, extra?, href?, ativo? }]
+ * linhas: [{ k, rotulo, n, extra?, href?, ativo? }]; rodape = nota por baixo da lista.
  */
-export function Ranking({ titulo, linhas, total, nota, vazio = "Sem dados neste período.", mostrar = 10 }) {
+export function Ranking({ titulo, linhas, total, nota, rodape, vazio = "Sem dados neste período.", mostrar = 10 }) {
   const soma = total || linhas.reduce((a, l) => a + l.n, 0);
   const max = Math.max(1, ...linhas.map((l) => l.n));
   const linha = (l) => {
@@ -91,6 +91,7 @@ export function Ranking({ titulo, linhas, total, nota, vazio = "Sem dados neste 
           )}
         </>
       )}
+      {rodape && <p className="an-bloco-rodape">{rodape}</p>}
     </div>
   );
 }

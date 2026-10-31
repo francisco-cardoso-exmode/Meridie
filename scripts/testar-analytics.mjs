@@ -24,6 +24,24 @@ import {
   rotuloLongo,
   nomePais,
   SEM_CIDADE,
+  diaHoraLisboa,
+  passaDiaHora,
+  exprDiaHora,
+  semFiltros,
+  temFiltros,
+  vistasRelogio,
+  resumoHorario,
+  ocorrenciasDia,
+  indiceMaior,
+  rotuloHorario,
+  descricaoPeriodo,
+  lerTipos,
+  lerPagina,
+  alternarTipo,
+  paginacao,
+  dataHoraLisboa,
+  detalheEvento,
+  POR_PAGINA,
 } from "../lib/analytics.js";
 
 let ok = 0;
@@ -207,6 +225,201 @@ t("dados falsos: 2000 eventos aleatórios somam o mesmo nos baldes", () => {
     assert.equal(s.reduce((a, b) => a + b.n, 0), 2000, g);
   }
   assert.equal(dataCivil(p.inicio), p.de);
+});
+
+// ---------- Horário (dia/hora), mapa de calor clicável, registo ----------
+
+t("filtros dia/hora/imóvel: leitura (a hora 0 vale)", () => {
+  assert.deepEqual(lerFiltros({ dia: "3", hora: "21" }), { dia: 3, hora: 21 });
+  assert.deepEqual(lerFiltros({ hora: "0" }), { hora: 0 });
+  assert.ok(temFiltros({ hora: 0 }));
+  assert.ok(!temFiltros({}));
+  for (const mau of [{ dia: "0" }, { dia: "8" }, { hora: "24" }, { hora: "-1" }, { dia: "2.5" }, { hora: "x" }, { dia: ["1"] }])
+    assert.deepEqual(lerFiltros(mau), {}, JSON.stringify(mau));
+  assert.deepEqual(lerFiltros({ imovel: "Casa-Azul" }), { imovel: "casa-azul" });
+  assert.deepEqual(lerFiltros({ imovel: "../x" }), {});
+  assert.deepEqual(lerFiltros({ imovel: "a|b" }), {});
+});
+
+t("filtros dia/hora → $expr no fuso de Lisboa, depois do intervalo de datas", () => {
+  const m = matchEventos(new Date(0), new Date(1), { dia: 3, hora: 21, pais: "PT" });
+  assert.equal(Object.keys(m)[0], "criadoEm");
+  assert.deepEqual(m.$expr, {
+    $and: [
+      { $eq: [{ $isoDayOfWeek: { date: "$criadoEm", timezone: "Europe/Lisbon" } }, 3] },
+      { $eq: [{ $hour: { date: "$criadoEm", timezone: "Europe/Lisbon" } }, 21] },
+    ],
+  });
+  assert.deepEqual(exprDiaHora({ hora: 0 }), { $eq: [{ $hour: { date: "$criadoEm", timezone: "Europe/Lisbon" } }, 0] });
+  assert.equal(exprDiaHora({}), null);
+  assert.equal(matchEventos(new Date(0), new Date(1), {}).$expr, undefined);
+});
+
+t("filtro imóvel: página dele + eventos com o slug; junta-se à origem com $and", () => {
+  const m = matchEventos(new Date(0), new Date(1), { imovel: "casa-1" });
+  assert.equal(m.$or.length, 4);
+  assert.deepEqual(m.$or[0], { caminho: "/empreendimentos/casa-1" });
+  const re = (i) => new RegExp(m.$or[i].valor.$regex);
+  assert.ok(re(2).test("casa-1|outra") && !re(2).test("casa-10|outra"));
+  assert.ok(re(3).test("outra|casa-1") && !re(3).test("outra|casa-10"));
+  const m2 = matchEventos(new Date(0), new Date(1), { imovel: "casa-1", fonte: "Google" });
+  assert.equal(m2.$or, undefined);
+  assert.equal(m2.$and.length, 2);
+});
+
+t("dia/hora de Lisboa nos dias da mudança de hora", () => {
+  // 25/10/2026 (domingo): a 1h repete — as duas são domingo à 1h.
+  assert.deepEqual(diaHoraLisboa(new Date("2026-10-25T00:30:00Z")), { dia: 7, hora: 1 });
+  assert.deepEqual(diaHoraLisboa(new Date("2026-10-25T01:30:00Z")), { dia: 7, hora: 1 });
+  assert.deepEqual(diaHoraLisboa(new Date("2026-10-25T02:30:00Z")), { dia: 7, hora: 2 });
+  // 29/03/2026 (domingo): salta da 1h para as 2h — não há 1h.
+  assert.deepEqual(diaHoraLisboa(new Date("2026-03-29T00:30:00Z")), { dia: 7, hora: 0 });
+  assert.deepEqual(diaHoraLisboa(new Date("2026-03-29T01:30:00Z")), { dia: 7, hora: 2 });
+  // Sábado 23:30 UTC no verão já é domingo 00:30 em Lisboa; no inverno não.
+  assert.deepEqual(diaHoraLisboa(new Date("2026-07-11T23:30:00Z")), { dia: 7, hora: 0 });
+  assert.deepEqual(diaHoraLisboa(new Date("2026-12-12T23:30:00Z")), { dia: 6, hora: 23 });
+  assert.ok(passaDiaHora(new Date("2026-10-25T01:30:00Z"), { dia: 7, hora: 1 }));
+  assert.ok(!passaDiaHora(new Date("2026-10-25T01:30:00Z"), { dia: 6 }));
+  assert.ok(passaDiaHora(new Date("2026-10-25T01:30:00Z"), {}));
+  // A grelha (convenção $dayOfWeek, 1 = domingo) põe a quarta na linha 2 → dia 3.
+  const g = grelhaCalor([{ _id: { d: 4, h: 21 }, n: 5 }]);
+  assert.equal(g[3 - 1][21], 5);
+  assert.equal(dataHoraLisboa(new Date("2026-10-25T01:30:00Z")), "25/10/2026 01:30");
+  assert.equal(dataHoraLisboa(new Date("2026-07-11T23:05:00Z")), "12/07/2026 00:05");
+});
+
+// Eventos falsos à volta das duas mudanças de hora, com país, para simular
+// a agregação: grelha (sem dia/hora) e o filtro dia/hora aplicado a tudo.
+function eventosFalsos() {
+  let seed = 7;
+  const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  const ev = [];
+  for (const [de, ate] of [
+    ["2026-03-22", "2026-04-05"],
+    ["2026-10-18", "2026-11-01"],
+  ]) {
+    const a = instanteLisboa(de).getTime();
+    const b = instanteLisboa(ate).getTime();
+    for (let i = 0; i < 1500; i++) ev.push({ criadoEm: new Date(a + rnd() * (b - a)), pais: rnd() < 0.3 ? "BR" : "PT" });
+  }
+  return ev;
+}
+const grelhaDe = (evs) => {
+  const g = Array.from({ length: 7 }, () => Array(24).fill(0));
+  for (const e of evs) {
+    const { dia, hora } = diaHoraLisboa(e.criadoEm);
+    g[dia - 1][hora]++;
+  }
+  return g;
+};
+const aplicar = (evs, f) => evs.filter((e) => (!f.pais || e.pais === f.pais) && passaDiaHora(e.criadoEm, f));
+
+t("mapa de calor ignora dia/hora mas respeita os outros filtros", () => {
+  const evs = eventosFalsos();
+  const f = { pais: "PT", dia: 7, hora: 1 };
+  assert.deepEqual(semFiltros(f, "dia", "hora"), { pais: "PT" });
+  const grelha = grelhaDe(aplicar(evs, semFiltros(f, "dia", "hora")));
+  // Sem o país a grelha é outra (o país conta).
+  assert.notDeepEqual(grelha, grelhaDe(evs));
+  // O horário filtrado (domingo 1h, com a hora repetida de 25/10) é a célula da grelha.
+  const noHorario = aplicar(evs, f);
+  assert.equal(noHorario.length, grelha[6][1]);
+  assert.ok(noHorario.length > 0);
+  // Cada gráfico ignora só a sua dimensão.
+  const { porDia, porHora } = vistasRelogio(grelha, f);
+  assert.equal(porDia[6], grelha[6][1]);
+  assert.equal(porDia[2], aplicar(evs, { pais: "PT", dia: 3, hora: 1 }).length);
+  assert.equal(porHora[5], aplicar(evs, { pais: "PT", dia: 7, hora: 5 }).length);
+  const livre = vistasRelogio(grelha, {});
+  const total = aplicar(evs, { pais: "PT" }).length;
+  assert.equal(livre.porDia.reduce((a, b) => a + b, 0), total);
+  assert.equal(livre.porHora.reduce((a, b) => a + b, 0), total);
+  assert.equal(livre.porDia[0], aplicar(evs, { pais: "PT", dia: 1 }).length);
+  assert.equal(livre.porHora[23], aplicar(evs, { pais: "PT", hora: 23 }).length);
+  // Em 29/03 não existe a 1h de domingo; em 25/10 existe duas vezes.
+  assert.equal(aplicar([{ criadoEm: new Date("2026-03-29T01:10:00Z") }], { dia: 7, hora: 1 }).length, 0);
+  const duas = [{ criadoEm: new Date("2026-10-25T00:10:00Z") }, { criadoEm: new Date("2026-10-25T01:10:00Z") }];
+  assert.equal(aplicar(duas, { dia: 7, hora: 1 }).length, 2);
+  assert.equal(indiceMaior([0, 3, 5, 5]), 2);
+  assert.equal(indiceMaior([0, 0]), -1);
+});
+
+t("painel do horário: %, média e comparação", () => {
+  const g = Array.from({ length: 7 }, () => Array(24).fill(0));
+  g[2][21] = 42; // quarta 21h
+  g[0][10] = 126;
+  // total 168 → média de uma hora da semana = 1
+  const r = resumoHorario(g, { dia: 3, hora: 21 }, 4);
+  assert.equal(r.visitas, 42);
+  assert.equal(r.total, 168);
+  assert.equal(r.pct, 25);
+  assert.equal(r.nSlots, 168);
+  assert.equal(r.media, 1);
+  assert.equal(r.razao, 42);
+  assert.equal(r.porOcorrencia, 10.5);
+  const soDia = resumoHorario(g, { dia: 1 }, 4);
+  assert.equal(soDia.visitas, 126);
+  assert.equal(soDia.nSlots, 7);
+  assert.equal(soDia.media, 24);
+  assert.equal(soDia.razao, 5.25);
+  const soHora = resumoHorario(g, { hora: 21 });
+  assert.equal(soHora.visitas, 42);
+  assert.equal(soHora.media, 7);
+  assert.equal(soHora.razao, 6);
+  assert.equal(soHora.porOcorrencia, null);
+  assert.equal(resumoHorario(g, {}), null);
+  const vazio = resumoHorario(grelhaCalor([]), { dia: 1, hora: 0 });
+  assert.equal(vazio.pct, 0);
+  assert.equal(vazio.razao, null);
+  // Quartas-feiras nos últimos 30 dias até sábado 31/10: 7, 14, 21, 28.
+  const agora = new Date("2026-10-31T15:00:00Z");
+  const p = resolverPeriodo({ periodo: "30d" }, agora);
+  assert.equal(ocorrenciasDia(p, 3), 4);
+  assert.equal(ocorrenciasDia(p, 6), 5); // sábados 3…31 (hoje conta)
+  assert.equal(ocorrenciasDia(p), 30);
+  assert.equal(rotuloHorario(3, 21), "Quarta-feira, 21:00–21:59");
+  assert.equal(rotuloHorario(3), "Quarta-feira (todo o dia)");
+  assert.equal(rotuloHorario(null, 0), "Todos os dias, 00:00–00:59");
+  assert.equal(descricaoPeriodo(p), "últimos 30 dias");
+  const pers = resolverPeriodo({ periodo: "pers", de: "2026-10-01", ate: "2026-10-15" }, agora);
+  assert.equal(descricaoPeriodo(pers), "de 01/10/2026 a 15/10/2026");
+});
+
+t("registo de interações: tipos, páginas, endereço", () => {
+  assert.deepEqual(lerTipos({ tipos: "pesquisa,lixo,origem" }), ["origem", "pesquisa"]);
+  assert.deepEqual(lerTipos({}), []);
+  assert.equal(alternarTipo(["origem"], "lead_enviada"), "origem,lead_enviada");
+  assert.equal(alternarTipo(["origem", "lead_enviada"], "origem"), "lead_enviada");
+  assert.equal(alternarTipo(["origem"], "origem"), "");
+  assert.equal(lerPagina({ p: "3" }), 3);
+  assert.equal(lerPagina({ p: "0" }), 1);
+  assert.equal(lerPagina({ p: "abc" }), 1);
+  assert.equal(POR_PAGINA, 50);
+  assert.deepEqual(paginacao(0, 1), { pagina: 1, paginas: 1, skip: 0, porPagina: 50 });
+  assert.deepEqual(paginacao(120, 2), { pagina: 2, paginas: 3, skip: 50, porPagina: 50 });
+  assert.deepEqual(paginacao(120, 9), { pagina: 3, paginas: 3, skip: 100, porPagina: 50 });
+  assert.equal(paginacao(100, 3).pagina, 2);
+  // 120 eventos (mais recentes primeiro): as 3 páginas cobrem todos, sem repetir.
+  const ids = Array.from({ length: 120 }, (_, i) => 119 - i);
+  const vistos = [];
+  for (let n = 1; n <= 3; n++) {
+    const pg = paginacao(120, n);
+    vistos.push(...ids.slice(pg.skip, pg.skip + pg.porPagina));
+  }
+  assert.deepEqual(vistos, ids);
+  // qs: novos filtros; a página volta à 1.ª quando muda outro filtro.
+  const atual = { periodo: "30d", dia: 3, hora: 0, imovel: "casa-1", tipos: "origem,pesquisa", p: 4 };
+  assert.equal(qs(atual), "?periodo=30d&imovel=casa-1&dia=3&hora=0&tipos=origem%2Cpesquisa");
+  assert.equal(qs(atual, { p: 5 }), "?periodo=30d&imovel=casa-1&dia=3&hora=0&tipos=origem%2Cpesquisa&p=5");
+  assert.equal(qs(atual, { p: 1 }), "?periodo=30d&imovel=casa-1&dia=3&hora=0&tipos=origem%2Cpesquisa");
+  assert.equal(qs(atual, { dia: null, hora: null }), "?periodo=30d&imovel=casa-1&tipos=origem%2Cpesquisa");
+  // Detalhe legível.
+  const nomeEmp = (s) => ({ "casa-1": "Casa Um", "casa-2": "Casa Dois" })[s] || s;
+  assert.equal(detalheEvento({ tipo: "empreendimento_visto", valor: "casa-1" }, { nomeEmp }), "Casa Um");
+  assert.equal(detalheEvento({ tipo: "comparacao", valor: "casa-1|casa-2" }, { nomeEmp }), "Casa Um vs Casa Dois");
+  assert.equal(detalheEvento({ tipo: "pagina_vista", valor: "/marcas/x" }), "/marcas/x");
+  assert.equal(detalheEvento({ tipo: "pesquisa", valor: "T3 Lisboa" }), "«T3 Lisboa»");
+  assert.equal(detalheEvento({ tipo: "origem", valor: "Google" }), "Google");
 });
 
 console.log(process.exitCode ? `\nFalharam testes (${ok} passaram).` : `✓ ${ok} grupos de testes passaram.`);

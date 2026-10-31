@@ -1,25 +1,48 @@
 import Link from "next/link";
-import { PERIODOS, qs, nomePais } from "@/lib/analytics";
+import { PERIODOS, qs, nomePais, DIAS_SEMANA } from "@/lib/analytics";
 
 const BASE = "/admin/analytics";
 
-const NOMES_FILTRO = { pais: "País", cidade: "Cidade", pagina: "Página", fonte: "Origem" };
+const NOMES_FILTRO = {
+  pais: "País",
+  cidade: "Cidade",
+  pagina: "Página",
+  fonte: "Origem",
+  imovel: "Empreendimento",
+  dia: "Dia",
+  hora: "Hora",
+};
+const tem = (v) => v != null && v !== "";
 
 /**
  * Barra de filtros (uma linha, por cima de tudo o que filtra). Funciona sem
  * JavaScript: os períodos são links e os campos são formulários GET, por isso
  * o endereço da página fica partilhável com os filtros todos.
  *
- * atual: { periodo, de, ate, pais, cidade, pagina, fonte }
+ * atual: { periodo, de, ate, pais, cidade, pagina, fonte, imovel, dia, hora, tipos, p }
+ * (dia 1 = segunda … 7 = domingo; hora 0–23 — a hora 0 é um valor válido).
  */
-export default function Filtros({ atual, periodo, opcoes, rotuloPagina }) {
+export default function Filtros({ atual, periodo, opcoes, rotuloPagina, nomeEmp = (s) => s }) {
   const ocultos = (exceto) =>
     Object.entries(atual)
-      .filter(([k, v]) => v && !exceto.includes(k) && (k !== "de" && k !== "ate" ? true : atual.periodo === "pers"))
+      .filter(
+        ([k, v]) =>
+          tem(v) && k !== "p" && !exceto.includes(k) && (k !== "de" && k !== "ate" ? true : atual.periodo === "pers")
+      )
       .map(([k, v]) => <input key={k} type="hidden" name={k} value={v} />);
-  const ativos = Object.keys(NOMES_FILTRO).filter((k) => atual[k]);
+  const ativos = Object.keys(NOMES_FILTRO).filter((k) => tem(atual[k]));
   const valorFiltro = (k) =>
-    k === "pais" ? nomePais(atual.pais) : k === "pagina" ? rotuloPagina(atual.pagina) : atual[k];
+    k === "pais"
+      ? nomePais(atual.pais)
+      : k === "pagina"
+        ? rotuloPagina(atual.pagina)
+        : k === "imovel"
+          ? nomeEmp(atual.imovel)
+          : k === "dia"
+            ? DIAS_SEMANA[atual.dia - 1]
+            : k === "hora"
+              ? `${atual.hora}h–${atual.hora + 1}h`
+              : atual[k];
 
   return (
     <section className="an-filtros" aria-label="Filtros">
@@ -52,7 +75,7 @@ export default function Filtros({ atual, periodo, opcoes, rotuloPagina }) {
       </div>
 
       <form action={BASE} method="get" className="an-filtros-linha an-campos">
-        {ocultos(["pais", "cidade", "pagina", "fonte"])}
+        {ocultos(["pais", "cidade", "pagina", "fonte", "imovel", "dia", "hora"])}
         <label>
           País
           <select name="pais" defaultValue={atual.pais || ""}>
@@ -93,6 +116,39 @@ export default function Filtros({ atual, periodo, opcoes, rotuloPagina }) {
             ))}
           </datalist>
         </label>
+        <label>
+          Empreendimento
+          <select name="imovel" defaultValue={atual.imovel || ""}>
+            <option value="">Todos</option>
+            {[...new Set([...(atual.imovel ? [atual.imovel] : []), ...opcoes.imoveis])].map((s) => (
+              <option key={s} value={s}>
+                {nomeEmp(s)}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="an-campo-curto">
+          Dia
+          <select name="dia" defaultValue={tem(atual.dia) ? String(atual.dia) : ""}>
+            <option value="">Todos</option>
+            {DIAS_SEMANA.map((d, i) => (
+              <option key={d} value={i + 1}>
+                {d}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="an-campo-curto">
+          Hora
+          <select name="hora" defaultValue={tem(atual.hora) ? String(atual.hora) : ""}>
+            <option value="">Todas</option>
+            {Array.from({ length: 24 }, (_, h) => (
+              <option key={h} value={h}>
+                {h}h–{h + 1}h
+              </option>
+            ))}
+          </select>
+        </label>
         <button type="submit" className="an-chip ativo">Filtrar</button>
       </form>
 
@@ -110,7 +166,10 @@ export default function Filtros({ atual, periodo, opcoes, rotuloPagina }) {
           </Link>
         ))}
         {ativos.length > 1 && (
-          <Link href={BASE + qs({ periodo: atual.periodo, de: atual.de, ate: atual.ate })} className="an-limpar">
+          <Link
+            href={BASE + qs({ periodo: atual.periodo, de: atual.de, ate: atual.ate, tipos: atual.tipos })}
+            className="an-limpar"
+          >
             Limpar filtros
           </Link>
         )}
@@ -120,6 +179,14 @@ export default function Filtros({ atual, periodo, opcoes, rotuloPagina }) {
           download
         >
           Exportar CSV
+        </a>
+        <a
+          href={`/api/admin/analytics/export${qs(atual) ? qs(atual) + "&" : "?"}vista=interacoes`}
+          className="an-chip"
+          download
+          title="Lista de interações filtradas (até 10 000), com data, tipo e detalhe"
+        >
+          Exportar interações
         </a>
       </div>
     </section>
