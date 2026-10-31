@@ -115,11 +115,12 @@ function agrupar(lista, chave) {
 // Últimos 30 dias (hora de Lisboa), com zeros nos dias sem visitas.
 function serieDiaria(porDia) {
   const m = Object.fromEntries(porDia.map((x) => [x._id, x.n]));
+  // Conta por data de calendário (não por blocos de 24 h) para não falhar na mudança de hora.
+  const hoje = new Date().toLocaleDateString("en-CA", { timeZone: "Europe/Lisbon" });
+  const base = new Date(`${hoje}T12:00:00Z`);
   const dias = [];
   for (let i = 29; i >= 0; i--) {
-    const d = new Date(Date.now() - i * 864e5).toLocaleDateString("en-CA", {
-      timeZone: "Europe/Lisbon",
-    });
+    const d = new Date(base.getTime() - i * 864e5).toISOString().slice(0, 10);
     dias.push([d, m[d] || 0]);
   }
   return dias;
