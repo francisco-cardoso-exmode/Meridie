@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { enviarEvento } from "@/components/Track";
 
 // Classifica de onde veio o visitante (UTM ou referrer).
@@ -42,15 +43,28 @@ function classificarOrigem() {
   }
 }
 
-// Regista a origem UMA vez por sessão (anónimo, sem cookies).
+// Último caminho registado (ao nível do módulo): em modo estrito o React corre
+// o efeito duas vezes na montagem — assim a página só conta uma vez.
+let ultimoCaminho = null;
+
+// Regista a origem UMA vez por sessão (= uma visita) e cada página vista,
+// também na navegação do lado do cliente. Anónimo, sem cookies (só
+// sessionStorage, que se apaga ao fechar o separador).
 export default function TrackVisita() {
+  const pathname = usePathname();
   useEffect(() => {
+    if (!pathname || pathname.startsWith("/admin")) return;
     try {
-      if (sessionStorage.getItem("meridie_origem")) return;
-      const origem = classificarOrigem();
-      sessionStorage.setItem("meridie_origem", "1");
-      if (origem) enviarEvento("origem", origem);
+      if (!sessionStorage.getItem("meridie_origem")) {
+        const origem = classificarOrigem();
+        // Guarda a origem para juntar aos eventos seguintes ("-" = interna).
+        sessionStorage.setItem("meridie_origem", origem ? origem.slice(0, 60) : "-");
+        if (origem) enviarEvento("origem", origem);
+      }
     } catch {}
-  }, []);
+    if (pathname === ultimoCaminho) return;
+    ultimoCaminho = pathname;
+    enviarEvento("pagina_vista", pathname);
+  }, [pathname]);
   return null;
 }

@@ -1,11 +1,14 @@
 import { getDb } from "@/lib/mongodb";
 import { dentroDoLimite, ipDe } from "@/lib/rateLimit";
 import { allEmpreendimentos } from "@/lib/store";
+import { normalizarCaminho, classeDispositivo, descodificarCidade } from "@/lib/analytics";
 
 export const dynamic = "force-dynamic";
 
 // Tipos de evento aceites (lista fechada para evitar lixo).
+// "pagina_vista": valor = caminho da página (rota do site, sem query).
 const TIPOS = new Set([
+  "pagina_vista",
   "empreendimento_visto",
   "pesquisa",
   "filtro",
@@ -79,17 +82,29 @@ export async function POST(request) {
       return Response.json({ ok: false }, { status: 403 });
     }
 
-    const { tipo, valor } = await request.json();
+    const { tipo, valor, caminho, fonte } = (await request.json()) || {};
     if (!TIPOS.has(tipo)) {
       return Response.json({ ok: false }, { status: 400 });
     }
-    const v = (typeof valor === "string" || typeof valor === "number" ? String(valor) : "")
+    let v = (typeof valor === "string" || typeof valor === "number" ? String(valor) : "")
       .trim()
       .slice(0, 140);
     if (!v) return Response.json({ ok: true });
 
+    // Página onde o evento aconteceu (caminho público sem query → interno PT).
+    let pagina = normalizarCaminho(typeof caminho === "string" ? caminho : "");
+    if (tipo === "pagina_vista") {
+      pagina = normalizarCaminho(v);
+      if (!pagina) return Response.json({ ok: false }, { status: 400 });
+      v = pagina.caminho;
+    }
+
+    // Robôs (pelo User-Agent) não contam como visitas.
+    const dispositivo = classeDispositivo(request.headers.get("user-agent"));
+    if (!dispositivo) return Response.json({ ok: true });
+
     // Limite generoso por IP (o IP não é guardado nos eventos).
-    if (!(await dentroDoLimite(`track:${ipDe(request)}`, 120, 10 * 60))) {
+    if (!(await dentroDoLimite(`track:${ipDe(request)}`, 200, 10 * 60))) {
       return Response.json({ ok: false }, { status: 429 });
     }
 
@@ -97,16 +112,29 @@ export async function POST(request) {
       return Response.json({ ok: false }, { status: 400 });
     }
 
-    // País de origem dado pela Vercel (sem guardar IP — privacidade/RGPD).
-    const pais = request.headers.get("x-vercel-ip-country") || "";
+    // Localização aproximada dada pela Vercel a partir do IP, no momento —
+    // o IP em si não é guardado (privacidade/RGPD).
+    const pais = (request.headers.get("x-vercel-ip-country") || "").slice(0, 2).toUpperCase();
+    const regiao = (request.headers.get("x-vercel-ip-country-region") || "").slice(0, 10);
+    const cidade = descodificarCidade(request.headers.get("x-vercel-ip-city"));
+    const f =
+      tipo === "origem"
+        ? v.slice(0, 60)
+        : typeof fonte === "string"
+          ? fonte.trim().slice(0, 60)
+          : "";
+
+    const evento = { tipo, valor: v, pais, criadoEm: new Date(), dispositivo };
+    if (cidade) evento.cidade = cidade;
+    if (regiao) evento.regiao = regiao;
+    if (f) evento.fonte = f;
+    if (pagina) {
+      evento.caminho = pagina.caminho;
+      evento.lang = pagina.lang;
+    }
 
     const db = await getDb();
-    await db.collection("eventos").insertOne({
-      tipo,
-      valor: v,
-      pais,
-      criadoEm: new Date(),
-    });
+    await db.collection("eventos").insertOne(evento);
     return Response.json({ ok: true });
   } catch {
     // Silencioso — tracking nunca pode partir a navegação.
