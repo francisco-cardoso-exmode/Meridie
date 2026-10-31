@@ -3,25 +3,25 @@
 import { useEffect, useRef } from "react";
 import "leaflet/dist/leaflet.css";
 import { useT } from "@/components/LangProvider";
+import { CORES_PONTO, temMapa } from "@/lib/mapa";
 
-// Cores dos marcadores por tipo de ponto de interesse.
-export const CORES_PONTO = {
-  historico: "#c89b3c",
-  praia: "#1f9bb0",
-  montanha: "#3b8c5a",
-  natureza: "#3b8c5a",
-  cidade: "#1b3f6e",
-  gastronomia: "#b4564b",
-};
+// As cores vivem em lib/mapa.js (a página de servidor também as usa na legenda).
+export { CORES_PONTO };
 
-export default function RegionMap({ mapa, pontos = [], nome }) {
+// Default estável (um [] novo em cada render recriava o mapa).
+const SEM_PONTOS = [];
+
+const escapaHtml = (s) =>
+  String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+
+export default function RegionMap({ mapa, pontos = SEM_PONTOS, nome }) {
   const { t, tf } = useT();
   const elRef = useRef(null);
   const mapRef = useRef(null);
 
   useEffect(() => {
     if (!elRef.current || mapRef.current) return;
-    if (!mapa || typeof mapa.lat !== "number") return;
+    if (!temMapa(mapa)) return;
     let cancelado = false;
 
     (async () => {
@@ -31,7 +31,7 @@ export default function RegionMap({ mapa, pontos = [], nome }) {
       const map = L.map(elRef.current, {
         scrollWheelZoom: false,
         attributionControl: true,
-      }).setView([mapa.lat, mapa.lng], mapa.zoom);
+      }).setView([mapa.lat, mapa.lng], mapa.zoom || 11);
       mapRef.current = map;
 
       // Tiles do OpenStreetMap: não exigem chave de API (os da CARTO passaram a
@@ -42,7 +42,8 @@ export default function RegionMap({ mapa, pontos = [], nome }) {
         maxZoom: 19,
       }).addTo(map);
 
-      pontos.forEach((p) => {
+      (pontos || []).forEach((p) => {
+        if (typeof p?.lat !== "number" || typeof p?.lng !== "number") return;
         const cor = CORES_PONTO[p.tipo] || "#1b3f6e";
         const icon = L.divIcon({
           className: "rm-pin",
@@ -53,7 +54,7 @@ export default function RegionMap({ mapa, pontos = [], nome }) {
         });
         L.marker([p.lat, p.lng], { icon, title: p.nome })
           .addTo(map)
-          .bindPopup(`<strong>${p.nome}</strong>`);
+          .bindPopup(`<strong>${escapaHtml(p.nome)}</strong>`);
       });
     })();
 
@@ -65,6 +66,9 @@ export default function RegionMap({ mapa, pontos = [], nome }) {
       }
     };
   }, [mapa, pontos]);
+
+  // Sem coordenadas não há mapa — nem uma caixa vazia.
+  if (!temMapa(mapa)) return null;
 
   return (
     <div

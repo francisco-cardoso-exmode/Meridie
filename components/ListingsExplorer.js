@@ -33,6 +33,22 @@ export const ESTADOS_ORDEM = [
   "Pronto",
 ];
 
+// Imóvel sem preço publicado ("sob consulta" ou sem valor): não entra nos
+// filtros de preço e fica sempre no fim quando se ordena por preço.
+const semPreco = (e) => e.precoTipo === "consulta" || !(Number(e.preco) > 0);
+
+// Filtros ↔ query string (?q=&pais=&zona=…), para a pesquisa poder ser partilhada.
+const PARAMS = {
+  texto: "q",
+  pais: "pais",
+  zona: "zona",
+  tipo: "tipo",
+  finalidade: "fin",
+  estado: "estado",
+  preco: "preco",
+  ordenacao: "ord",
+};
+
 const norm = (s) =>
   (s || "")
     .toString()
@@ -79,6 +95,50 @@ export default function ListingsExplorer({
   };
   const reset = () => setF(ESTADO_INICIAL);
 
+  // Ao montar, aplica os filtros que vierem no URL (só valores válidos).
+  // Lê window.location em vez de useSearchParams para a página continuar
+  // estática (e a lista completa no HTML) — os filtros entram depois.
+  const [lidoDoUrl, setLidoDoUrl] = useState(false);
+  useEffect(() => {
+    const sp = new URLSearchParams(window.location.search);
+    const validos = {
+      pais: paises,
+      zona: zonas,
+      tipo: tipos,
+      finalidade: finalidades,
+      estado: ESTADOS_ORDEM,
+      preco: Object.keys(FAIXAS),
+      ordenacao: Object.keys(ORDENACOES),
+    };
+    const novo = {};
+    for (const [campo, chave] of Object.entries(PARAMS)) {
+      const v = sp.get(chave);
+      if (!v) continue;
+      if (campo === "texto" ? comBusca : (validos[campo] || []).includes(v)) novo[campo] = v;
+    }
+    if (Object.keys(novo).length) {
+      setF((prev) => ({ ...prev, ...novo }));
+      if (colapsavel && Object.keys(novo).some((k) => k !== "texto")) setAberto(true);
+    }
+    setLidoDoUrl(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Escreve os filtros ativos na query string (sem recarregar nem criar histórico).
+  useEffect(() => {
+    if (!lidoDoUrl) return;
+    const url = new URL(window.location.href);
+    for (const [campo, chave] of Object.entries(PARAMS)) {
+      const v = f[campo];
+      if (v && v !== ESTADO_INICIAL[campo]) url.searchParams.set(chave, v);
+      else url.searchParams.delete(chave);
+    }
+    if (url.href !== window.location.href) {
+      window.history.replaceState(window.history.state, "", url.href);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [f, lidoDoUrl]);
+
   // Regista a pesquisa (depois de o utilizador parar de escrever).
   useEffect(() => {
     const q = f.texto.trim().toLowerCase();
@@ -97,6 +157,7 @@ export default function ListingsExplorer({
       if (f.finalidade && e.finalidade !== f.finalidade) return false;
       if (f.estado && e.estado !== f.estado) return false;
       if (f.preco) {
+        if (semPreco(e)) return false;
         const [min, max] = f.preco.split("-").map(Number);
         const v = precoEur(e);
         if (min && v < min) return false;
@@ -110,6 +171,11 @@ export default function ListingsExplorer({
             e.zona,
             e.tipo,
             e.finalidade,
+            // Em inglês, também as etiquetas traduzidas ("Apartment", "Holiday"…).
+            tr(e.tipo),
+            tr(e.finalidade),
+            tr(e.estado),
+            tr(PAIS_LABEL[e.pais] || ""),
             e.construtora,
             referenciaDe(e),
           ].join(" ")
@@ -119,14 +185,18 @@ export default function ListingsExplorer({
       return true;
     });
 
+    // Sem preço vai sempre para o fim, nas duas ordens.
+    const porPreco = (dir) => (a, b) =>
+      semPreco(a) - semPreco(b) || dir * (precoEur(a) - precoEur(b));
     const ord = {
-      "preco-asc": (a, b) => precoEur(a) - precoEur(b),
-      "preco-desc": (a, b) => precoEur(b) - precoEur(a),
+      "preco-asc": porPreco(1),
+      "preco-desc": porPreco(-1),
       "area-desc": (a, b) => b.area - a.area,
       destaque: (a, b) => Number(b.destaque) - Number(a.destaque),
     }[f.ordenacao];
 
     return [...lista].sort(ord);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [empreendimentos, f, comPais, taxa]);
 
   const ativo =

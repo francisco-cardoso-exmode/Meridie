@@ -10,7 +10,7 @@ export default function MarcasFaixa({ marcas }) {
         const foto = m.logo || m.produtos?.find((p) => p.imagem)?.imagem || m.imagens?.[0];
         return (
           <L href={`/marcas/${m.slug}`} key={m.slug} className="marcas-faixa-item" title={m.nome}>
-            {foto && <img src={foto} alt={m.nome} loading="lazy" />}
+            {foto && <img src={foto} alt={m.nome} loading="lazy" width={240} height={120} />}
             <span>{m.nome}</span>
           </L>
         );

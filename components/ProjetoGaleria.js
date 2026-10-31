@@ -19,7 +19,7 @@ export default function ProjetoGaleria({ imagens = [], nome = "" }) {
       <div className="gallery">
         <div className="main">
           <button type="button" className="galeria-btn" onClick={() => setIndice(0)}>
-            <img src={imagens[0]} alt={nome} />
+            <img src={imagens[0]} alt={nome} width={1280} height={800} fetchPriority="high" />
           </button>
         </div>
         {lado.length > 0 && (
@@ -31,7 +31,7 @@ export default function ProjetoGaleria({ imagens = [], nome = "" }) {
                   className="galeria-btn"
                   onClick={() => setIndice(i + 1)}
                 >
-                  <img src={img} alt={tf("{nome} — foto {i}", { nome, i: i + 2 })} loading="lazy" />
+                  <img src={img} alt={tf("{nome} — foto {i}", { nome, i: i + 2 })} loading="lazy" width={640} height={400} />
                   {i === lado.length - 1 && extra > 0 && (
                     <span className="galeria-mais">+{extra} {t("fotos")}</span>
                   )}

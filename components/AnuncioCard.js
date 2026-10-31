@@ -13,7 +13,7 @@ export default function AnuncioCard({ anuncio: a }) {
       rel="noopener"
       className="pub-card"
     >
-      {a.imagem && <img src={a.imagem} alt={a.titulo} loading="lazy" />}
+      {a.imagem && <img src={a.imagem} alt={a.titulo} loading="lazy" width={800} height={500} />}
       <div className="pub-body">
         <span className="rb-tag">{t(a.categoria || "Publicidade")}</span>
         <h3>{a.titulo}</h3>

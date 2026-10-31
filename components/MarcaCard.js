@@ -10,7 +10,7 @@ export default function MarcaCard({ marca: m }) {
   const n = m.produtos?.length || 0;
   return (
     <L href={`/marcas/${m.slug}`} className="marca-card">
-      <div className="marca-foto">{foto && <img src={foto} alt={m.nome} loading="lazy" />}</div>
+      <div className="marca-foto">{foto && <img src={foto} alt={m.nome} loading="lazy" width={600} height={600} />}</div>
       <div className="marca-body">
         {m.origem && <span className="marca-origem">{m.origem}</span>}
         <h3>{m.nome}</h3>
