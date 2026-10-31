@@ -86,7 +86,7 @@ export async function POST(request) {
       dentroDoLimite(`contacto-dia:${ip}`, 10, 24 * 60 * 60),
     ]);
     if (!curto || !diario) {
-      return erro("Demasiados pedidos. Tenta novamente mais tarde.", 429);
+      return erro("Demasiados pedidos. Tenta novamente daqui a alguns minutos.", 429);
     }
 
     // Origem do formulário: só slugs simples; se for um empreendimento, liga-se a ele.

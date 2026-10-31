@@ -156,7 +156,7 @@ export async function POST(request) {
     // Só se limita o que chega à IA (as respostas em cache são grátis).
     if (!(await dentroDoLimite(`comparar:${ipDe(request)}`, 10, 60 * 60))) {
       return Response.json(
-        { erro: "Demasiados pedidos. Tenta novamente mais tarde." },
+        { erro: "Demasiados pedidos. Tenta novamente daqui a alguns minutos." },
         { status: 429 }
       );
     }
