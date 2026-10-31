@@ -6,6 +6,10 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   const c = await getCambio();
+  // Taxa de recurso (fontes em baixo): cache curta, para a CDN não a servir
+  // durante 15 minutos depois de as fontes voltarem.
+  const sMaxAge = c.aoVivo ? CAMBIO_TTL : 60;
+  const swr = c.aoVivo ? 3600 : 60;
   return Response.json(
     {
       taxa: c.taxa,
@@ -14,7 +18,7 @@ export async function GET() {
     },
     {
       headers: {
-        "Cache-Control": `public, s-maxage=${CAMBIO_TTL}, stale-while-revalidate=3600`,
+        "Cache-Control": `public, s-maxage=${sMaxAge}, stale-while-revalidate=${swr}`,
       },
     }
   );

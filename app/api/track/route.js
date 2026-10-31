@@ -1,4 +1,6 @@
 import { getDb } from "@/lib/mongodb";
+import { dentroDoLimite, ipDe } from "@/lib/rateLimit";
+import { allEmpreendimentos } from "@/lib/store";
 
 export const dynamic = "force-dynamic";
 
@@ -13,20 +15,90 @@ const TIPOS = new Set([
   "origem",
 ]);
 
+// Eventos cujo valor tem de ser um empreendimento que existe.
+const COM_SLUG = new Set(["empreendimento_visto", "comparacao", "interesse", "lead_enviada"]);
+// Origens do formulário que não são empreendimentos.
+const ORIGENS_FIXAS = new Set(["contacto"]);
+
+// Conjunto de slugs em memória, renovado a cada 5 minutos.
+const SLUGS_TTL = 5 * 60 * 1000;
+let slugsCache = { set: null, em: 0 };
+
+async function slugsExistentes() {
+  if (slugsCache.set && Date.now() - slugsCache.em < SLUGS_TTL) return slugsCache.set;
+  const lista = await allEmpreendimentos({ todos: true });
+  slugsCache = { set: new Set(lista.map((e) => e.slug).filter(Boolean)), em: Date.now() };
+  return slugsCache.set;
+}
+
+async function valorValido(tipo, v) {
+  if (!COM_SLUG.has(tipo)) return true;
+  const slugs = await slugsExistentes();
+  if (tipo === "comparacao") {
+    const partes = v.split("|");
+    return partes.length === 2 && partes.every((s) => slugs.has(s));
+  }
+  if (tipo === "interesse" || tipo === "lead_enviada") {
+    return ORIGENS_FIXAS.has(v) || slugs.has(v);
+  }
+  return slugs.has(v);
+}
+
+// Hosts aceites como origem do pedido: o próprio site (e localhost em dev).
+function hostsDoSite(request) {
+  const hosts = new Set(["localhost", "127.0.0.1"]);
+  for (const u of [process.env.NEXT_PUBLIC_SITE_URL, process.env.SITE_URL]) {
+    try {
+      if (u) hosts.add(new URL(u).hostname);
+    } catch {}
+  }
+  for (const h of [process.env.VERCEL_URL, process.env.VERCEL_PROJECT_PRODUCTION_URL]) {
+    if (h) hosts.add(h.split(":")[0]);
+  }
+  const host = request.headers.get("x-forwarded-host") || request.headers.get("host");
+  if (host) hosts.add(host.split(":")[0]);
+  return hosts;
+}
+
+function origemPermitida(request) {
+  const origem = request.headers.get("origin") || request.headers.get("referer");
+  if (!origem) return false;
+  try {
+    const host = new URL(origem).hostname;
+    const hosts = hostsDoSite(request);
+    // Aceita também o "www." do domínio (e vice-versa).
+    return hosts.has(host) || hosts.has(host.replace(/^www\./, "")) || hosts.has(`www.${host}`);
+  } catch {
+    return false;
+  }
+}
+
 export async function POST(request) {
   try {
+    if (!origemPermitida(request)) {
+      return Response.json({ ok: false }, { status: 403 });
+    }
+
     const { tipo, valor } = await request.json();
     if (!TIPOS.has(tipo)) {
       return Response.json({ ok: false }, { status: 400 });
     }
-    const v = (valor || "").toString().trim().slice(0, 140);
+    const v = (typeof valor === "string" || typeof valor === "number" ? String(valor) : "")
+      .trim()
+      .slice(0, 140);
     if (!v) return Response.json({ ok: true });
 
+    // Limite generoso por IP (o IP não é guardado nos eventos).
+    if (!(await dentroDoLimite(`track:${ipDe(request)}`, 120, 10 * 60))) {
+      return Response.json({ ok: false }, { status: 429 });
+    }
+
+    if (!(await valorValido(tipo, v))) {
+      return Response.json({ ok: false }, { status: 400 });
+    }
+
     // País de origem dado pela Vercel (sem guardar IP — privacidade/RGPD).
-    const pais =
-      request.headers.get("x-vercel-ip-country") ||
-      request.headers.get("x-country") ||
-      "";
+    const pais = request.headers.get("x-vercel-ip-country") || "";
 
     const db = await getDb();
     await db.collection("eventos").insertOne({
