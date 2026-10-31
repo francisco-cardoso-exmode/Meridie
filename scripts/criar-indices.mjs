@@ -24,13 +24,22 @@ const INDICES = [
   ["regioes", { parent: 1 }, { name: "parent" }],
   ["marcas", { slug: 1 }, { unique: true, name: "slug_unico" }],
   ["anuncios", { slug: 1 }, { unique: true, name: "slug_unico" }],
+  // Analytics: todas as agregações começam por um intervalo de criadoEm.
+  // O índice TTL em { criadoEm: 1 } serve também de índice por data.
   ["eventos", { tipo: 1, criadoEm: 1 }, { name: "tipo_criadoEm" }],
-  ["eventos", { tipo: 1, valor: 1 }, { name: "tipo_valor" }],
-  ["eventos", { pais: 1 }, { name: "pais" }],
+  ["eventos", { tipo: 1, valor: 1, criadoEm: 1 }, { name: "tipo_valor_criadoEm" }],
+  ["eventos", { pais: 1, cidade: 1, criadoEm: 1 }, { name: "pais_cidade_criadoEm" }],
+  ["eventos", { caminho: 1, criadoEm: 1 }, { name: "caminho_criadoEm" }],
   ["eventos", { criadoEm: 1 }, { expireAfterSeconds: 400 * DIA, name: "ttl_400_dias" }],
   ["comparacoes_cache", { key: 1 }, { unique: true, name: "key_unica" }],
   ["comparacoes_cache", { criadoEm: 1 }, { expireAfterSeconds: 30 * DIA, name: "ttl_30_dias" }],
   ["contactos", { criadoEm: -1 }, { name: "criadoEm_desc" }],
+];
+
+// Índices substituídos por outros que começam pelas mesmas chaves.
+const OBSOLETOS = [
+  ["eventos", "tipo_valor"], // → tipo_valor_criadoEm
+  ["eventos", "pais"], // → pais_cidade_criadoEm
 ];
 
 const c = new MongoClient(process.env.MONGODB_URI);
@@ -54,6 +63,18 @@ for (const [colecao, chaves, opcoes] of INDICES) {
         ])
         .toArray();
       console.log(`    slugs repetidos: ${repetidos.map((r) => `${r._id} (${r.n}×)`).join(", ")}`);
+    }
+  }
+}
+
+// Só apaga os antigos depois de os novos existirem.
+if (!falhas) {
+  for (const [colecao, nome] of OBSOLETOS) {
+    try {
+      await db.collection(colecao).dropIndex(nome);
+      console.log(`  − ${colecao}.${nome} (substituído)`);
+    } catch {
+      // Já não existe — nada a fazer.
     }
   }
 }
