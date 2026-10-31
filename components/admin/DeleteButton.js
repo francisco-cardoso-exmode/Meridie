@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { pedidoAdmin } from "@/lib/adminCliente";
 
 export default function DeleteButton({ slug, nome, endpoint = "empreendimentos" }) {
   const [a, setA] = useState("idle");
@@ -8,15 +9,17 @@ export default function DeleteButton({ slug, nome, endpoint = "empreendimentos" 
   async function apagar() {
     if (!confirm(`Apagar "${nome}"? Esta ação não pode ser desfeita.`)) return;
     setA("loading");
-    try {
-      const res = await fetch(`/api/admin/${endpoint}/${slug}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("falhou");
+    const r = await pedidoAdmin(`/api/admin/${endpoint}/${encodeURIComponent(slug)}`, {
+      method: "DELETE",
+    });
+    // 404: já não existia — recarregar mostra a lista certa.
+    if (r.ok || r.status === 404) {
       // Recarrega a página inteira (mais robusto que router.refresh em produção).
       window.location.reload();
-    } catch {
-      alert("Não foi possível apagar. Tenta novamente.");
-      setA("idle");
+      return;
     }
+    alert(r.erro || "Não foi possível apagar. Tenta novamente.");
+    setA("idle");
   }
 
   return (

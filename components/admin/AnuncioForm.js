@@ -4,19 +4,13 @@ import { useState } from "react";
 import VersaoInglesa from "@/components/admin/VersaoInglesa";
 import ImageUploader from "@/components/admin/ImageUploader";
 import { CATEGORIAS_PARCEIRO } from "@/lib/categoriasParceiro";
-
-const slugify = (s) =>
-  (s || "")
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/\p{Diacritic}/gu, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
+import { pedidoAdmin, useAvisoSaida, useEnEditado } from "@/lib/adminCliente";
+import { slugify } from "@/lib/slug";
 
 export default function AnuncioForm({ initial = null }) {
   const editing = !!initial;
   const [estado, setEstado] = useState({ a: "idle", msg: "" });
-  const [en, setEn] = useState(initial?.en || null);
+  const { enEditado, temEnEditado, enMostrado, mudarEn } = useEnEditado(initial?.en);
   const [f, setF] = useState({
     titulo: initial?.titulo || "",
     texto: initial?.texto || "",
@@ -29,6 +23,10 @@ export default function AnuncioForm({ initial = null }) {
     mostrarHome: initial?.mostrarHome ?? true,
     ativo: initial?.ativo !== false,
   });
+  // Aviso ao sair com alterações por gravar.
+  const [inicialJson] = useState(() => JSON.stringify(f));
+  const libertar = useAvisoSaida(JSON.stringify(f) !== inicialJson || temEnEditado);
+
   const set = (k) => (e) =>
     setF((p) => ({ ...p, [k]: e.target.type === "checkbox" ? e.target.checked : e.target.value }));
 
@@ -48,21 +46,17 @@ export default function AnuncioForm({ initial = null }) {
       mostrarHome: !!f.mostrarHome,
       ativo: !!f.ativo,
     };
-    try {
-      const url = editing ? `/api/admin/anuncios/${initial.slug}` : "/api/admin/anuncios";
-      const res = await fetch(url, {
-        method: editing ? "PUT" : "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(en ? { ...doc, en } : doc),
-      });
-      const json = await res.json();
-      if (res.ok && json.ok) {
-        window.location.href = "/admin/publicidade";
-      } else {
-        setEstado({ a: "erro", msg: json.erro || "Erro ao guardar." });
-      }
-    } catch {
-      setEstado({ a: "erro", msg: "Erro de ligação." });
+    const url = editing ? `/api/admin/anuncios/${encodeURIComponent(initial.slug)}` : "/api/admin/anuncios";
+    // Só as correções inglesas feitas nesta edição (o servidor junta-as).
+    const r = await pedidoAdmin(url, {
+      method: editing ? "PUT" : "POST",
+      body: temEnEditado ? { ...doc, enEditado } : doc,
+    });
+    if (r.ok) {
+      libertar();
+      window.location.href = "/admin/publicidade";
+    } else {
+      setEstado({ a: "erro", msg: r.erro });
     }
   }
 
@@ -118,7 +112,7 @@ export default function AnuncioForm({ initial = null }) {
         Ativo
       </label>
       {estado.a === "erro" && <div className="form-msg erro">{estado.msg}</div>}
-      {initial && <VersaoInglesa colecao="anuncios" doc={initial} en={en} onChange={setEn} />}
+      {initial && <VersaoInglesa colecao="anuncios" doc={initial} en={enMostrado} onChange={mudarEn} />}
       <div className="admin-form-actions">
         <button type="submit" className="btn btn-primary" disabled={estado.a === "loading"}>
           {estado.a === "loading" ? "A guardar..." : editing ? "Guardar" : "Criar parceiro"}

@@ -1,41 +1,29 @@
-import { NextResponse, after } from "next/server";
-import { traduzirEmFundo } from "@/lib/traducao";
-import { getDb } from "@/lib/mongodb";
-import { isAdmin } from "@/lib/adminAuth";
-import { revalidaSite } from "@/lib/revalida";
+import { atualizar, apagar } from "@/lib/crudAdmin";
 
 export const dynamic = "force-dynamic";
 // A tradução para inglês corre em segundo plano depois de responder.
 export const maxDuration = 120;
 
 export async function PUT(request, { params }) {
-  if (!(await isAdmin()))
-    return NextResponse.json({ ok: false }, { status: 401 });
-
-  const { slug } = await params;
-  const doc = await request.json().catch(() => null);
-  if (!doc) return NextResponse.json({ ok: false }, { status: 400 });
-
-  delete doc._id;
-  delete doc.enFonte;
-  doc.slug = slug;
-
-  const db = await getDb();
-  const antes = await db.collection("regioes").findOne({ slug }, { projection: { en: 1 } });
-  const r = await db.collection("regioes").updateOne({ slug }, { $set: doc });
-  if (!r.matchedCount)
-    return NextResponse.json({ ok: false, erro: "Não encontrado." }, { status: 404 });
-  revalidaSite();
-  after(() => traduzirEmFundo("regioes", slug, antes?.en ?? null));
-  return NextResponse.json({ ok: true });
+  return atualizar(request, params, "regioes", {
+    validar: (doc, slug) =>
+      doc.parent === slug ? "Uma região não pode pertencer a si própria." : null,
+  });
 }
 
+// Uma região com zonas não se apaga: as zonas ficavam a apontar para nada.
 export async function DELETE(request, { params }) {
-  if (!(await isAdmin()))
-    return NextResponse.json({ ok: false }, { status: 401 });
-  const { slug } = await params;
-  const db = await getDb();
-  await db.collection("regioes").deleteOne({ slug });
-  revalidaSite();
-  return NextResponse.json({ ok: true });
+  return apagar(params, "regioes", {
+    podeApagar: async (db, slug) => {
+      const zonas = await db
+        .collection("regioes")
+        .find({ parent: slug }, { projection: { _id: 0, nome: 1, slug: 1 } })
+        .toArray();
+      if (!zonas.length) return null;
+      return (
+        `Esta região tem ${zonas.length} zona(s): ${zonas.map((z) => z.nome || z.slug).join(", ")}. ` +
+        "Muda-as para outra região (campo \"Pertence a\") ou apaga-as primeiro."
+      );
+    },
+  });
 }

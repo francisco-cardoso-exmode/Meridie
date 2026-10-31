@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { pedidoAdmin, useAvisoSaida, useEnEditado } from "@/lib/adminCliente";
+import { slugify } from "@/lib/slug";
 import VersaoInglesa from "@/components/admin/VersaoInglesa";
 import Link from "next/link";
 import ImageUploader from "@/components/admin/ImageUploader";
@@ -57,7 +59,7 @@ const textoParaLinks = (s) =>
 export default function EmpreendimentoForm({ initial = null, regioesExistentes = [] }) {
   const editing = !!initial;
   const [estado, setEstado] = useState({ a: "idle", msg: "" });
-  const [en, setEn] = useState(initial?.en || null);
+  const { enEditado, temEnEditado, enMostrado, mudarEn } = useEnEditado(initial?.en);
 
   const [f, setF] = useState({
     slug: initial?.slug || "",
@@ -90,6 +92,10 @@ export default function EmpreendimentoForm({ initial = null, regioesExistentes =
     links: linksParaTexto(initial?.links),
     precoTipo: initial?.precoTipo || "exato",
   });
+
+  // Aviso ao sair com alterações por gravar.
+  const [inicialJson] = useState(() => JSON.stringify(f));
+  const libertar = useAvisoSaida(JSON.stringify(f) !== inicialJson || temEnEditado);
 
   const set = (campo) => (e) => {
     const v = e.target.type === "checkbox" ? e.target.checked : e.target.value;
@@ -135,25 +141,23 @@ export default function EmpreendimentoForm({ initial = null, regioesExistentes =
       proximidades: linhasParaArray(f.proximidades),
     };
 
-    try {
-      const url = editing
-        ? `/api/admin/empreendimentos/${initial.slug}`
-        : "/api/admin/empreendimentos";
-      const res = await fetch(url, {
-        method: editing ? "PUT" : "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(en ? { ...doc, en } : doc),
-      });
-      const json = await res.json();
-      if (res.ok && json.ok) {
-        window.location.href = "/admin/empreendimentos";
-      } else {
-        setEstado({ a: "erro", msg: json.erro || "Erro ao guardar." });
-      }
-    } catch {
-      setEstado({ a: "erro", msg: "Erro de ligação." });
+    const url = editing
+      ? `/api/admin/empreendimentos/${encodeURIComponent(initial.slug)}`
+      : "/api/admin/empreendimentos";
+    // Só as correções inglesas feitas nesta edição (o servidor junta-as).
+    const r = await pedidoAdmin(url, {
+      method: editing ? "PUT" : "POST",
+      body: temEnEditado ? { ...doc, enEditado } : doc,
+    });
+    if (r.ok) {
+      libertar();
+      window.location.href = "/admin/empreendimentos";
+    } else {
+      setEstado({ a: "erro", msg: r.erro });
     }
   }
+
+  const slugFinal = slugify(f.slug);
 
   const cidadeTrim = f.cidade.trim();
   const zonaTrim = f.zona.trim();
@@ -172,6 +176,7 @@ export default function EmpreendimentoForm({ initial = null, regioesExistentes =
         <label>
           Slug (URL) {editing && <small>— não editável</small>}
           <input value={f.slug} onChange={set("slug")} required readOnly={editing} placeholder="ex: vibe-meireles-fortaleza" />
+          {!editing && f.slug && slugFinal !== f.slug && <small>Vai ficar: {slugFinal || "—"}</small>}
         </label>
         <label>
           Nome
@@ -338,7 +343,7 @@ export default function EmpreendimentoForm({ initial = null, regioesExistentes =
 
       {estado.a === "erro" && <div className="form-msg erro">{estado.msg}</div>}
 
-      {initial && <VersaoInglesa colecao="empreendimentos" doc={initial} en={en} onChange={setEn} />}
+      {initial && <VersaoInglesa colecao="empreendimentos" doc={initial} en={enMostrado} onChange={mudarEn} />}
       <div className="admin-form-actions">
         <button type="submit" className="btn btn-primary" disabled={estado.a === "loading"}>
           {estado.a === "loading" ? "A guardar..." : editing ? "Guardar alterações" : "Criar empreendimento"}
@@ -393,7 +398,7 @@ export default function EmpreendimentoForm({ initial = null, regioesExistentes =
           </div>
         )}
         {editing ? (
-          <Link href={`/empreendimentos/${initial.slug}`} target="_blank" className="btn-ver-site">
+          <Link href={`/empreendimentos/${encodeURIComponent(initial.slug)}`} target="_blank" className="btn-ver-site">
             Ver página completa no site ↗
           </Link>
         ) : (

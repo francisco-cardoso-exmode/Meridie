@@ -1,20 +1,19 @@
 import { getDb } from "@/lib/mongodb";
+import { leAdmin } from "@/lib/leituraAdmin";
+import AvisoSemBase from "@/components/admin/AvisoSemBase";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Leads" };
 
 async function getLeads() {
-  try {
-    const db = await getDb();
-    return await db
-      .collection("contactos")
-      .find({}, { projection: { _id: 0 } })
-      .sort({ criadoEm: -1 })
-      .limit(300)
-      .toArray();
-  } catch {
-    return [];
-  }
+  if (!process.env.MONGODB_URI) return [];
+  const db = await getDb();
+  return await db
+    .collection("contactos")
+    .find({})
+    .sort({ criadoEm: -1 })
+    .limit(300)
+    .toArray();
 }
 
 function dataPt(d) {
@@ -26,6 +25,7 @@ function dataPt(d) {
       year: "numeric",
       hour: "2-digit",
       minute: "2-digit",
+      timeZone: "Europe/Lisbon",
     });
   } catch {
     return "";
@@ -33,23 +33,24 @@ function dataPt(d) {
 }
 
 export default async function AdminLeads() {
-  const leads = await getLeads();
+  const { dados: leads, semBase } = await leAdmin(getLeads, []);
 
   return (
     <div className="admin-container">
       <h1>Leads</h1>
+      <AvisoSemBase mostrar={semBase} />
       <p className="admin-sub">
-        {leads.length} mensagem(ns) recebida(s) pelo formulário de contacto.
+        {semBase ? "Não foi possível ler as mensagens." : `${leads.length} mensagem(ns) recebida(s) pelo formulário de contacto.`}
       </p>
 
-      {leads.length === 0 ? (
+      {semBase ? null : leads.length === 0 ? (
         <div className="empty-state">
           <p>Ainda não há mensagens. Aparecem aqui assim que alguém submeter o formulário.</p>
         </div>
       ) : (
         <div className="leads-list">
-          {leads.map((l, i) => (
-            <div className="lead-card" key={i}>
+          {leads.map((l) => (
+            <div className="lead-card" key={String(l._id)}>
               <div className="lead-top">
                 <div>
                   <strong>{l.nome || "—"}</strong>{" "}

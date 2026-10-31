@@ -3,22 +3,19 @@ import { allMarcas, garanteSeed, AREAS_MARCA } from "@/lib/marcas";
 import { getDb } from "@/lib/mongodb";
 import { thumbUrl } from "@/lib/format";
 import DeleteButton from "@/components/admin/DeleteButton";
+import AvisoSemBase from "@/components/admin/AvisoSemBase";
+import { leAdmin } from "@/lib/leituraAdmin";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Marcas" };
 
 export default async function AdminMarcas() {
-  // Na primeira visita, grava as marcas de exemplo na base de dados (o site
-  // público já as mostra, por isso não é preciso invalidar a cache).
-  if (process.env.MONGODB_URI) {
-    try {
-      const db = await getDb();
-      await garanteSeed(db);
-    } catch {
-      // sem ligação: a lista mostra o seed na mesma
-    }
-  }
-  const lista = await allMarcas({ todos: true });
+  // Na primeira visita de sempre, grava as marcas de exemplo na base de dados
+  // (só uma vez — se forem apagadas, não voltam).
+  const { dados: lista, semBase } = await leAdmin(async () => {
+    if (process.env.MONGODB_URI) await garanteSeed(await getDb());
+    return allMarcas({ todos: true, estrito: true });
+  }, []);
   return (
     <div className="admin-container">
       <div className="admin-head">
@@ -33,8 +30,9 @@ export default async function AdminMarcas() {
         <Link href="/admin/marcas/novo" className="btn btn-primary">+ Nova</Link>
       </div>
 
+      <AvisoSemBase mostrar={semBase} />
       <div className="admin-list">
-        {lista.length === 0 && (
+        {!semBase && lista.length === 0 && (
           <div className="empty-state"><p>Ainda não há marcas. Cria a primeira.</p></div>
         )}
         {lista.map((m) => (
@@ -55,7 +53,7 @@ export default async function AdminMarcas() {
               </div>
             </div>
             <div className="admin-row-actions">
-              <Link href={`/admin/marcas/${m.slug}`} className="admin-link">Editar</Link>
+              <Link href={`/admin/marcas/${encodeURIComponent(m.slug)}`} className="admin-link">Editar</Link>
               <DeleteButton slug={m.slug} nome={m.nome} endpoint="marcas" />
             </div>
           </div>

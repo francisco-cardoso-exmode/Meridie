@@ -4,25 +4,33 @@ import { formatarPreco, referenciaDe } from "@/lib/empreendimentos";
 import { thumbUrl } from "@/lib/format";
 import DeleteButton from "@/components/admin/DeleteButton";
 import RefCopy from "@/components/admin/RefCopy";
+import AvisoSemBase from "@/components/admin/AvisoSemBase";
+import { leAdmin } from "@/lib/leituraAdmin";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Empreendimentos" };
 
 export default async function AdminEmpreendimentos() {
-  const lista = await allEmpreendimentos({ todos: true });
+  const { dados: lista, semBase } = await leAdmin(
+    () => allEmpreendimentos({ todos: true, estrito: true }),
+    []
+  );
 
   return (
     <div className="admin-container">
       <div className="admin-head">
         <div>
           <h1>Empreendimentos</h1>
-          <p className="admin-sub">{lista.length} no total. Cada card é um empreendimento.</p>
+          <p className="admin-sub">
+            {semBase ? "—" : lista.length} no total. Cada card é um empreendimento.
+          </p>
         </div>
         <Link href="/admin/empreendimentos/novo" className="btn btn-primary">
           + Novo
         </Link>
       </div>
 
+      <AvisoSemBase mostrar={semBase} />
       <div className="admin-list">
         {lista.map((e) => (
           <div className="admin-row" key={e.slug}>
@@ -42,10 +50,10 @@ export default async function AdminEmpreendimentos() {
             </div>
             <RefCopy valor={referenciaDe(e)} />
             <div className="admin-row-actions">
-              <Link href={`/empreendimentos/${e.slug}`} target="_blank" className="admin-link">
+              <Link href={`/empreendimentos/${encodeURIComponent(e.slug)}`} target="_blank" className="admin-link">
                 Ver
               </Link>
-              <Link href={`/admin/empreendimentos/${e.slug}`} className="admin-link">
+              <Link href={`/admin/empreendimentos/${encodeURIComponent(e.slug)}`} className="admin-link">
                 Editar
               </Link>
               <DeleteButton slug={e.slug} nome={e.nome} />
