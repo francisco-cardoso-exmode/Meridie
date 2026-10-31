@@ -54,7 +54,7 @@ export default async function PrivacidadePage({ params }) {
             <strong>{T("Dados de contacto que nos forneces")}</strong>{" "}{T("através dos formulários (nome, email e a mensagem/assunto que escreves).")}
           </li>
           <li>
-            <strong>{T("Dados de navegação anónimos")}</strong>{" "}{T("— páginas e empreendimentos vistos, pesquisas e filtros usados, e o país de acesso. Não guardamos o teu endereço IP.")}
+            <strong>{T("Dados de navegação anónimos")}</strong>{" "}{T("— páginas e empreendimentos vistos, pesquisas e filtros usados, de onde chegaste ao site (ex.: Google), o tipo de dispositivo (telemóvel, tablet ou computador) e a localização aproximada (país, região e cidade, estimados a partir do endereço IP no momento do acesso). Não guardamos o teu endereço IP nem usamos cookies para isto: durante a visita, o navegador guarda apenas a origem da visita (sessionStorage), que se apaga quando fechas o separador. Estes dados são apagados automaticamente ao fim de cerca de 13 meses.")}
           </li>
           <li>
             <strong>{T("Cookies de análise")}</strong>{" "}{T("(Google Analytics), apenas se deres o teu consentimento — ver a")}{" "}<L href="/cookies">{T("Política de Cookies")}</L>.
