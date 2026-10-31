@@ -5,7 +5,7 @@ import Icon from "@/components/Icon";
 import { useT } from "@/components/LangProvider";
 
 /**
- * Hero principal — ecrã dividido Portugal / Brasil em 100vh.
+ * Hero principal — ecrã dividido Portugal / Brasil a toda a altura (100svh).
  * Os dois painéis começam ao meio; ao passar o rato por cima de um, esse
  * painel estica e revela o texto completo + CTA, enquanto o outro encolhe.
  * Interação 100% CSS (ver .hero-split em globals.css). Em mobile empilha.
@@ -17,13 +17,22 @@ export default function HeroSplit({
   return (
     <section className="hero-split" aria-label={t("Escolhe o teu mercado")}>
       <div className="hs-overlay-center">
-        <span className="hs-brand">{slogan}</span>
+        {/* Título principal da Home: a marca (só para leitores de ecrã e
+            motores de busca) + a proposta de valor visível. */}
+        <h1 className="hs-brand">
+          <span className="sr-only">Meridie Investments — </span>
+          {slogan}
+        </h1>
       </div>
 
       <L href="/portugal" className="split-panel panel-pt">
         <img
           src="https://images.unsplash.com/photo-1555881400-74d7acaacd8b?auto=format&fit=crop&w=1500&q=72"
           alt={t("Lisboa, Portugal")}
+          width={1500}
+          height={1000}
+          loading="eager"
+          fetchPriority="high"
         />
         <div className="sp-content">
           <span className="flag"><Icon name="pin" size={24} /></span>
@@ -42,6 +51,10 @@ export default function HeroSplit({
         <img
           src="https://images.unsplash.com/photo-1483729558449-99ef09a8c325?auto=format&fit=crop&w=1500&q=72"
           alt={t("Rio de Janeiro, Brasil")}
+          width={1500}
+          height={1000}
+          loading="eager"
+          fetchPriority="high"
         />
         <div className="sp-content">
           <span className="flag"><Icon name="pin" size={24} /></span>

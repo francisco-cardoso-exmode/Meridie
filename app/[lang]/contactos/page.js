@@ -2,24 +2,28 @@ import ContactForm from "@/components/ContactForm";
 import Reveal from "@/components/Reveal";
 import Icon from "@/components/Icon";
 import { getConteudo } from "@/lib/conteudo";
-import { t, tf, alternates } from "@/lib/i18n";
+import { t, tf } from "@/lib/i18n";
+import { metaPagina } from "@/lib/seo";
+import { telHref, mailHref, whatsappHref } from "@/lib/contactoLinks";
 import { traduzDoc, traduzLista } from "@/lib/i18n/conteudo";
 
 export const revalidate = 60;
 
 export async function generateMetadata({ params }) {
   const { lang } = await params;
-  return {
-    title: t(lang, "Contactos"),
-    description: t(lang, "Fala com a Meridie Investments sobre o teu investimento imobiliário entre Portugal e o Brasil. Respondemos em 24 horas úteis."),
-    alternates: alternates(lang, "/contactos"),
-  };
+  return metaPagina(lang, "/contactos", {
+    titulo: t(lang, "Contactos"),
+    descricao: t(lang, "Fala com a Meridie Investments sobre o teu investimento imobiliário entre Portugal e o Brasil. Respondemos em 24 horas úteis."),
+  });
 }
 
 export default async function Contactos({ params }) {
   const { lang } = await params;
   const T = (x) => t(lang, x);
   const c = await getConteudo("contactos", lang);
+  const mail = mailHref(c.email);
+  const tel = telHref(c.telefone);
+  const wa = whatsappHref(c.telefone);
   return (
     <>
       <section className="page-hero">
@@ -39,32 +43,44 @@ export default async function Contactos({ params }) {
                 {T("Onde nos encontrar")}
               </h2>
               <ul className="value-list" style={{ marginBottom: 28 }}>
-                <li>
-                  <span className="check"><Icon name="mail" size={20} /></span>
-                  <span>
-                    <strong>{T("Email")}</strong>
-                    <br />
-                    {c.email}
-                  </span>
-                </li>
-                <li>
-                  <span className="check"><Icon name="phone" size={20} /></span>
-                  <span>
-                    <strong>{T("Telefone")}</strong>
-                    <br />
-                    {c.telefone}
-                  </span>
-                </li>
-                <li>
-                  <span className="check"><Icon name="pin" size={20} /></span>
-                  <span>
-                    <strong>{T("Presença")}</strong>
-                    <br />
-                    {c.presenca}
-                  </span>
-                </li>
+                {c.email && (
+                  <li>
+                    <span className="check"><Icon name="mail" size={20} /></span>
+                    <span>
+                      <strong>{T("Email")}</strong>
+                      <br />
+                      {mail ? <a href={mail}>{c.email}</a> : c.email}
+                    </span>
+                  </li>
+                )}
+                {c.telefone && (
+                  <li>
+                    <span className="check"><Icon name="phone" size={20} /></span>
+                    <span>
+                      <strong>{T("Telefone")}</strong>
+                      <br />
+                      {tel ? <a href={tel}>{c.telefone}</a> : c.telefone}
+                      {wa && (
+                        <>
+                          {" · "}
+                          <a href={wa} target="_blank" rel="noopener">WhatsApp</a>
+                        </>
+                      )}
+                    </span>
+                  </li>
+                )}
+                {c.presenca && (
+                  <li>
+                    <span className="check"><Icon name="pin" size={20} /></span>
+                    <span>
+                      <strong>{T("Presença")}</strong>
+                      <br />
+                      {c.presenca}
+                    </span>
+                  </li>
+                )}
               </ul>
-              <p>{T("Horário:")} {c.horario}</p>
+              {c.horario && <p>{T("Horário:")} {c.horario}</p>}
             </Reveal>
 
             <Reveal delay={0.1}>

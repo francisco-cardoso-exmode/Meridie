@@ -1,16 +1,19 @@
 import L from "@/components/L";
 import Reveal from "@/components/Reveal";
 import Icon from "@/components/Icon";
-import { t, tf, alternates } from "@/lib/i18n";
+import { t, tf } from "@/lib/i18n";
+import { metaPagina } from "@/lib/seo";
+
+// Revalida de hora a hora (o rodapé mostra dados da empresa do backoffice).
+export const revalidate = 3600;
 import { traduzDoc, traduzLista } from "@/lib/i18n/conteudo";
 
 export async function generateMetadata({ params }) {
   const { lang } = await params;
-  return {
-    title: t(lang, "Parcerias"),
-    description: t(lang, "A rede Meridie reúne corretores certificados, advogados e contabilistas verificados em Portugal e no Brasil. Conheça os nossos parceiros ou candidate-se a integrar a rede."),
-    alternates: alternates(lang, "/parcerias"),
-  };
+  return metaPagina(lang, "/parcerias", {
+    titulo: t(lang, "Parcerias"),
+    descricao: t(lang, "A rede Meridie reúne corretores certificados, advogados e contabilistas verificados em Portugal e no Brasil. Conheça os nossos parceiros ou candidate-se a integrar a rede."),
+  });
 }
 
 const rede = [

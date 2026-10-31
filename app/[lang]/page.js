@@ -4,6 +4,7 @@ import Reveal from "@/components/Reveal";
 import Icon from "@/components/Icon";
 import EmpreendimentoCard from "@/components/EmpreendimentoCard";
 import RegionBanner from "@/components/RegionBanner";
+import { cartaoRegiao } from "@/lib/regioes";
 import ListingsExplorer from "@/components/ListingsExplorer";
 import {
   empreendimentosDestaque,
@@ -20,22 +21,29 @@ import AreasCards from "@/components/AreasCards";
 import MarcasFaixa from "@/components/MarcasFaixa";
 import { allMarcas } from "@/lib/marcas";
 import { TECNOLOGIA_VISIVEL } from "@/lib/flags";
-import { t, alternates } from "@/lib/i18n";
+import { t } from "@/lib/i18n";
+import { metaPagina, DESCRICAO_SITE } from "@/lib/seo";
 import { traduzLista } from "@/lib/i18n/conteudo";
+import { cartaoEmpreendimento } from "@/lib/empreendimentos";
 
 export const revalidate = 60;
 
 export async function generateMetadata({ params }) {
   const { lang } = await params;
-  return { alternates: alternates(lang, "/") };
+  return metaPagina(lang, "/", {
+    titulo: t(lang, "Meridie Investments — Investimento imobiliário Portugal e Brasil"),
+    tituloAbsoluto: true,
+    descricao: t(lang, DESCRICAO_SITE),
+  });
 }
 
 export default async function Home({ params }) {
   const { lang } = await params;
   const T = (x) => t(lang, x);
   const c = await getConteudo("home", lang);
-  const destaques = traduzLista(await empreendimentosDestaque(6), lang);
-  const todos = traduzLista(await allEmpreendimentos(), lang);
+  // Só os campos que os cards e o explorador usam (ver cartaoEmpreendimento).
+  const destaques = traduzLista(await empreendimentosDestaque(6), lang).map(cartaoEmpreendimento);
+  const todos = traduzLista(await allEmpreendimentos(), lang).map(cartaoEmpreendimento);
   const paises = [...new Set(todos.map((e) => e.pais))];
   const regioes = traduzLista(await allRegioes(), lang);
   const anuncios = traduzLista(await allAnuncios({ home: true }), lang);
@@ -169,7 +177,7 @@ export default async function Home({ params }) {
           <div className="region-grid">
             {regioesDestaque.map((r, i) => (
               <Reveal key={r.slug} delay={(i % 2) * 0.1}>
-                <RegionBanner regiao={r} />
+                <RegionBanner regiao={cartaoRegiao(r)} />
               </Reveal>
             ))}
           </div>
@@ -238,7 +246,7 @@ export default async function Home({ params }) {
         <section className="bg-soft">
           <div className="container">
             <Reveal>
-              <RegionBanner regiao={regiaoFooter} />
+              <RegionBanner regiao={cartaoRegiao(regiaoFooter)} />
             </Reveal>
           </div>
         </section>

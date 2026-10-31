@@ -5,11 +5,11 @@ import Icon from "@/components/Icon";
 import ContactForm from "@/components/ContactForm";
 import EmpreendimentoCard from "@/components/EmpreendimentoCard";
 import RegionBanner from "@/components/RegionBanner";
+import { cartaoRegiao } from "@/lib/regioes";
 import PrecoDual from "@/components/PrecoDual";
 import VideoEmbed from "@/components/VideoEmbed";
 import { textoComLinks } from "@/lib/format";
-import { PAIS_LABEL, referenciaDe } from "@/lib/empreendimentos";
-import { abs } from "@/lib/site";
+import { PAIS_LABEL, referenciaDe, cartaoEmpreendimento } from "@/lib/empreendimentos";
 import Track from "@/components/Track";
 import ProjetoGaleria from "@/components/ProjetoGaleria";
 import GaleriaExtra from "@/components/GaleriaExtra";
@@ -19,7 +19,10 @@ import {
   allEmpreendimentos,
   regiaoDoEmpreendimento,
 } from "@/lib/store";
-import { t, tf, alternates, caminho } from "@/lib/i18n";
+import { t, tf, caminho } from "@/lib/i18n";
+import { getEmpresa } from "@/lib/config";
+import ContactosDiretos from "@/components/ContactosDiretos";
+import { metaPagina, metaNaoEncontrado, urlPublica, jsonLd } from "@/lib/seo";
 import { traduzDoc, traduzLista } from "@/lib/i18n/conteudo";
 
 export const revalidate = 60;
@@ -33,31 +36,16 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }) {
   const { slug, lang } = await params;
   const e = traduzDoc(await empreendimentoBySlug(slug), lang);
-  if (!e || e.publicado === false) return { title: t(lang, "Empreendimento não encontrado") };
+  if (!e || e.publicado === false) return metaNaoEncontrado(lang, t(lang, "Empreendimento não encontrado"));
   const titulo = `${e.nome} — ${e.cidade}`;
   const desc =
     e.resumo ||
     (e.descricao ? e.descricao.slice(0, 160) : tf(lang, "Investir em {nome}, {cidade}.", { nome: e.nome, cidade: e.cidade }));
-  const img = e.imagens?.[0];
-  const url = caminho(lang, `/empreendimentos/${e.slug}`);
-  return {
-    title: titulo,
-    description: desc,
-    alternates: alternates(lang, `/empreendimentos/${e.slug}`),
-    openGraph: {
-      type: "website",
-      title: titulo,
-      description: desc,
-      url,
-      images: img ? [{ url: img }] : undefined,
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: titulo,
-      description: desc,
-      images: img ? [img] : undefined,
-    },
-  };
+  return metaPagina(lang, `/empreendimentos/${e.slug}`, {
+    titulo,
+    descricao: desc,
+    imagem: e.imagens?.[0],
+  });
 }
 
 export default async function PaginaEmpreendimento({ params }) {
@@ -77,7 +65,11 @@ export default async function PaginaEmpreendimento({ params }) {
   const regiao = traduzDoc(await regiaoDoEmpreendimento(e), lang);
   const semelhantes = traduzLista(await allEmpreendimentos({ pais: e.pais }), lang)
     .filter((x) => x.slug !== e.slug)
-    .slice(0, 3);
+    .slice(0, 3)
+    .map(cartaoEmpreendimento);
+
+  const empresa = await getEmpresa();
+  const urlPagina = urlPublica(lang, `/empreendimentos/${e.slug}`);
 
   const ld = {
     "@context": "https://schema.org",
@@ -87,7 +79,7 @@ export default async function PaginaEmpreendimento({ params }) {
     sku: referenciaDe(e),
     category: e.tipo,
     image: Array.isArray(e.imagens) ? e.imagens : undefined,
-    url: abs(`/empreendimentos/${e.slug}`),
+    url: urlPagina,
     ...(e.precoTipo !== "consulta" && e.preco
       ? {
           offers: {
@@ -95,22 +87,36 @@ export default async function PaginaEmpreendimento({ params }) {
             price: e.preco,
             priceCurrency: e.moeda || "EUR",
             availability: "https://schema.org/InStock",
-            url: abs(`/empreendimentos/${e.slug}`),
+            url: urlPagina,
           },
         }
       : {}),
+  };
+
+  const ldMigalhas = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: T("Início"), item: urlPublica(lang, "/") },
+      { "@type": "ListItem", position: 2, name: paisLabel, item: urlPublica(lang, `/${e.pais}`) },
+      { "@type": "ListItem", position: 3, name: e.nome, item: urlPagina },
+    ],
   };
 
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }}
+        dangerouslySetInnerHTML={{ __html: jsonLd(ld) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLd(ldMigalhas) }}
       />
       <Track tipo="empreendimento_visto" valor={e.slug} />
       <div className="prop-hero">
         <div className="container">
-          <nav className="breadcrumb">
+          <nav className="breadcrumb" aria-label={T("Caminho")}>
             <L href="/">{T("Início")}</L>{" "}{T("·")}{" "}
             <L href={`/${e.pais}`}>{paisLabel}</L> · {e.nome}
           </nav>
@@ -141,18 +147,25 @@ export default async function PaginaEmpreendimento({ params }) {
               )}
 
               <div className="spec-row">
-                <div className="spec-box">
-                  <div className="v">{e.quartos}</div>
-                  <div className="l">{e.quartos === 1 ? T("Quarto") : T("Quartos")}</div>
-                </div>
-                <div className="spec-box">
-                  <div className="v">{e.casasBanho}</div>
-                  <div className="l">{T("Casas de banho")}</div>
-                </div>
-                <div className="spec-box">
-                  <div className="v">{e.area}</div>
-                  <div className="l">{T("m² de área")}</div>
-                </div>
+                {/* Só as caixas com valor (como no card). */}
+                {Number(e.quartos) > 0 && (
+                  <div className="spec-box">
+                    <div className="v">{e.quartos}</div>
+                    <div className="l">{Number(e.quartos) === 1 ? T("Quarto") : T("Quartos")}</div>
+                  </div>
+                )}
+                {Number(e.casasBanho) > 0 && (
+                  <div className="spec-box">
+                    <div className="v">{e.casasBanho}</div>
+                    <div className="l">{T("Casas de banho")}</div>
+                  </div>
+                )}
+                {Number(e.area) > 0 && (
+                  <div className="spec-box">
+                    <div className="v">{e.area}</div>
+                    <div className="l">{T("m² de área")}</div>
+                  </div>
+                )}
                 <div className="spec-box">
                   <div className="v" style={{ color: "var(--gold)" }}>
                     <Icon name={e.estado === "Pronto" ? "check" : "trending-up"} size={26} />
@@ -192,17 +205,21 @@ export default async function PaginaEmpreendimento({ params }) {
                 </>
               )}
 
-              <h2 style={{ fontSize: "1.4rem", marginBottom: 12 }}>{T("Características")}</h2>
-              <ul className="feature-list">
-                {(e.caracteristicas || []).map((c) => (
-                  <li key={c}>
-                    <span className="check"><Icon name="check" size={18} /></span>
-                    <span>{c}</span>
-                  </li>
-                ))}
-              </ul>
+              {e.caracteristicas?.length > 0 && (
+                <>
+                  <h2 style={{ fontSize: "1.4rem", marginBottom: 12 }}>{T("Características")}</h2>
+                  <ul className="feature-list">
+                    {e.caracteristicas.map((c) => (
+                      <li key={c}>
+                        <span className="check"><Icon name="check" size={18} /></span>
+                        <span>{c}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
 
-              {e.proximidades && (
+              {e.proximidades?.length > 0 && (
                 <>
                   <h2 style={{ fontSize: "1.4rem", margin: "28px 0 12px" }}>
                     {T("Localização & proximidades")}
@@ -220,7 +237,7 @@ export default async function PaginaEmpreendimento({ params }) {
             </div>
 
             {/* Aside — preço + interesse */}
-            <aside className="prop-aside">
+            <aside className="prop-aside" id="interesse">
               <div className="price-big"><PrecoDual preco={e.preco} moeda={e.moeda} tipo={e.precoTipo} max={e.precoMax} /></div>
               <div className="price-sub">
                 {T(e.finalidade)} · {e.cidade}, {paisLabel}
@@ -253,10 +270,21 @@ export default async function PaginaEmpreendimento({ params }) {
                 assuntoInicial={`[${referenciaDe(e)}] ${e.nome} — ${e.cidade}, ${paisLabel}`}
                 origem={e.slug}
               />
+              <ContactosDiretos
+                empresa={empresa}
+                lang={lang}
+                mensagem={tf(lang, "Olá! Tenho interesse no empreendimento {nome} (ref. {ref}).", { nome: e.nome, ref: referenciaDe(e) })}
+                assunto={`[${referenciaDe(e)}] ${e.nome}`}
+              />
             </aside>
           </div>
         </div>
       </section>
+
+      {/* Botão fixo em mobile: leva ao formulário de interesse. */}
+      <a href="#interesse" className="prop-sticky-cta btn btn-primary">
+        {T("Tenho interesse")}
+      </a>
 
       {e.video && (
         <section style={{ paddingTop: 0 }}>
@@ -291,7 +319,7 @@ export default async function PaginaEmpreendimento({ params }) {
               </p>
             </Reveal>
             <Reveal>
-              <RegionBanner regiao={regiao} />
+              <RegionBanner regiao={cartaoRegiao(regiao)} />
             </Reveal>
           </div>
         </section>

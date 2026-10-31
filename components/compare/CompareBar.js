@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useCompare } from "@/components/compare/CompareProvider";
 import { useT } from "@/components/LangProvider";
 
@@ -7,15 +9,26 @@ import { useT } from "@/components/LangProvider";
 export default function CompareBar() {
   const { itens, remover, limpar } = useCompare();
   const { t, href } = useT();
-  if (!itens.length) return null;
+  const router = useRouter();
+  const visivel = itens.length > 0;
+
+  // Enquanto a barra está visível, o fim da página ganha espaço para ela
+  // não tapar o rodapé.
+  useEffect(() => {
+    if (!visivel) return;
+    document.body.classList.add("com-compare-bar");
+    return () => document.body.classList.remove("com-compare-bar");
+  }, [visivel]);
+
+  if (!visivel) return null;
 
   const dois = itens.length === 2;
   const mesma = dois && itens[0].zk === itens[1].zk;
 
   function comparar() {
     if (!mesma) return;
-    window.location.href = href(
-      `/comparar?a=${encodeURIComponent(itens[0].slug)}&b=${encodeURIComponent(itens[1].slug)}`
+    router.push(
+      href(`/comparar?a=${encodeURIComponent(itens[0].slug)}&b=${encodeURIComponent(itens[1].slug)}`)
     );
   }
 
@@ -25,7 +38,7 @@ export default function CompareBar() {
         <div className="cb-itens">
           {itens.map((it, i) => (
             <span className="cb-chip" key={it.slug}>
-              {it.imagem && <img src={it.imagem} alt="" />}
+              {it.imagem && <img src={it.imagem} alt="" width={34} height={34} loading="lazy" />}
               <span className="cb-chip-txt">
                 <strong>{it.nome}</strong>
                 <small>{[it.cidade, it.zona].filter(Boolean).join(" · ")}</small>

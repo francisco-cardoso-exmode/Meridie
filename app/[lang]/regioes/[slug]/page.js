@@ -5,7 +5,9 @@ import Icon from "@/components/Icon";
 import MarketHero from "@/components/MarketHero";
 import EmpreendimentoCard from "@/components/EmpreendimentoCard";
 import RegionBanner from "@/components/RegionBanner";
-import RegionMap, { CORES_PONTO } from "@/components/RegionMap";
+import { cartaoRegiao } from "@/lib/regioes";
+import { CORES_PONTO, temMapa } from "@/lib/mapa";
+import RegionMap from "@/components/RegionMap";
 import {
   allRegioes,
   regiaoBySlug,
@@ -15,10 +17,11 @@ import {
   tiposDe,
   finalidadesDe,
 } from "@/lib/store";
-import { PAIS_LABEL } from "@/lib/empreendimentos";
+import { PAIS_LABEL, cartaoEmpreendimento } from "@/lib/empreendimentos";
 import ListingsExplorer from "@/components/ListingsExplorer";
 import { textoComLinks } from "@/lib/format";
-import { t, tf, alternates, caminho } from "@/lib/i18n";
+import { t, tf, caminho } from "@/lib/i18n";
+import { metaPagina, metaNaoEncontrado } from "@/lib/seo";
 import { traduzDoc, traduzLista } from "@/lib/i18n/conteudo";
 
 const NIVEL_LABEL = { regiao: "Região", estado: "Estado", cidade: "Cidade", zona: "Zona" };
@@ -43,22 +46,12 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }) {
   const { slug, lang } = await params;
   const r = traduzDoc(await regiaoBySlug(slug), lang);
-  if (!r) return { title: t(lang, "Região não encontrada") };
-  const titulo = tf(lang, "Investir em {nome}", { nome: r.nome });
-  const desc = r.descricao || r.tagline || tf(lang, "Oportunidades de investimento em {nome}.", { nome: r.nome });
-  const url = caminho(lang, `/regioes/${r.slug}`);
-  return {
-    title: titulo,
-    description: desc,
-    alternates: alternates(lang, `/regioes/${r.slug}`),
-    openGraph: {
-      type: "website",
-      title: titulo,
-      description: desc,
-      url,
-      images: r.imagem ? [{ url: r.imagem }] : undefined,
-    },
-  };
+  if (!r) return metaNaoEncontrado(lang, t(lang, "Região não encontrada"));
+  return metaPagina(lang, `/regioes/${r.slug}`, {
+    titulo: tf(lang, "Investir em {nome}", { nome: r.nome }),
+    descricao: r.descricao || r.tagline || tf(lang, "Oportunidades de investimento em {nome}.", { nome: r.nome }),
+    imagem: r.imagem,
+  });
 }
 
 export default async function PaginaRegiao({ params }) {
@@ -67,7 +60,7 @@ export default async function PaginaRegiao({ params }) {
   const regiao = traduzDoc(await regiaoBySlug(slug), lang);
   if (!regiao) notFound();
 
-  const empreendimentos = traduzLista(await empreendimentosPorRegiao(regiao), lang);
+  const empreendimentos = traduzLista(await empreendimentosPorRegiao(regiao), lang).map(cartaoEmpreendimento);
   const paisLabel = T(PAIS_LABEL[regiao.pais]);
   const tiposNoMapa = [...new Set((regiao.pontos || []).map((p) => p.tipo))];
   const regiaoMae = regiao.parent ? traduzDoc(await regiaoBySlug(regiao.parent), lang) : null;
@@ -215,7 +208,8 @@ export default async function PaginaRegiao({ params }) {
         </section>
       ) : null}
 
-      {/* Mapa */}
+      {/* Mapa (só se a região tiver coordenadas) */}
+      {temMapa(regiao.mapa) && (
       <section style={{ paddingTop: 0 }}>
         <div className="container">
           <Reveal className="section-head">
@@ -239,6 +233,7 @@ export default async function PaginaRegiao({ params }) {
           </Reveal>
         </div>
       </section>
+      )}
 
       {/* Sub-zonas em destaque */}
       {subZonas.length > 0 && (
@@ -252,7 +247,7 @@ export default async function PaginaRegiao({ params }) {
             <div className="region-grid">
               {subZonas.map((z, i) => (
                 <Reveal key={z.slug} delay={(i % 2) * 0.1}>
-                  <RegionBanner regiao={z} compact />
+                  <RegionBanner regiao={cartaoRegiao(z)} compact />
                 </Reveal>
               ))}
             </div>

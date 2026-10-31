@@ -9,10 +9,14 @@ import { useT } from "@/components/LangProvider";
 
 export default function EmpreendimentoCard({ e }) {
   const { t } = useT();
+  // O card inteiro é clicável através do link do título (::after estica-o por
+  // cima do card) — assim o botão "Comparar" não fica dentro do <a>.
   return (
-    <L href={`/empreendimentos/${e.slug}`} className="prop-card">
+    <article className="prop-card">
       <div className="prop-media">
-        <img src={e.imagens?.[0] || ""} alt={e.nome} loading="lazy" />
+        {e.imagens?.[0] && (
+          <img src={e.imagens[0]} alt="" loading="lazy" width={640} height={400} />
+        )}
         <div className="prop-badges">
           <span className="badge gold">{t(e.tipo)}</span>
           <span className="badge">{t(e.estado)}</span>
@@ -24,7 +28,11 @@ export default function EmpreendimentoCard({ e }) {
           {e.cidade} · {e.zona}
           <span className="prop-ref">{t("Ref.")} {referenciaDe(e)}</span>
         </div>
-        <h3>{e.nome}</h3>
+        <h3>
+          <L href={`/empreendimentos/${e.slug}`} className="prop-card-link">
+            {e.nome}
+          </L>
+        </h3>
         <p className="prop-resumo">{e.resumo}</p>
         <div className="prop-specs">
           {Number(e.quartos) > 0 && (
@@ -38,9 +46,9 @@ export default function EmpreendimentoCard({ e }) {
             <PrecoDual preco={e.preco} moeda={e.moeda} tipo={e.precoTipo} max={e.precoMax} />
             <small>{t(e.finalidade)}</small>
           </div>
-          <span className="badge navy">{t("Ver")}</span>
+          <span className="badge navy" aria-hidden="true">{t("Ver")}</span>
         </div>
       </div>
-    </L>
+    </article>
   );
 }

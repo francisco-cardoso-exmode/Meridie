@@ -1,7 +1,8 @@
 import "../globals.css";
 import { notFound } from "next/navigation";
 import { LangProvider } from "@/components/LangProvider";
-import { LANGS, ehLang, LOCALE, OG_LOCALE, t, alternates } from "@/lib/i18n";
+import { LANGS, ehLang, LOCALE, t } from "@/lib/i18n";
+import { jsonLd as ldJson, DESCRICAO_SITE } from "@/lib/seo";
 import { Spectral } from "next/font/google";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -12,6 +13,7 @@ import CompareBar from "@/components/compare/CompareBar";
 import Analytics from "@/components/Analytics";
 import TrackVisita from "@/components/TrackVisita";
 import CookieConsent from "@/components/CookieConsent";
+import { CONSENT_PADRAO } from "@/lib/consentimento";
 import { SITE_URL, SITE_NAME } from "@/lib/site";
 
 // Fonte serif dos títulos (liga ao logo). Igual em todos os dispositivos.
@@ -22,8 +24,7 @@ const spectral = Spectral({
   display: "swap",
 });
 
-const DESC =
-  "Plataforma de investimento imobiliário transfronteiriço entre Portugal e o Brasil. Capital sem fronteiras, investimento com precisão — intermediação, assessoria jurídica e fiscal num único processo.";
+const DESC = DESCRICAO_SITE;
 
 export function generateStaticParams() {
   return LANGS.map((lang) => ({ lang }));
@@ -41,27 +42,9 @@ export async function generateMetadata({ params }) {
         ? ["real estate investment", "Portugal", "Brazil", "invest in Portugal", "invest in Brazil", "Portuguese wines", "Meridie Investments"]
         : ["investimento imobiliário", "Portugal", "Brasil", "imóveis Portugal Brasil", "investir em Portugal", "investir no Brasil", "empreendimentos", "intermediação imobiliária", "Meridie Investments"],
     applicationName: SITE_NAME,
-    alternates: alternates(lang, "/"),
-    robots: {
-      index: true,
-      follow: true,
-      googleBot: { index: true, follow: true, "max-image-preview": "large" },
-    },
-    openGraph: {
-      type: "website",
-      siteName: SITE_NAME,
-      title: titulo,
-      description: t(lang, "Capital sem fronteiras. Investimento com precisão. Portugal ↔ Brasil."),
-      locale: OG_LOCALE[lang],
-      url: SITE_URL,
-      images: [{ url: "/meridie_logo.png", width: 1000, height: 169, alt: SITE_NAME }],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: "Meridie Investments — Portugal ↔ Brasil",
-      description: t(lang, "Investimento imobiliário transfronteiriço com precisão."),
-      images: ["/meridie_logo.png"],
-    },
+    // Canonical, robots, Open Graph e Twitter são definidos por página
+    // (lib/seo.js → metaPagina), para nenhuma herdar os da Home — e uma
+    // página 404 fica só com o noindex do Next.
   };
 }
 
@@ -85,11 +68,14 @@ export default async function RootLayout({ children, params }) {
   return (
     <html lang={LOCALE[lang]} className={spectral.variable}>
       <body>
+        {process.env.NEXT_PUBLIC_GA_ID && (
+          <script id="ga-consent-default" dangerouslySetInnerHTML={{ __html: CONSENT_PADRAO }} />
+        )}
         <Analytics />
         <TrackVisita />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd(lang)) }}
+          dangerouslySetInnerHTML={{ __html: ldJson(jsonLd(lang)) }}
         />
         <CambioProvider
           inicial={{
@@ -102,8 +88,13 @@ export default async function RootLayout({ children, params }) {
         >
           <LangProvider lang={lang}>
             <CompareProvider>
+              <a href="#conteudo" className="skip-link">
+                {t(lang, "Saltar para o conteúdo")}
+              </a>
               <Header />
-              <main>{children}</main>
+              <main id="conteudo" tabIndex={-1}>
+                {children}
+              </main>
               <Footer lang={lang} />
               <CompareBar />
               <CookieConsent />

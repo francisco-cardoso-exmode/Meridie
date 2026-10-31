@@ -18,7 +18,9 @@ export default function RegionBanner({ regiao, compact = false }) {
       href={`/regioes/${regiao.slug}`}
       className={`region-banner${compact ? " compact" : ""}`}
     >
-      <img src={regiao.imagem} alt={regiao.nome} loading="lazy" />
+      {regiao.imagem && (
+        <img src={regiao.imagem} alt={regiao.nome} loading="lazy" width={1200} height={600} />
+      )}
       <div className="rb-content">
         <span className="rb-tag">
           {t("Destaque regional")} · {regiao.pais === "brasil" ? t("Brasil") : "Portugal"}

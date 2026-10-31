@@ -22,7 +22,7 @@ export default function GaleriaExtra({ imagens = [], nome = "" }) {
             key={i}
             onClick={() => setIndice(i + 3)}
           >
-            <img src={img} alt={tf("{nome} — foto {i}", { nome, i: i + 4 })} loading="lazy" />
+            <img src={img} alt={tf("{nome} — foto {i}", { nome, i: i + 4 })} loading="lazy" width={800} height={600} />
           </button>
         ))}
       </div>

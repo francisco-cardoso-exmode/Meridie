@@ -4,7 +4,8 @@ import Reveal from "@/components/Reveal";
 import MarcaGaleria from "@/components/MarcaGaleria";
 import BotaoPdf from "@/components/BotaoPdf";
 import { allMarcas, marcaBySlug, AREAS_MARCA } from "@/lib/marcas";
-import { t, tf, alternates } from "@/lib/i18n";
+import { t, tf } from "@/lib/i18n";
+import { metaPagina, metaNaoEncontrado } from "@/lib/seo";
 import { traduzDoc, traduzLista } from "@/lib/i18n/conteudo";
 
 export const revalidate = 60;
@@ -17,13 +18,12 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }) {
   const { slug, lang } = await params;
   const m = traduzDoc(await marcaBySlug(slug), lang);
-  if (!m || m.ativo === false) return { title: t(lang, "Marca não encontrada") };
-  return {
-    title: m.nome,
-    description: m.texto || tf(lang, "{nome} — marca representada pela Meridie Investments.", { nome: m.nome }),
-    alternates: alternates(lang, `/marcas/${m.slug}`),
-    openGraph: { images: m.imagens?.[0] ? [{ url: m.imagens[0] }] : undefined },
-  };
+  if (!m || m.ativo === false) return metaNaoEncontrado(lang, t(lang, "Marca não encontrada"));
+  return metaPagina(lang, `/marcas/${m.slug}`, {
+    titulo: m.nome,
+    descricao: m.texto || tf(lang, "{nome} — marca representada pela Meridie Investments.", { nome: m.nome }),
+    imagem: m.imagens?.[0],
+  });
 }
 
 export default async function PaginaMarca({ params }) {

@@ -5,33 +5,44 @@ import { comparaveis, zonaLabel, cidadeLabel } from "@/lib/compare";
 import PrecoDual from "@/components/PrecoDual";
 import CompareAnalysis from "@/components/compare/CompareAnalysis";
 import Track from "@/components/Track";
-import { t, tf, alternates } from "@/lib/i18n";
+import { t, tf } from "@/lib/i18n";
+import { metaPagina } from "@/lib/seo";
 import { traduzDoc, traduzLista } from "@/lib/i18n/conteudo";
 
 export const revalidate = 60;
 
 export async function generateMetadata({ params }) {
   const { lang } = await params;
-  return {
-    title: t(lang, "Comparar empreendimentos"),
-    description: t(lang, "Compare dois empreendimentos da mesma zona lado a lado — preço, tipologias, área e a zona (o que ver, transportes, distâncias)."),
-    alternates: alternates(lang, "/comparar"),
-  };
+  return metaPagina(lang, "/comparar", {
+    titulo: t(lang, "Comparar empreendimentos"),
+    descricao: t(lang, "Compare dois empreendimentos do mesmo país lado a lado — preço, tipologias, área e a zona (o que ver, transportes, distâncias)."),
+    // Combinações infinitas de ?a=&b= — não indexar (e fora do sitemap).
+    indexar: false,
+  });
 }
 
 const lista = (arr) => (Array.isArray(arr) && arr.length ? arr : null);
 
+// Tipologias podem vir como texto ("T2") ou objeto ({ nome, area, preco }).
 function tipologiasTxt(e) {
   if (!Array.isArray(e.tipologias) || !e.tipologias.length) return "—";
-  return e.tipologias.map((t) => t.nome).filter(Boolean).join(", ") || "—";
+  return (
+    e.tipologias
+      .map((t) => (typeof t === "string" ? t : t?.nome))
+      .filter(Boolean)
+      .join(", ") || "—"
+  );
 }
+
+// Empreendimentos despublicados não entram no comparador.
+const publicado = (e) => (e && e.publicado !== false ? e : null);
 
 export default async function CompararPage({ params, searchParams }) {
   const { lang } = await params;
   const T = (x) => t(lang, x);
   const sp = (await searchParams) || {};
-  const a = traduzDoc(await empreendimentoBySlug(sp.a), lang);
-  const b = traduzDoc(await empreendimentoBySlug(sp.b), lang);
+  const a = traduzDoc(publicado(await empreendimentoBySlug(sp.a)), lang);
+  const b = traduzDoc(publicado(await empreendimentoBySlug(sp.b)), lang);
 
   if (!a || !b || a.slug === b.slug) {
     return (
@@ -39,7 +50,7 @@ export default async function CompararPage({ params, searchParams }) {
         <div className="container" style={{ padding: "60px 0" }}>
           <h1>{T("Comparador")}</h1>
           <p className="muted">
-            {T("Escolhe")}{" "}<strong>{T("dois")}</strong>{" "}{T("empreendimentos do mesmo país para comparar. Em cada cartão tens o botão")}{" "}<em>{T("⇄ Comparar")}</em>.
+            {T("Escolhe")}{" "}<strong>{T("dois")}</strong>{" "}{T("empreendimentos do mesmo país para comparar. Em cada cartão tens o botão")}{" "}<em>= ({T("Comparar")})</em>.
           </p>
           <L href="/empreendimentos" className="btn btn-primary" style={{ marginTop: 16 }}>
             {T("Ver empreendimentos")}
@@ -114,7 +125,7 @@ export default async function CompararPage({ params, searchParams }) {
           {[a, b].map((x, i) => (
             <div className="comp-card" key={x.slug}>
               <L href={`/empreendimentos/${x.slug}`} className="comp-img">
-                <img src={x.imagens?.[0] || ""} alt={x.nome} />
+                {x.imagens?.[0] && <img src={x.imagens[0]} alt={x.nome} width={640} height={400} />}
               </L>
               <h2>{x.nome}</h2>
               <div className="comp-preco">

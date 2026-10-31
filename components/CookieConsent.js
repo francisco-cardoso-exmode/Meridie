@@ -3,24 +3,25 @@
 import L from "@/components/L";
 import { useEffect, useState } from "react";
 import { useT } from "@/components/LangProvider";
+import {
+  lerConsentimento,
+  guardarConsentimento,
+  EVENTO_CONSENTIMENTO,
+} from "@/lib/consentimento";
 
 // Banner de consentimento de cookies (RGPD). Guarda a escolha em localStorage e
-// avisa o componente do Google Analytics para carregar (ou não).
+// avisa o componente do Google Analytics para carregar (ou não). Volta a
+// aparecer quando a escolha é apagada ("Gerir cookies" no rodapé).
 export default function CookieConsent() {
   const { t } = useT();
   const [mostrar, setMostrar] = useState(false);
 
   useEffect(() => {
-    if (!localStorage.getItem("meridie_consent")) setMostrar(true);
+    const ver = () => setMostrar(!lerConsentimento());
+    ver();
+    window.addEventListener(EVENTO_CONSENTIMENTO, ver);
+    return () => window.removeEventListener(EVENTO_CONSENTIMENTO, ver);
   }, []);
-
-  function decidir(valor) {
-    try {
-      localStorage.setItem("meridie_consent", valor);
-      window.dispatchEvent(new Event("meridie-consent"));
-    } catch {}
-    setMostrar(false);
-  }
 
   if (!mostrar) return null;
 
@@ -33,10 +34,10 @@ export default function CookieConsent() {
           <L href="/privacidade">{t("Política de Privacidade")}</L>.
         </p>
         <div className="cookie-acoes">
-          <button type="button" className="cookie-rej" onClick={() => decidir("reject")}>
+          <button type="button" className="cookie-rej" onClick={() => guardarConsentimento("reject")}>
             {t("Rejeitar")}
           </button>
-          <button type="button" className="btn btn-primary" onClick={() => decidir("accept")}>
+          <button type="button" className="btn btn-primary" onClick={() => guardarConsentimento("accept")}>
             {t("Aceitar")}
           </button>
         </div>

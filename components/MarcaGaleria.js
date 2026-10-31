@@ -22,7 +22,7 @@ export default function MarcaGaleria({ imagens, nome }) {
               onClick={() => setI(idx)}
               aria-label={tf("Fotografia {i} de {nome}", { i: idx + 1, nome })}
             >
-              <img src={src} alt="" loading="lazy" />
+              <img src={src} alt="" loading="lazy" width={160} height={160} />
             </button>
           ))}
         </div>

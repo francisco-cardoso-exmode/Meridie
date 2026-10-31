@@ -3,17 +3,17 @@ import Reveal from "@/components/Reveal";
 import AnuncioCard from "@/components/AnuncioCard";
 import { allAnuncios } from "@/lib/anuncios";
 import { CATEGORIAS_PARCEIRO } from "@/lib/categoriasParceiro";
-import { t, tf, alternates } from "@/lib/i18n";
+import { t, tf } from "@/lib/i18n";
+import { metaPagina } from "@/lib/seo";
 import { traduzDoc, traduzLista } from "@/lib/i18n/conteudo";
 
 export const revalidate = 60;
 export async function generateMetadata({ params }) {
   const { lang } = await params;
-  return {
-    title: t(lang, "Parceiros & Patrocinadores"),
-    description: t(lang, "Companhias aéreas, hotéis, restaurantes e guias que acompanham os clientes da Meridie Investments entre Portugal e o Brasil."),
-    alternates: alternates(lang, "/publicidade"),
-  };
+  return metaPagina(lang, "/publicidade", {
+    titulo: t(lang, "Parceiros & Patrocinadores"),
+    descricao: t(lang, "Companhias aéreas, hotéis, restaurantes e guias que acompanham os clientes da Meridie Investments entre Portugal e o Brasil."),
+  });
 }
 
 export default async function PaginaPublicidade({ params }) {

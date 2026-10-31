@@ -4,14 +4,20 @@ import Icon from "@/components/Icon";
 import { getRedes, getEmpresa } from "@/lib/config";
 import { TECNOLOGIA_VISIVEL } from "@/lib/flags";
 import { t } from "@/lib/i18n";
+import GerirCookies from "@/components/GerirCookies";
+import { telHref, mailHref, whatsappHref } from "@/lib/contactoLinks";
 
 export default async function Footer({ lang = "pt" }) {
   const T = (x) => t(lang, x);
   const ano = new Date().getFullYear();
   const [redes, empresa] = await Promise.all([getRedes(), getEmpresa()]);
-  const email = empresa.email || "geral@meridie.pt";
-  const telefone = empresa.telefone || "+351 210 000 000";
+  // Só mostra os contactos preenchidos no backoffice (nada de placeholders).
+  const email = empresa.email || "";
+  const telefone = empresa.telefone || "";
   const locais = empresa.locais || "Lisboa · São Paulo";
+  const mail = mailHref(email);
+  const tel = telHref(telefone);
+  const wa = whatsappHref(telefone);
   return (
     <footer className="site-footer">
       <div className="container">
@@ -89,9 +95,17 @@ export default async function Footer({ lang = "pt" }) {
           <div>
             <h4>{T("Contactos")}</h4>
             <ul>
-              <li>{email}</li>
-              <li>{telefone}</li>
-              <li>{locais}</li>
+              {email && <li>{mail ? <a href={mail}>{email}</a> : email}</li>}
+              {telefone && <li>{tel ? <a href={tel}>{telefone}</a> : telefone}</li>}
+              {wa && (
+                <li>
+                  <a href={wa} target="_blank" rel="noopener">WhatsApp</a>
+                </li>
+              )}
+              {locais && <li>{locais}</li>}
+              <li>
+                <L href="/contactos">{T("Formulário de contacto")}</L>
+              </li>
             </ul>
           </div>
         </div>
@@ -101,6 +115,7 @@ export default async function Footer({ lang = "pt" }) {
             <L href="/privacidade">{T("Privacidade")}</L>
             <L href="/cookies">{T("Cookies")}</L>
             <L href="/termos">{T("Termos")}</L>
+            <GerirCookies className="footer-gerir-cookies" />
           </span>
         </div>
       </div>

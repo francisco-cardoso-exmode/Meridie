@@ -4,11 +4,11 @@ import { useCompare } from "@/components/compare/CompareProvider";
 import { paisKey } from "@/lib/compare";
 import { useT } from "@/components/LangProvider";
 
-// Botão "Comparar" sobreposto ao card. Como o card é um <Link>, travamos a
-// navegação ao clicar no botão.
+// Botão "Comparar" sobreposto ao card. Fica fora do link do card (HTML válido)
+// e acima do ::after que torna o card clicável.
 export default function CompareToggle({ e }) {
   const { toggle, estaSelecionado } = useCompare();
-  const { t } = useT();
+  const { t, tf } = useT();
   const ativo = estaSelecionado(e.slug);
 
   const item = {
@@ -26,14 +26,15 @@ export default function CompareToggle({ e }) {
       type="button"
       className={`compare-toggle${ativo ? " is-on" : ""}`}
       aria-pressed={ativo}
+      aria-label={
+        ativo
+          ? tf("Remover {nome} da comparação", { nome: e.nome })
+          : tf("Comparar {nome}", { nome: e.nome })
+      }
       title={ativo ? t("Remover da comparação") : t("Comparar este empreendimento")}
-      onClick={(ev) => {
-        ev.preventDefault();
-        ev.stopPropagation();
-        toggle(item);
-      }}
+      onClick={() => toggle(item)}
     >
-      {ativo ? "✓" : "="}
+      <span aria-hidden="true">{ativo ? "✓" : "="}</span>
     </button>
   );
 }
