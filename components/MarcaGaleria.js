@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useT } from "@/components/LangProvider";
+import Foto from "@/components/Foto";
 
 // Galeria simples da marca: foto grande + miniaturas.
 export default function MarcaGaleria({ imagens, nome }) {
@@ -10,7 +11,7 @@ export default function MarcaGaleria({ imagens, nome }) {
   return (
     <div className="marca-galeria">
       <div className="marca-galeria-main">
-        <img src={imagens[i]} alt={nome} />
+        <Foto src={imagens[i]} alt={nome} fill sizes="(max-width: 860px) 100vw, 820px" />
       </div>
       {imagens.length > 1 && (
         <div className="marca-thumbs">
@@ -22,7 +23,7 @@ export default function MarcaGaleria({ imagens, nome }) {
               onClick={() => setI(idx)}
               aria-label={tf("Fotografia {i} de {nome}", { i: idx + 1, nome })}
             >
-              <img src={src} alt="" loading="lazy" width={160} height={160} />
+              <Foto src={src} alt="" width={160} height={160} sizes="64px" />
             </button>
           ))}
         </div>

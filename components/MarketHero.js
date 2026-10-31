@@ -5,12 +5,13 @@
  * Usado no topo das páginas de mercado (Portugal / Brasil).
  */
 import { useT } from "@/components/LangProvider";
+import Foto from "@/components/Foto";
 
 export default function MarketHero({ img, alt, eyebrow, titulo, children }) {
   const { t } = useT();
   return (
     <section className="market-hero" aria-label={titulo}>
-      {img && <img src={img} alt={alt} width={1600} height={1000} loading="eager" fetchPriority="high" />}
+      {img && <Foto src={img} alt={alt} fill sizes="100vw" priority />}
       <div className="container">
         {eyebrow && <span className="eyebrow">{eyebrow}</span>}
         <h1>{titulo}</h1>

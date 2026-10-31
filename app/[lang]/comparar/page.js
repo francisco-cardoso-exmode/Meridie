@@ -8,6 +8,7 @@ import Track from "@/components/Track";
 import { t, tf } from "@/lib/i18n";
 import { metaPagina } from "@/lib/seo";
 import { traduzDoc, traduzLista } from "@/lib/i18n/conteudo";
+import Foto from "@/components/Foto";
 
 export const revalidate = 60;
 
@@ -125,7 +126,7 @@ export default async function CompararPage({ params, searchParams }) {
           {[a, b].map((x, i) => (
             <div className="comp-card" key={x.slug}>
               <L href={`/empreendimentos/${x.slug}`} className="comp-img">
-                {x.imagens?.[0] && <img src={x.imagens[0]} alt={x.nome} width={640} height={400} />}
+                {x.imagens?.[0] && <Foto src={x.imagens[0]} alt={x.nome} width={640} height={400} sizes="(max-width: 700px) 50vw, 560px" />}
               </L>
               <h2>{x.nome}</h2>
               <div className="comp-preco">

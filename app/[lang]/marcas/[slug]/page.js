@@ -7,6 +7,7 @@ import { allMarcas, marcaBySlug, AREAS_MARCA } from "@/lib/marcas";
 import { t, tf } from "@/lib/i18n";
 import { metaPagina, metaNaoEncontrado } from "@/lib/seo";
 import { traduzDoc, traduzLista } from "@/lib/i18n/conteudo";
+import Foto from "@/components/Foto";
 
 export const revalidate = 60;
 export const dynamicParams = true;
@@ -57,7 +58,7 @@ export default async function PaginaMarca({ params }) {
           {montra.length > 0 && (
             <div className="marca-montra" aria-hidden="true">
               {montra.map((src) => (
-                <img key={src} src={src} alt="" />
+                <Foto key={src} src={src} alt="" width={300} height={300} sizes="(max-width: 860px) 20vw, 120px" />
               ))}
             </div>
           )}
@@ -78,7 +79,7 @@ export default async function PaginaMarca({ params }) {
               {m.produtos.map((p, i) => (
                 <article className="ficha" key={`${p.nome}-${i}`}>
                   <div className="ficha-foto">
-                    {p.imagem && <img src={p.imagem} alt={p.nome} loading="lazy" />}
+                    {p.imagem && <Foto src={p.imagem} alt={p.nome} fill sizes="(max-width: 1100px) 340px, 170px" />}
                   </div>
                   <div className="ficha-texto">
                     <span className="marca-origem">{m.nome}</span>

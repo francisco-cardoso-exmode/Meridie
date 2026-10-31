@@ -3,6 +3,7 @@
 import L from "@/components/L";
 import Icon from "@/components/Icon";
 import { useT } from "@/components/LangProvider";
+import Foto from "@/components/Foto";
 
 /**
  * Hero principal — ecrã dividido Portugal / Brasil a toda a altura (100svh).
@@ -26,13 +27,12 @@ export default function HeroSplit({
       </div>
 
       <L href="/portugal" className="split-panel panel-pt">
-        <img
+        <Foto
           src="https://images.unsplash.com/photo-1555881400-74d7acaacd8b?auto=format&fit=crop&w=1500&q=72"
           alt={t("Lisboa, Portugal")}
-          width={1500}
-          height={1000}
-          loading="eager"
-          fetchPriority="high"
+          fill
+          sizes="(max-width: 860px) 100vw, 75vw"
+          priority
         />
         <div className="sp-content">
           <span className="flag"><Icon name="pin" size={24} /></span>
@@ -48,13 +48,12 @@ export default function HeroSplit({
       </L>
 
       <L href="/brasil" className="split-panel panel-br">
-        <img
+        <Foto
           src="https://images.unsplash.com/photo-1483729558449-99ef09a8c325?auto=format&fit=crop&w=1500&q=72"
           alt={t("Rio de Janeiro, Brasil")}
-          width={1500}
-          height={1000}
-          loading="eager"
-          fetchPriority="high"
+          fill
+          sizes="(max-width: 860px) 100vw, 75vw"
+          priority
         />
         <div className="sp-content">
           <span className="flag"><Icon name="pin" size={24} /></span>

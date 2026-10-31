@@ -16,6 +16,8 @@ export default function Logo({
   const { t } = useT();
   const content = (
     <span className={`logo logo-${variant} ${className}`.trim()}>
+      {/* <img> simples: SVG vetorial, o next/image não o otimizaria. */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src="/logo-horizontal.svg"
         alt="Meridie Investments"

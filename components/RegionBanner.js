@@ -2,6 +2,7 @@
 
 import L from "@/components/L";
 import { useT } from "@/components/LangProvider";
+import Foto from "@/components/Foto";
 
 /**
  * Banner de destaque regional (estilo "sponsor").
@@ -19,7 +20,7 @@ export default function RegionBanner({ regiao, compact = false }) {
       className={`region-banner${compact ? " compact" : ""}`}
     >
       {regiao.imagem && (
-        <img src={regiao.imagem} alt={regiao.nome} loading="lazy" width={1200} height={600} />
+        <Foto src={regiao.imagem} alt={regiao.nome} fill sizes={compact ? "(max-width: 860px) 100vw, 50vw" : "(max-width: 1240px) 100vw, 1200px"} />
       )}
       <div className="rb-content">
         <span className="rb-tag">

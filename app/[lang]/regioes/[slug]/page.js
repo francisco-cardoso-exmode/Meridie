@@ -23,6 +23,7 @@ import { textoComLinks } from "@/lib/format";
 import { t, tf, caminho } from "@/lib/i18n";
 import { metaPagina, metaNaoEncontrado } from "@/lib/seo";
 import { traduzDoc, traduzLista } from "@/lib/i18n/conteudo";
+import Foto from "@/components/Foto";
 
 const NIVEL_LABEL = { regiao: "Região", estado: "Estado", cidade: "Cidade", zona: "Zona" };
 
@@ -272,7 +273,7 @@ export default async function PaginaRegiao({ params }) {
                     rel="noopener"
                     className="pub-card"
                   >
-                    {p.imagem && <img src={p.imagem} alt={p.titulo} loading="lazy" />}
+                    {p.imagem && <Foto src={p.imagem} alt={p.titulo} width={800} height={500} sizes="(max-width: 760px) 100vw, 400px" />}
                     <div className="pub-body">
                       <span className="rb-tag">{T("Publicidade")}</span>
                       <h3>{p.titulo}</h3>

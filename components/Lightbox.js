@@ -86,6 +86,13 @@ export default function Lightbox({ imagens = [], nome = "", indice, onMudar }) {
           ‹
         </button>
       )}
+      {/* <img> simples de propósito: a proporção é desconhecida e a caixa tem
+          de abraçar a foto (sombra + cantos). Com next/image teria de ser
+          fill (sombra à volta do ecrã todo) ou tamanho "auto" com srcset, e
+          aí uma origem mais pequena que o candidato escolhido aparece
+          encolhida (o otimizador não amplia). Os uploads já vêm
+          redimensionados do browser, por isso o original é razoável. */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         className="lb-img"
         src={imagens[indice]}
