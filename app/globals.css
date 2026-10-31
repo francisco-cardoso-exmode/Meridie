@@ -3579,6 +3579,29 @@ a.marca-card:hover {
     grid-template-columns: 1fr;
   }
 }
+/* Listas das páginas (cartões, passos, perguntas — ConteudoForm) */
+.prod-editor-row.lista-editor-row {
+  grid-template-columns: 1fr;
+}
+.lista-editor-icone {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.lista-editor-icone select {
+  flex: 1;
+}
+.admin-form .conteudo-grupo {
+  font-size: 1.05rem;
+  margin: 18px 0 12px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+}
+.admin-form .conteudo-grupo:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
 
 /* ============ Fichas de produto ============ */
 .ficha-head {

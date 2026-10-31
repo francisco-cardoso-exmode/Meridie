@@ -28,7 +28,7 @@ export default async function Contactos({ params }) {
     <>
       <section className="page-hero">
         <div className="container">
-          <span className="eyebrow">{T("Contactos")}</span>
+          <span className="eyebrow">{c.heroEyebrow}</span>
           <h1>{c.heroTitulo}</h1>
           <p>{c.heroTexto}</p>
         </div>
@@ -38,9 +38,9 @@ export default async function Contactos({ params }) {
         <div className="container">
           <div className="grid grid-2" style={{ gap: 56, alignItems: "start" }}>
             <Reveal>
-              <span className="eyebrow">{T("Fala connosco")}</span>
+              <span className="eyebrow">{c.infoEyebrow}</span>
               <h2 style={{ fontSize: "1.8rem", marginBottom: 18 }}>
-                {T("Onde nos encontrar")}
+                {c.infoTitulo}
               </h2>
               <ul className="value-list" style={{ marginBottom: 28 }}>
                 {c.email && (

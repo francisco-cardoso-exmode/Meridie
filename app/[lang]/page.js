@@ -42,6 +42,7 @@ export default async function Home({ params }) {
   const { lang } = await params;
   const T = (x) => t(lang, x);
   const c = await getConteudo("home", lang);
+  const areas = TECNOLOGIA_VISIVEL ? await getConteudo("areas", lang) : null;
   // Só os campos que os cards e o explorador usam (ver cartaoEmpreendimento).
   const destaques = traduzLista(await empreendimentosDestaque(6), lang).map(cartaoEmpreendimento);
   const todos = traduzLista(await allEmpreendimentos(), lang).map(cartaoEmpreendimento);
@@ -57,22 +58,22 @@ export default async function Home({ params }) {
   return (
     <>
       {/* Hero split 100vh — escolha Portugal / Brasil */}
-      <HeroSplit slogan={c.heroSlogan} />
+      <HeroSplit c={c} />
 
       {/* Outras áreas — Bebidas & Alimentação e Tecnologia */}
       <section className="bg-soft">
         <div className="container">
           <Reveal className="section-head">
             <span className="eyebrow">
-              {TECNOLOGIA_VISIVEL ? T("Um nome, três áreas de investimento") : T("Bebidas & Alimentação")}
+              {TECNOLOGIA_VISIVEL ? c.areasEyebrowTec : c.areasEyebrow}
             </span>
             <h2>{c.areasTitulo}</h2>
             <p>{c.areasTexto}</p>
           </Reveal>
-          {TECNOLOGIA_VISIVEL && <AreasCards areas={["marcas", "tecnologia"]} />}
+          {TECNOLOGIA_VISIVEL && <AreasCards areas={["marcas", "tecnologia"]} textos={areas} />}
           {marcas.length > 0 && (
             <Reveal>
-              <p className="marcas-faixa-titulo">{T("Marcas que representamos")}</p>
+              <p className="marcas-faixa-titulo">{c.marcasFaixaTitulo}</p>
               <MarcasFaixa marcas={marcas} />
               <div style={{ marginTop: 26 }}>
                 <L href="/marcas" className="btn btn-primary">{T("Conhecer as marcas")}</L>
@@ -86,20 +87,16 @@ export default async function Home({ params }) {
       <section>
         <div className="container">
           <Reveal className="section-head">
-            <span className="eyebrow">{T("Dois mercados, uma plataforma")}</span>
+            <span className="eyebrow">{c.difEyebrow}</span>
             <h2>{c.difTitulo}</h2>
             <p>{c.difTexto}</p>
           </Reveal>
           <div className="grid grid-3">
-            {[
-              ["shield-check", "Rede verificada", "Corretores, advogados e contabilistas selecionados e verificados em Portugal e no Brasil."],
-              ["layers", "Processo integrado", "Da análise do imóvel à escritura, com apoio jurídico e fiscal em cada etapa — um único processo."],
-              ["globe", "Dois mercados", "Presença e conhecimento real nos dois países — legislação, fiscalidade e dinâmicas locais. Não apenas contactos."],
-            ].map(([icon, tit, d], i) => (
-              <Reveal className="card" key={tit} delay={i * 0.1}>
-                <div className="icon"><Icon name={icon} /></div>
-                <h3>{T(tit)}</h3>
-                <p>{T(d)}</p>
+            {c.diferenciais.map((d, i) => (
+              <Reveal className="card" key={d.id} delay={i * 0.1}>
+                {d.icone && <div className="icon"><Icon name={d.icone} /></div>}
+                <h3>{d.titulo}</h3>
+                <p>{d.texto}</p>
               </Reveal>
             ))}
           </div>
@@ -110,9 +107,9 @@ export default async function Home({ params }) {
       <section className="bg-soft">
         <div className="container">
           <Reveal className="section-head">
-            <span className="eyebrow">{T("Empreendimentos")}</span>
-            <h2>{T("Oportunidades em destaque")}</h2>
-            <p>{T("Uma seleção curada de imóveis nos dois mercados.")}</p>
+            <span className="eyebrow">{c.destaquesEyebrow}</span>
+            <h2>{c.destaquesTitulo}</h2>
+            <p>{c.destaquesTexto}</p>
           </Reveal>
           <div className="listing-grid">
             {destaques.map((e, i) => (
@@ -140,11 +137,9 @@ export default async function Home({ params }) {
       <section>
         <div className="container">
           <Reveal className="section-head">
-            <span className="eyebrow">{T("Toda a oferta")}</span>
-            <h2>{T("Explora todos os empreendimentos")}</h2>
-            <p>
-              {T("Pesquisa pelo nome, cidade, zona ou referência — ou clica em Filtros para refinar por país, tipologia, finalidade e preço.")}
-            </p>
+            <span className="eyebrow">{c.ofertaEyebrow}</span>
+            <h2>{c.ofertaTitulo}</h2>
+            <p>{c.ofertaTexto}</p>
           </Reveal>
           <ListingsExplorer
             empreendimentos={todos}
@@ -168,11 +163,9 @@ export default async function Home({ params }) {
       <section>
         <div className="container">
           <Reveal className="section-head">
-            <span className="eyebrow">{T("Explorar por região")}</span>
-            <h2>{T("Cada região, uma oportunidade")}</h2>
-            <p>
-              {T("Descobre as vantagens de cada mercado e o que podes fazer acontecer — clica numa região para ver os empreendimentos.")}
-            </p>
+            <span className="eyebrow">{c.regioesEyebrow}</span>
+            <h2>{c.regioesTitulo}</h2>
+            <p>{c.regioesTexto}</p>
           </Reveal>
           <div className="region-grid">
             {regioesDestaque.map((r, i) => (
@@ -188,24 +181,17 @@ export default async function Home({ params }) {
       <section className="bg-soft">
         <div className="container">
           <Reveal className="section-head">
-            <span className="eyebrow">{T("Para quem é")}</span>
-            <h2>{T("Um serviço calibrado ao teu perfil")}</h2>
+            <span className="eyebrow">{c.perfisEyebrow}</span>
+            <h2>{c.perfisTitulo}</h2>
           </Reveal>
           <div className="grid grid-2">
-            <Reveal className="card">
-              <div className="icon">①</div>
-              <h3>{T("Investidor particular")}</h3>
-              <p>
-                {T("Primeiro investimento no exterior? Guiamos-te em cada passo — da escolha do imóvel à documentação final, com total transparência sobre custos, impostos e prazos.")}
-              </p>
-            </Reveal>
-            <Reveal className="card" delay={0.1}>
-              <div className="icon">②</div>
-              <h3>{T("Investidor premium")}</h3>
-              <p>
-                {T("Já investes e queres escalar para o mercado oposto? Trabalhamos como parceiros estratégicos: estruturação fiscal, acesso exclusivo a oportunidades e gestor dedicado.")}
-              </p>
-            </Reveal>
+            {c.perfis.map((p, i) => (
+              <Reveal className="card" key={p.id} delay={(i % 2) * 0.1}>
+                {p.icone && <div className="icon">{p.icone}</div>}
+                <h3>{p.titulo}</h3>
+                <p>{p.texto}</p>
+              </Reveal>
+            ))}
           </div>
         </div>
       </section>
@@ -214,22 +200,15 @@ export default async function Home({ params }) {
       <section>
         <div className="container">
           <Reveal className="section-head">
-            <span className="eyebrow">{T("Como funciona")}</span>
-            <h2>{T("Do primeiro contacto à escritura")}</h2>
-            <p>
-              {T("Um processo desenhado para ser simples, previsível e seguro — sabes sempre em que fase estás e quem trabalha por ti.")}
-            </p>
+            <span className="eyebrow">{c.processoEyebrow}</span>
+            <h2>{c.processoTitulo}</h2>
+            <p>{c.processoTexto}</p>
           </Reveal>
           <Reveal className="stats">
-            {[
-              ["1", "Contacto e perfil"],
-              ["2", "Seleção de imóveis"],
-              ["3", "Due diligence"],
-              ["4", "Escritura e pós-venda"],
-            ].map(([n, l]) => (
-              <div className="stat" key={n}>
-                <div className="num">{n}</div>
-                <div className="label">{T(l)}</div>
+            {c.passos.map((p, i) => (
+              <div className="stat" key={p.id}>
+                <div className="num">{i + 1}</div>
+                <div className="label">{p.titulo}</div>
               </div>
             ))}
           </Reveal>
@@ -257,8 +236,8 @@ export default async function Home({ params }) {
         <section>
           <div className="container">
             <Reveal className="section-head">
-              <span className="eyebrow">{T("Parceiros & destaques")}</span>
-              <h2>{T("Em destaque")}</h2>
+              <span className="eyebrow">{c.anunciosEyebrow}</span>
+              <h2>{c.anunciosTitulo}</h2>
             </Reveal>
             <div className="region-grid">
               {anuncios.map((a, i) => (

@@ -16,30 +16,15 @@ export async function generateMetadata({ params }) {
   });
 }
 
-const valores = [
-  ["Confiança", "Cada parceiro da nossa rede é verificado. Sabes sempre com quem trabalhas."],
-  ["Transparência", "Sem surpresas em fees, processo ou documentos. Tudo claro desde o primeiro contacto."],
-  ["Rigor", "Processo jurídico e fiscal impecável nos dois países. Nada é deixado ao acaso."],
-  ["Personalização", "Cada cliente tem objetivos únicos. O serviço adapta-se — nunca é produto de prateleira."],
-  ["Conhecimento", "Operamos em ambos os mercados com profundidade real — legislação, fiscalidade e cultura."],
-];
-
-const diferenciais = [
-  ["Conhecimento bilateral real", "Não somos uma agência com 'contactos do outro lado'. Operamos nos dois mercados com conhecimento profundo."],
-  ["Rede de parceiros verificados", "Cada corretor, advogado e contabilista passa por seleção rigorosa, com credenciais verificadas."],
-  ["Coordenação total", "Um ponto de contacto único coordena todo o processo — intermediação, jurídico e fiscal — nos dois países."],
-  ["Transparência de custos", "Sabes exatamente quanto custa cada serviço antes de avançar. Sem custos escondidos."],
-];
-
 export default async function QuemSomos({ params }) {
   const { lang } = await params;
   const T = (x) => t(lang, x);
-  const c = await getConteudo("quem-somos", lang);
+  const [c, areas] = await Promise.all([getConteudo("quem-somos", lang), getConteudo("areas", lang)]);
   return (
     <>
       <section className="page-hero">
         <div className="container">
-          <span className="eyebrow">{T("Quem Somos")}</span>
+          <span className="eyebrow">{c.heroEyebrow}</span>
           <h1>{c.heroTitulo}</h1>
           <p>{c.heroTexto}</p>
         </div>
@@ -48,10 +33,10 @@ export default async function QuemSomos({ params }) {
       <section className="bg-soft">
         <div className="container">
           <Reveal className="section-head">
-            <span className="eyebrow">{T("O nosso percurso")}</span>
-            <h2>{T("Começámos no imobiliário. Hoje investimos onde encontramos valor.")}</h2>
+            <span className="eyebrow">{c.percursoEyebrow}</span>
+            <h2>{c.percursoTitulo}</h2>
           </Reveal>
-          <AreasCards />
+          <AreasCards textos={areas} />
         </div>
       </section>
 
@@ -59,7 +44,7 @@ export default async function QuemSomos({ params }) {
         <div className="container">
           <div className="grid grid-2" style={{ alignItems: "start", gap: 48 }}>
             <Reveal>
-              <span className="eyebrow">{T("A nossa missão")}</span>
+              <span className="eyebrow">{c.missaoEyebrow}</span>
               <h2 style={{ fontSize: "1.9rem", marginBottom: 16 }}>
                 {c.missaoTitulo}
               </h2>
@@ -67,7 +52,7 @@ export default async function QuemSomos({ params }) {
               <p>{c.missaoTexto2}</p>
             </Reveal>
             <Reveal delay={0.1}>
-              <span className="eyebrow">{T("A nossa visão")}</span>
+              <span className="eyebrow">{c.visaoEyebrow}</span>
               <p style={{ fontSize: "1.15rem", color: "var(--ink)", marginTop: 8 }}>
                 {c.visaoTexto}
               </p>
@@ -79,14 +64,14 @@ export default async function QuemSomos({ params }) {
       <section className="bg-soft">
         <div className="container">
           <Reveal className="section-head">
-            <span className="eyebrow">{T("Os nossos valores")}</span>
-            <h2>{T("Aquilo em que não cedemos")}</h2>
+            <span className="eyebrow">{c.valoresEyebrow}</span>
+            <h2>{c.valoresTitulo}</h2>
           </Reveal>
           <Reveal className="value-table">
-            {valores.map(([k, v], i) => (
-              <div className="vrow" key={k}>
-                <div className={`vk${i % 2 === 1 ? " alt" : ""}`}>{T(k)}</div>
-                <div className="vv">{T(v)}</div>
+            {c.valores.map((v, i) => (
+              <div className="vrow" key={v.id}>
+                <div className={`vk${i % 2 === 1 ? " alt" : ""}`}>{v.titulo}</div>
+                <div className="vv">{v.texto}</div>
               </div>
             ))}
           </Reveal>
@@ -96,14 +81,14 @@ export default async function QuemSomos({ params }) {
       <section>
         <div className="container">
           <Reveal className="section-head">
-            <span className="eyebrow">{T("Diferenciais")}</span>
-            <h2>{T("Porque escolher a Meridie")}</h2>
+            <span className="eyebrow">{c.diferenciaisEyebrow}</span>
+            <h2>{c.diferenciaisTitulo}</h2>
           </Reveal>
           <div className="grid grid-2">
-            {diferenciais.map(([tit, d], i) => (
-              <Reveal className="card" key={tit} delay={(i % 2) * 0.1}>
-                <h3>{T(tit)}</h3>
-                <p>{T(d)}</p>
+            {c.diferenciais.map((d, i) => (
+              <Reveal className="card" key={d.id} delay={(i % 2) * 0.1}>
+                <h3>{d.titulo}</h3>
+                <p>{d.texto}</p>
               </Reveal>
             ))}
           </div>

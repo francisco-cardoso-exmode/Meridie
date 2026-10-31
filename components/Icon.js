@@ -274,6 +274,9 @@ const P = {
   ),
 };
 
+// Nomes disponíveis (escolha de ícone no backoffice).
+export const NOMES_ICONES = Object.keys(P);
+
 export default function Icon({ name, size = 24, className = "", title }) {
   const glyph = P[name];
   if (!glyph) return null;

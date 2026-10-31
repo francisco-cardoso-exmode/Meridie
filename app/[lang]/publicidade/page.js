@@ -3,6 +3,7 @@ import Reveal from "@/components/Reveal";
 import AnuncioCard from "@/components/AnuncioCard";
 import { allAnuncios } from "@/lib/anuncios";
 import { CATEGORIAS_PARCEIRO } from "@/lib/categoriasParceiro";
+import { getConteudo } from "@/lib/conteudo";
 import { t, tf } from "@/lib/i18n";
 import { metaPagina } from "@/lib/seo";
 import { traduzDoc, traduzLista } from "@/lib/i18n/conteudo";
@@ -19,6 +20,7 @@ export async function generateMetadata({ params }) {
 export default async function PaginaPublicidade({ params }) {
   const { lang } = await params;
   const T = (x) => t(lang, x);
+  const c = await getConteudo("publicidade", lang);
   const anuncios = traduzLista(await allAnuncios(), lang);
   const principal = anuncios.find((a) => a.principal);
   const resto = anuncios.filter((a) => a !== principal);
@@ -33,11 +35,9 @@ export default async function PaginaPublicidade({ params }) {
     <>
       <section className="page-hero">
         <div className="container">
-          <span className="eyebrow">{T("Parceiros e patrocinadores")}</span>
-          <h1>{T("Quem nos acompanha entre Portugal e o Brasil.")}</h1>
-          <p>
-            {T("Da viagem à estadia, da mesa à descoberta do destino: as empresas que tornam cada visita mais simples para os nossos clientes.")}
-          </p>
+          <span className="eyebrow">{c.heroEyebrow}</span>
+          <h1>{c.heroTitulo}</h1>
+          <p>{c.heroTexto}</p>
         </div>
       </section>
 
@@ -45,7 +45,7 @@ export default async function PaginaPublicidade({ params }) {
         <section>
           <div className="container">
             <Reveal className="section-head">
-              <span className="eyebrow">{T("Patrocinador principal")}</span>
+              <span className="eyebrow">{c.principalEyebrow}</span>
             </Reveal>
             <Reveal>
               <div className="pub-principal">
@@ -86,10 +86,8 @@ export default async function PaginaPublicidade({ params }) {
       <section>
         <div className="container">
           <Reveal className="cta-band">
-            <h2>{T("Queres ver a tua empresa aqui?")}</h2>
-            <p>
-              {T("Trabalhamos com parcerias e com espaços de patrocínio, com destaque nesta página e na página inicial. Diz-nos o que procuras e enviamos as condições.")}
-            </p>
+            <h2>{c.ctaTitulo}</h2>
+            <p>{c.ctaTexto}</p>
             <L href="/contactos" className="btn btn-primary">{T("Pedir condições")}</L>
           </Reveal>
         </div>

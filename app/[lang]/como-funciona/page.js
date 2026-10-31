@@ -16,52 +16,6 @@ export async function generateMetadata({ params }) {
   });
 }
 
-const passos = [
-  {
-    n: 1,
-    t: "Contacto e análise do perfil",
-    d: "Começa com uma conversa. Compreendemos os teus objetivos, orçamento, preferências de mercado e situação fiscal. Sem compromisso — apenas a base para um serviço personalizado.",
-  },
-  {
-    n: 2,
-    t: "Seleção de oportunidades",
-    d: "Apresentamos um conjunto curado de imóveis com análise de rentabilidade estimada, localização, estado legal e contexto de mercado.",
-  },
-  {
-    n: 3,
-    t: "Due diligence jurídica e fiscal",
-    d: "Antes de qualquer compromisso financeiro, analisamos o imóvel, o vendedor, os documentos e as implicações tributárias nos dois países. Zero surpresas depois da compra.",
-  },
-  {
-    n: 4,
-    t: "Negociação e contratos",
-    d: "Apoiamos a negociação de preço e condições. Os advogados parceiros redigem ou revêm todos os contratos — da promessa à escritura — protegendo os teus interesses.",
-  },
-  {
-    n: 5,
-    t: "Escritura e pós-venda",
-    d: "Acompanhamos até ao registo definitivo. Se precisares de gestão do imóvel, arrendamento ou declarações fiscais, a nossa rede continua disponível.",
-  },
-];
-
-const pilares = [
-  {
-    icon: "link",
-    t: "Intermediação imobiliária",
-    d: "Ligamos-te aos melhores corretores certificados no país de destino, com base no teu perfil e objetivos de rentabilidade — da seleção de imóveis à assinatura do contrato.",
-  },
-  {
-    icon: "scale",
-    t: "Assessoria jurídica",
-    d: "Due diligence legal, revisão e elaboração de contratos (CPCV), representação por procuração, Golden Visa e acompanhamento até à escritura e registo.",
-  },
-  {
-    icon: "percent",
-    t: "Assessoria fiscal",
-    d: "Estruturação fiscal eficiente, apoio com NIF/NHR (Portugal) e CPF/não-residentes (Brasil), tributação de rendimentos e mais-valias, evitando dupla tributação.",
-  },
-];
-
 export default async function ComoFunciona({ params }) {
   const { lang } = await params;
   const T = (x) => t(lang, x);
@@ -70,7 +24,7 @@ export default async function ComoFunciona({ params }) {
     <>
       <section className="page-hero">
         <div className="container">
-          <span className="eyebrow">{T("Como Funciona")}</span>
+          <span className="eyebrow">{c.heroEyebrow}</span>
           <h1>{c.heroTitulo}</h1>
           <p>{c.heroTexto}</p>
         </div>
@@ -79,16 +33,16 @@ export default async function ComoFunciona({ params }) {
       <section>
         <div className="container">
           <Reveal className="section-head">
-            <span className="eyebrow">{T("O processo")}</span>
-            <h2>{T("Os 5 passos")}</h2>
+            <span className="eyebrow">{c.passosEyebrow}</span>
+            <h2>{c.passosTitulo}</h2>
           </Reveal>
           <div className="steps">
-            {passos.map((p, i) => (
-              <Reveal className="step" key={p.n} delay={i * 0.08}>
-                <div className="n">{p.n}</div>
+            {c.passos.map((p, i) => (
+              <Reveal className="step" key={p.id} delay={i * 0.08}>
+                <div className="n">{i + 1}</div>
                 <div>
-                  <h3>{T(p.t)}</h3>
-                  <p>{T(p.d)}</p>
+                  <h3>{p.titulo}</h3>
+                  <p>{p.texto}</p>
                 </div>
               </Reveal>
             ))}
@@ -99,18 +53,16 @@ export default async function ComoFunciona({ params }) {
       <section className="bg-soft">
         <div className="container">
           <Reveal className="section-head">
-            <span className="eyebrow">{T("Os nossos serviços")}</span>
-            <h2>{T("Três pilares, um processo coordenado")}</h2>
-            <p>
-              {T("Não somos uma agência tradicional. Coordenamos toda a cadeia — da identificação do imóvel à conclusão legal e fiscal do negócio.")}
-            </p>
+            <span className="eyebrow">{c.pilaresEyebrow}</span>
+            <h2>{c.pilaresTitulo}</h2>
+            <p>{c.pilaresTexto}</p>
           </Reveal>
           <div className="grid grid-3">
-            {pilares.map((p, i) => (
-              <Reveal className="card" key={p.t} delay={i * 0.1}>
-                <div className="icon"><Icon name={p.icon} /></div>
-                <h3>{T(p.t)}</h3>
-                <p>{T(p.d)}</p>
+            {c.pilares.map((p, i) => (
+              <Reveal className="card" key={p.id} delay={i * 0.1}>
+                {p.icone && <div className="icon"><Icon name={p.icone} /></div>}
+                <h3>{p.titulo}</h3>
+                <p>{p.texto}</p>
               </Reveal>
             ))}
           </div>
@@ -120,10 +72,8 @@ export default async function ComoFunciona({ params }) {
       <section>
         <div className="container">
           <Reveal className="cta-band">
-            <h2>{T("Pronto para começar?")}</h2>
-            <p>
-              {T("O primeiro passo é só uma conversa. Conta-nos os teus objetivos e traçamos o caminho contigo.")}
-            </p>
+            <h2>{c.ctaTitulo}</h2>
+            <p>{c.ctaTexto}</p>
             <L href="/contactos" className="btn btn-primary">
               {T("Falar com um especialista")}
             </L>

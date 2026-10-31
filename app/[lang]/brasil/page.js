@@ -10,6 +10,7 @@ import {
   tiposDe,
   finalidadesDe,
 } from "@/lib/store";
+import { getConteudo } from "@/lib/conteudo";
 import { t, tf } from "@/lib/i18n";
 import { metaPagina } from "@/lib/seo";
 import { traduzDoc, traduzLista } from "@/lib/i18n/conteudo";
@@ -28,6 +29,7 @@ export const revalidate = 60;
 export default async function PaginaBrasil({ params }) {
   const { lang } = await params;
   const T = (x) => t(lang, x);
+  const c = await getConteudo("brasil", lang);
   const empreendimentos = traduzLista(await allEmpreendimentos({ pais: "brasil" }), lang).map(cartaoEmpreendimento);
   const regioes = traduzLista(await allRegioes({ pais: "brasil", topo: true }), lang);
 
@@ -36,19 +38,17 @@ export default async function PaginaBrasil({ params }) {
       <MarketHero
         img="https://images.unsplash.com/photo-1483729558449-99ef09a8c325?auto=format&fit=crop&w=1600&q=72"
         alt={T("Rio de Janeiro, Brasil")}
-        eyebrow={T("Mercado Brasil")}
-        titulo={T("Investir no Brasil")}
+        eyebrow={c.heroEyebrow}
+        titulo={c.heroTitulo}
       >
-        {T("Preços competitivos face à Europa, yields superiores e um mercado em expansão. São Paulo, Rio, Nordeste e Sul.")}
+        {c.heroTexto}
       </MarketHero>
 
       <section style={{ paddingBottom: 40 }}>
         <div className="container">
           <Reveal className="section-head" style={{ marginBottom: 28 }}>
-            <h2 style={{ fontSize: "1.6rem" }}>{T("Porquê o Brasil?")}</h2>
-            <p>
-              {T("De São Paulo e Rio ao Nordeste e ao Sul, o mercado oferece opções para diferentes perfis e orçamentos. Tratamos das especificidades — ITBI, regras para não-residentes, cartórios e documentação.")}
-            </p>
+            <h2 style={{ fontSize: "1.6rem" }}>{c.porqueTitulo}</h2>
+            <p>{c.porqueTexto}</p>
           </Reveal>
           <div className="region-grid">
             {regioes.map((r, i) => (

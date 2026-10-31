@@ -5,6 +5,7 @@ import { PAGINAS, getConteudo } from "@/lib/conteudo";
 import { getDb } from "@/lib/mongodb";
 import AvisoSemBase from "@/components/admin/AvisoSemBase";
 import { leAdmin } from "@/lib/leituraAdmin";
+import { extrair } from "@/lib/traducaoCampos";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Editar página" };
@@ -29,10 +30,12 @@ export default async function EditarPagina({ params }) {
       </div>
     );
   }
-  const [valores, enMostrado] = await Promise.all([
+  const [valores, enConteudo] = await Promise.all([
     getConteudo(pagina),
     getConteudo(pagina, "en"),
   ]);
+  // O inglês no formato do painel "Versão inglesa" (listas por id).
+  const enMostrado = extrair("paginas", { campos: enConteudo });
 
   return (
     <div className="admin-container">

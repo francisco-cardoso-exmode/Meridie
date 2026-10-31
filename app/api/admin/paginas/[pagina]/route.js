@@ -1,7 +1,7 @@
 import { NextResponse, after } from "next/server";
 import { traduzirEmFundo } from "@/lib/traducao";
 import { isAdmin } from "@/lib/adminAuth";
-import { PAGINAS, getConteudo, setConteudo, limpaCampos } from "@/lib/conteudo";
+import { PAGINAS, getConteudo, setConteudo, limpaCampos, migraDoc } from "@/lib/conteudo";
 import { getDb } from "@/lib/mongodb";
 import { revalidaSite } from "@/lib/revalida";
 import { prepararEn } from "@/lib/validar";
@@ -29,10 +29,18 @@ export async function POST(request, { params }) {
   if (!campos) return NextResponse.json({ ok: false, erro: "Pedido inválido." }, { status: 400 });
 
   const db = await getDb();
-  const antes = await db.collection("paginas").findOne({ _id: pagina });
-  // Só as correções inglesas desta edição, juntas ao inglês ATUAL da base.
-  const { set, enAntes } = prepararEn("paginas", antes ?? { campos }, { campos }, body.enEditado);
-  await setConteudo(pagina, campos, set.en);
+  // Já no formato atual (ex.: os cartões antigos da Tecnologia passam a lista).
+  const antes = migraDoc(pagina, await db.collection("paginas").findOne({ _id: pagina }));
+  // Só as correções inglesas desta edição, juntas ao inglês ATUAL da base. As
+  // chaves válidas são as dos campos gravados agora (as listas têm ids estáveis,
+  // e uma lista nova ainda não está no documento antigo).
+  const { set, enAntes } = prepararEn("paginas", { ...(antes || {}), campos }, { campos }, body.enEditado);
+  await setConteudo(
+    pagina,
+    campos,
+    set.en ?? (antes?.migrado ? antes.en : undefined),
+    antes?.migrado ? antes.enFonte : undefined
+  );
   revalidaSite();
   after(() => traduzirEmFundo("paginas", pagina, enAntes));
   return NextResponse.json({ ok: true });
