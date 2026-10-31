@@ -73,6 +73,12 @@ export default async function Footer({ lang = "pt" }) {
               <li>
                 <L href="/faq">{T("Perguntas frequentes")}</L>
               </li>
+              <li>
+                <L href="/alojamento">{T("Alojamento local")}</L>
+              </li>
+              <li>
+                <L href="/inscreve-a-tua-casa">{T("Inscreve a tua casa")}</L>
+              </li>
             </ul>
           </div>
           <div>
