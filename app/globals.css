@@ -332,6 +332,8 @@ section {
   gap: 24px;
   text-align: center;
 }
+/* Passos da Home: uma coluna por passo (o número vem do backoffice). */
+.stats.passos-home { grid-template-columns: repeat(var(--n, 4), 1fr); }
 .stat .num {
   font-size: 2.6rem;
   font-weight: 800;
@@ -1604,6 +1606,11 @@ body.com-compare-bar {
   .stats {
     grid-template-columns: repeat(2, 1fr);
   }
+  .stats.passos-home {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  /* Número ímpar de passos: o último fica ao centro. */
+  .stats.passos-home > :last-child:nth-child(odd) { grid-column: 1 / -1; }
   .spec-row {
     grid-template-columns: repeat(2, 1fr);
   }

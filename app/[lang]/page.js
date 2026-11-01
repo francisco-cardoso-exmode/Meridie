@@ -179,7 +179,7 @@ export default async function Home({ params }) {
             <h2>{c.processoTitulo}</h2>
             <p>{c.processoTexto}</p>
           </Reveal>
-          <Reveal className="stats">
+          <Reveal className="stats passos-home" style={{ "--n": c.passos.length }}>
             {c.passos.map((p, i) => (
               <div className="stat" key={p.id}>
                 <div className="num">{i + 1}</div>

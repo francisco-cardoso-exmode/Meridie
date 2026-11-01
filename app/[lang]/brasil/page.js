@@ -20,7 +20,7 @@ export async function generateMetadata({ params }) {
   const { lang } = await params;
   return metaPagina(lang, "/brasil", {
     titulo: t(lang, "Investir no Brasil"),
-    descricao: t(lang, "Empreendimentos selecionados no Brasil — São Paulo, Rio de Janeiro, Nordeste e Sul. Yields superiores à média europeia e mercado em expansão. Filtra por zona, tipo e finalidade."),
+    descricao: t(lang, "Empreendimentos selecionados no Brasil, com foco no Nordeste — Fortaleza, Cumbuco e Jericoacoara. Yields superiores à média europeia. Filtra por zona, tipo e finalidade."),
   });
 }
 
