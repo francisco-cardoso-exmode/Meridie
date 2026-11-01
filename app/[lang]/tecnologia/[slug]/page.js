@@ -11,6 +11,8 @@ import { t, tf } from "@/lib/i18n";
 import { metaPagina, metaNaoEncontrado, urlPublica, jsonLd } from "@/lib/seo";
 import { SITE_NAME } from "@/lib/site";
 import { traduzDoc, traduzLista } from "@/lib/i18n/conteudo";
+import { emPrevisualizacao } from "@/lib/previsualizacao";
+import AvisoPrevisualizacao from "@/components/AvisoPrevisualizacao";
 
 export const revalidate = 60;
 export const dynamicParams = true;
@@ -22,18 +24,19 @@ export async function generateStaticParams() {
 async function visivel(slug, lang) {
   if (!TECNOLOGIA_VISIVEL) return null;
   const s = traduzDoc(await solucaoBySlug(slug), lang);
-  return s && s.ativo !== false ? s : null;
+  return s && (s.ativo !== false || (await emPrevisualizacao())) ? s : null;
 }
 
 export async function generateMetadata({ params }) {
   const { slug, lang } = await params;
   const s = await visivel(slug, lang);
   if (!s) return metaNaoEncontrado(lang, t(lang, "Solução não encontrada"));
-  return metaPagina(lang, hrefSolucao(s.slug), {
+  const meta = metaPagina(lang, hrefSolucao(s.slug), {
     titulo: s.nome,
     descricao: s.tagline || (s.problema ? s.problema.slice(0, 160) : s.nome),
     imagem: s.imagens?.[0],
   });
+  return s.ativo === false ? { ...meta, robots: { index: false, follow: false } } : meta;
 }
 
 // Pedido de um só item (mesmo sistema das Representações).
@@ -60,6 +63,7 @@ export default async function PaginaSolucao({ params }) {
 
   return (
     <div className="sol-pagina">
+      {s.ativo === false && <AvisoPrevisualizacao caminho={hrefSolucao(s.slug)} editar={`/admin/solucoes/${encodeURIComponent(s.slug)}`} />}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(ld) }} />
       <section className="page-hero">
         <div className="container">

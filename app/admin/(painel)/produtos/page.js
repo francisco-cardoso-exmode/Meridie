@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { urlPrevisualizar } from "@/lib/previsualizacao";
 import { allMarcas } from "@/lib/marcas";
 import { allCategorias, allProdutos } from "@/lib/representacoes";
 import { formataPreco, hrefProduto, temPreco } from "@/lib/catalogo";
@@ -105,7 +106,9 @@ export default async function AdminProdutos() {
                 </div>
               </div>
               <div className="admin-row-actions">
-                <Link href={hrefProduto(p)} target="_blank" className="admin-link">Ver</Link>
+                <a href={urlPrevisualizar(hrefProduto(p))} target="_blank" className="admin-link">
+                  {p.ativo === false ? "Pré-visualizar" : "Ver"}
+                </a>
                 {!p.legado && (
                   <>
                     <Link href={`/admin/produtos/${encodeURIComponent(p.slug)}`} className="admin-link">Editar</Link>

@@ -13,25 +13,31 @@ import { COMODIDADES, PAISES, hojeLisboa, moedaDe, formatarValor, percentagemTax
 import { getConfigAl } from "@/lib/al/config";
 import { pagamentoDisponivel } from "@/lib/pagamentos";
 import Icon from "@/components/Icon";
+import { emPrevisualizacao } from "@/lib/previsualizacao";
+import AvisoPrevisualizacao from "@/components/AvisoPrevisualizacao";
 
 export const revalidate = 60;
 
+// Publicada, ou qualquer uma em pré-visualização do backoffice.
+const lerCasa = async (slug) => (await casaPublica(slug)) || ((await emPrevisualizacao()) ? casaPublica(slug, { qualquerEstado: true }) : null);
+
 export async function generateMetadata({ params }) {
   const { lang, slug } = await params;
-  const r = await casaPublica(slug);
+  const r = await lerCasa(slug);
   if (!r) return metaNaoEncontrado(lang);
   const c = traduzDoc(r.casa, lang);
-  return metaPagina(lang, `/alojamento/${slug}`, {
+  const meta = metaPagina(lang, `/alojamento/${slug}`, {
     titulo: c.titulo,
     descricao: String(c.descricao || "").slice(0, 160) || t(lang, "Alojamento local Meridie"),
     imagem: c.fotos?.[0],
   });
+  return r.oculta ? { ...meta, robots: { index: false, follow: false } } : meta;
 }
 
 export default async function CasaPagina({ params }) {
   const { lang, slug } = await params;
   const T = (x) => t(lang, x);
-  const r = await casaPublica(slug);
+  const r = await lerCasa(slug);
   if (!r) notFound();
   const c = traduzDoc(r.casa, lang);
   const hoje = hojeLisboa();
@@ -43,6 +49,7 @@ export default async function CasaPagina({ params }) {
 
   return (
     <div className="container al-pagina">
+      {r.oculta && <AvisoPrevisualizacao caminho={`/alojamento/${slug}`} editar={`/admin/alojamento/casas/${slug}`} />}
       <nav className="breadcrumb" aria-label="breadcrumb">
         <L href="/alojamento">{T("Alojamento local")}</L> / <span>{c.cidade}</span>
       </nav>

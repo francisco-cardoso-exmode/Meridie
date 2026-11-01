@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { urlPrevisualizar } from "@/lib/previsualizacao";
 import { allEmpreendimentos } from "@/lib/store";
 import { formatarPreco, referenciaDe, precoEmEuros, PAIS_LABEL } from "@/lib/empreendimentos";
 import { thumbUrl } from "@/lib/format";
@@ -87,9 +88,9 @@ export default async function AdminEmpreendimentos() {
             </div>
             <RefCopy valor={referenciaDe(e)} />
             <div className="admin-row-actions">
-              <Link href={`/empreendimentos/${encodeURIComponent(e.slug)}`} target="_blank" className="admin-link">
-                Ver
-              </Link>
+              <a href={urlPrevisualizar(`/empreendimentos/${encodeURIComponent(e.slug)}`)} target="_blank" className="admin-link">
+                {e.publicado === false ? "Pré-visualizar" : "Ver"}
+              </a>
               <Link href={`/admin/empreendimentos/${encodeURIComponent(e.slug)}`} className="admin-link">
                 Editar
               </Link>

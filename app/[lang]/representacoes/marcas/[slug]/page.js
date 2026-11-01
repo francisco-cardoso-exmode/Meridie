@@ -10,6 +10,10 @@ import { arvoreCategorias, hrefCategoria, hrefMarca } from "@/lib/catalogo";
 import { t, tf } from "@/lib/i18n";
 import { metaPagina, metaNaoEncontrado } from "@/lib/seo";
 import { traduzDoc, traduzLista } from "@/lib/i18n/conteudo";
+import { emPrevisualizacao } from "@/lib/previsualizacao";
+import AvisoPrevisualizacao from "@/components/AvisoPrevisualizacao";
+
+const podeVer = async (m) => !!m && (m.ativo !== false || (await emPrevisualizacao()));
 
 export const revalidate = 60;
 export const dynamicParams = true;
@@ -21,20 +25,26 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }) {
   const { slug, lang } = await params;
   const m = traduzDoc(await marcaBySlug(slug), lang);
-  if (!m || m.ativo === false) return metaNaoEncontrado(lang, t(lang, "Marca não encontrada"));
-  return metaPagina(lang, hrefMarca(m.slug), {
+  if (!(await podeVer(m))) return metaNaoEncontrado(lang, t(lang, "Marca não encontrada"));
+  const meta = metaPagina(lang, hrefMarca(m.slug), {
     titulo: m.nome,
     descricao: m.texto || tf(lang, "{nome} — marca representada pela Meridie Investments.", { nome: m.nome }),
     imagem: m.imagens?.[0],
   });
+  return m.ativo === false ? { ...meta, robots: { index: false, follow: false } } : meta;
 }
 
 export default async function PaginaMarca({ params }) {
   const { slug, lang } = await params;
   const T = (x) => t(lang, x);
   const m = traduzDoc(await marcaBySlug(slug), lang);
-  if (!m || m.ativo === false) notFound();
-  const [outrasPt, produtosPt, catsPt] = await Promise.all([allMarcas(), allProdutos({ marca: m.slug }), allCategorias()]);
+  if (!(await podeVer(m))) notFound();
+  // Marca inativa (pré-visualização): os seus produtos ativos, como ficarão ao ativá-la.
+  const [outrasPt, produtosPt, catsPt] = await Promise.all([
+    allMarcas(),
+    allProdutos({ marca: m.slug, todos: m.ativo === false }).then((l) => l.filter((p) => p.ativo !== false)),
+    allCategorias(),
+  ]);
   const outras = traduzLista(outrasPt, lang).filter((x) => x.slug !== m.slug);
   const produtos = cartoesProdutos(traduzLista(produtosPt, lang), [m]);
   // Produtos agrupados pela categoria de topo (pela ordem das categorias).
@@ -50,6 +60,7 @@ export default async function PaginaMarca({ params }) {
 
   return (
     <div className="marca-pagina">
+      {m.ativo === false && <AvisoPrevisualizacao caminho={hrefMarca(m.slug)} editar={`/admin/marcas/${encodeURIComponent(m.slug)}`} />}
       <section className="page-hero">
         <div className="container marca-hero">
           <div>

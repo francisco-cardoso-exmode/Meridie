@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { urlPrevisualizar } from "@/lib/previsualizacao";
+import { hrefMarca } from "@/lib/catalogo";
 import { allMarcas, garanteSeed } from "@/lib/marcas";
 import { allCategorias, allProdutos } from "@/lib/representacoes";
 import ListaFiltravel from "@/components/admin/ListaFiltravel";
@@ -84,6 +86,9 @@ export default async function AdminMarcas() {
                 </div>
               </div>
               <div className="admin-row-actions">
+                <a href={urlPrevisualizar(hrefMarca(m.slug))} target="_blank" className="admin-link">
+                  {m.ativo === false ? "Pré-visualizar" : "Ver"}
+                </a>
                 <Link href={`/admin/marcas/${encodeURIComponent(m.slug)}`} className="admin-link">Editar</Link>
                 <DeleteButton slug={m.slug} nome={m.nome} endpoint="marcas" />
               </div>

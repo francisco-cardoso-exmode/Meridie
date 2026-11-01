@@ -6,7 +6,9 @@ import PrecoProduto from "@/components/PrecoProduto";
 import ProdutoCard from "@/components/ProdutoCard";
 import AdicionarAoPedido from "@/components/AdicionarAoPedido";
 import { allMarcas } from "@/lib/marcas";
-import { allCategorias, allProdutos, cartoesProdutos } from "@/lib/representacoes";
+import { allCategorias, allProdutos, cartoesProdutos, produtoBySlug } from "@/lib/representacoes";
+import { emPrevisualizacao } from "@/lib/previsualizacao";
+import AvisoPrevisualizacao from "@/components/AvisoPrevisualizacao";
 import { hrefCategoria, hrefMarca, hrefProduto, temPreco } from "@/lib/catalogo";
 import { caminho, t, tf } from "@/lib/i18n";
 import { metaPagina, metaNaoEncontrado, urlPublica, jsonLd } from "@/lib/seo";
@@ -20,9 +22,13 @@ export async function generateStaticParams() {
   return [];
 }
 
-// Só os produtos visíveis (ativos, de marca e categoria ativas).
+// Só os produtos visíveis (ativos, de marca e categoria ativas) — ou qualquer
+// um, marcado `oculto`, em pré-visualização do backoffice.
 async function produtoVisivel(slug) {
-  return (await allProdutos()).find((p) => p.slug === slug) || null;
+  const p = (await allProdutos()).find((x) => x.slug === slug);
+  if (p) return p;
+  const oculto = await produtoBySlug(slug);
+  return oculto && (await emPrevisualizacao()) ? { ...oculto, oculto: true } : null;
 }
 
 const absoluto = (src) => (src?.startsWith("/") ? `${SITE_URL}${src}` : src);
@@ -32,12 +38,13 @@ export async function generateMetadata({ params }) {
   const p = traduzDoc(await produtoVisivel(produto), lang);
   if (!p) return metaNaoEncontrado(lang, t(lang, "Produto não encontrado"));
   const marca = (await allMarcas({ todos: true })).find((m) => m.slug === p.marca);
-  return metaPagina(lang, hrefProduto(p), {
+  const meta = metaPagina(lang, hrefProduto(p), {
     titulo: marca ? `${p.nome} — ${marca.nome}` : p.nome,
     descricao: p.resumo || (p.descricao ? p.descricao.slice(0, 160) : p.nome),
     imagem: p.imagens?.[0],
     tipo: "website",
   });
+  return p.oculto ? { ...meta, robots: { index: false, follow: false } } : meta;
 }
 
 export default async function PaginaProduto({ params }) {
@@ -122,6 +129,7 @@ export default async function PaginaProduto({ params }) {
 
   return (
     <div className="rep-produto-pagina">
+      {pt.oculto && <AvisoPrevisualizacao caminho={hrefProduto(pt)} editar={`/admin/produtos/${encodeURIComponent(pt.slug)}`} />}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(ld) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(ldMigalhas) }} />
       <section className="rep-produto-topo">

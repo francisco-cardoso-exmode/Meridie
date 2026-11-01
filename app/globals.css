@@ -4996,3 +4996,27 @@ a.an-calor-cel:focus-visible,
 .lead-nota-nova { margin-top: 10px; display: grid; gap: 8px; }
 .lead-nota-nova textarea { width: 100%; font: inherit; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; }
 .lead-nota-nova .btn { padding: 8px 16px; font-size: 0.85rem; }
+
+/* Pré-visualização de conteúdo oculto (só admin) */
+.aviso-previsualizacao {
+  position: fixed;
+  left: 50%;
+  top: 86px;
+  transform: translateX(-50%);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  gap: 8px 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: max-content;
+  max-width: calc(100vw - 32px);
+  padding: 12px 20px;
+  border-radius: 12px;
+  background: var(--navy-dark);
+  color: #fff;
+  font-size: 0.88rem;
+  box-shadow: 0 12px 34px rgba(10, 25, 47, 0.35);
+}
+.aviso-previsualizacao strong { color: var(--gold-light); }
+.aviso-previsualizacao a { color: #fff; text-decoration: underline; font-weight: 600; }

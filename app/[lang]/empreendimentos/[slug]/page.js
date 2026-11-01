@@ -26,6 +26,11 @@ import ContactosDiretos from "@/components/ContactosDiretos";
 import { metaPagina, metaNaoEncontrado, urlPublica, jsonLd } from "@/lib/seo";
 import { traduzDoc, traduzLista } from "@/lib/i18n/conteudo";
 import { intervalo, formataIntervalo, eUm, formataQuartos } from "@/lib/intervalo";
+import { emPrevisualizacao } from "@/lib/previsualizacao";
+import AvisoPrevisualizacao from "@/components/AvisoPrevisualizacao";
+
+// Visível no site, ou oculto mas em pré-visualização do backoffice.
+const podeVer = async (e) => !!e && (e.publicado !== false || (await emPrevisualizacao()));
 
 export const revalidate = 60;
 export const dynamicParams = true;
@@ -38,23 +43,24 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }) {
   const { slug, lang } = await params;
   const e = traduzDoc(await empreendimentoBySlug(slug), lang);
-  if (!e || e.publicado === false) return metaNaoEncontrado(lang, t(lang, "Empreendimento não encontrado"));
+  if (!(await podeVer(e))) return metaNaoEncontrado(lang, t(lang, "Empreendimento não encontrado"));
   const titulo = `${e.nome} — ${e.cidade}`;
   const desc =
     e.resumo ||
     (e.descricao ? e.descricao.slice(0, 160) : tf(lang, "Investir em {nome}, {cidade}.", { nome: e.nome, cidade: e.cidade }));
-  return metaPagina(lang, `/empreendimentos/${e.slug}`, {
+  const meta = metaPagina(lang, `/empreendimentos/${e.slug}`, {
     titulo,
     descricao: desc,
     imagem: e.imagens?.[0],
   });
+  return e.publicado === false ? { ...meta, robots: { index: false, follow: false } } : meta;
 }
 
 export default async function PaginaEmpreendimento({ params }) {
   const { slug, lang } = await params;
   const T = (x) => t(lang, x);
   const e = traduzDoc(await empreendimentoBySlug(slug), lang);
-  if (!e || e.publicado === false) {
+  if (!(await podeVer(e))) {
     // URL antigo? Reencaminha para o novo slug.
     const antigo = await empreendimentoPorSlugAntigo(slug);
     if (antigo && antigo.publicado !== false) {
@@ -125,6 +131,9 @@ export default async function PaginaEmpreendimento({ params }) {
 
   return (
     <>
+      {e.publicado === false && (
+        <AvisoPrevisualizacao caminho={`/empreendimentos/${e.slug}`} editar={`/admin/empreendimentos/${encodeURIComponent(e.slug)}`} />
+      )}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLd(ld) }}

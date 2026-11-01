@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { urlPrevisualizar } from "@/lib/previsualizacao";
 import { notFound } from "next/navigation";
 import CasaForm from "@/components/al/CasaForm";
 import Relatorio from "@/components/al/Relatorio";
@@ -50,6 +51,9 @@ export default async function CasaAdmin({ params }) {
       </p>
       {falta.length > 0 && <div className="ajuda-aviso">Para publicar falta: {falta.join(", ")}.</div>}
       <div className="al-acoes-admin">
+        <a href={urlPrevisualizar(`/alojamento/${slug}`)} target="_blank" className="btn btn-outline">
+          {casa.estado === "publicada" ? "Ver no site ↗" : "Pré-visualizar ↗"}
+        </a>
         {(ACOES[casa.estado] || []).map(([estado, rot]) => (
           <BotaoAcao
             key={estado}

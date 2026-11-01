@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { urlPrevisualizar } from "@/lib/previsualizacao";
 import ListaFiltravel from "@/components/admin/ListaFiltravel";
 import AvisoSemBase from "@/components/admin/AvisoSemBase";
 import { leAdmin } from "@/lib/leituraAdmin";
@@ -37,11 +38,9 @@ export default async function CasasAdmin() {
             </div>
           </div>
           <div className="admin-row-actions">
-            {c.estado === "publicada" && (
-              <Link href={`/alojamento/${c.slug}`} target="_blank" className="admin-link">
-                Ver
-              </Link>
-            )}
+            <a href={urlPrevisualizar(`/alojamento/${c.slug}`)} target="_blank" className="admin-link">
+              {c.estado === "publicada" ? "Ver" : "Pré-visualizar"}
+            </a>
             <Link href={`/admin/alojamento/casas/${c.slug}`} className="admin-link">
               Abrir
             </Link>

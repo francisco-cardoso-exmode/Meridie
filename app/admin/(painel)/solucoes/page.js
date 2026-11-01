@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { urlPrevisualizar } from "@/lib/previsualizacao";
 import { allSolucoes } from "@/lib/solucoes";
 import { TIPOS_SOLUCAO, hrefSolucao, temPreco } from "@/lib/catalogo";
 import ListaFiltravel from "@/components/admin/ListaFiltravel";
@@ -66,7 +67,9 @@ export default async function AdminSolucoes() {
                 </div>
               </div>
               <div className="admin-row-actions">
-                <Link href={hrefSolucao(s.slug)} target="_blank" className="admin-link">Ver</Link>
+                <a href={urlPrevisualizar(hrefSolucao(s.slug))} target="_blank" className="admin-link">
+                  {s.ativo === false ? "Pré-visualizar" : "Ver"}
+                </a>
                 <Link href={`/admin/solucoes/${encodeURIComponent(s.slug)}`} className="admin-link">Editar</Link>
                 <DeleteButton slug={s.slug} nome={s.nome} endpoint="solucoes" />
               </div>
