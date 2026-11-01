@@ -44,6 +44,10 @@ const INDICES = [
   ["pedidos", { criadoEm: -1 }, { name: "criadoEm_desc" }],
   ["pedidos", { estado: 1, criadoEm: -1 }, { name: "estado_criadoEm" }],
   ["pedidos", { referencia: 1 }, { unique: true, name: "referencia_unica" }],
+  // Lixo (30 dias, esvaziado pela app para limpar também as imagens) e atividade do backoffice.
+  ["lixo", { apagadoEm: -1 }, { name: "apagadoEm_desc" }],
+  ["lixo", { expiraEm: 1 }, { name: "expiraEm" }],
+  ["atividade", { em: 1 }, { expireAfterSeconds: 730 * DIA, name: "ttl_2_anos" }],
   // Alojamento Local
   ["al_proprietarios", { email: 1 }, { unique: true, name: "email_unico" }],
   ["al_equipa", { email: 1 }, { unique: true, name: "email_unico" }],

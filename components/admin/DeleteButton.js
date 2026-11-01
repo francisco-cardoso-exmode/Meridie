@@ -7,7 +7,7 @@ export default function DeleteButton({ slug, nome, endpoint = "empreendimentos" 
   const [a, setA] = useState("idle");
 
   async function apagar() {
-    if (!confirm(`Apagar "${nome}"? Esta ação não pode ser desfeita.`)) return;
+    if (!confirm(`Apagar "${nome}"? Fica 30 dias no lixo (Conta → Atividade e lixo), de onde se pode recuperar.`)) return;
     setA("loading");
     const r = await pedidoAdmin(`/api/admin/${endpoint}/${encodeURIComponent(slug)}`, {
       method: "DELETE",

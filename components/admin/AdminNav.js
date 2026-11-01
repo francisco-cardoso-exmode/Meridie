@@ -49,6 +49,7 @@ const MENU = [
     sub: [
       { href: "/admin/definicoes", label: "Definições" },
       { href: "/admin/utilizadores", label: "Utilizadores" },
+      { href: "/admin/atividade", label: "Atividade e lixo" },
       { href: "/admin/ajuda", label: "Ajuda" },
     ],
   },
