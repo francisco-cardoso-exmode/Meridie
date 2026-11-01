@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { pedidoAdmin } from "@/lib/adminCliente";
+import { pedidoAdmin, useAvisoSaida } from "@/lib/adminCliente";
 
 // `bloqueado`: a leitura da base falhou — não gravar valores vazios por cima dos reais.
 export default function EmpresaForm({ inicial, bloqueado = false }) {
@@ -14,6 +14,8 @@ export default function EmpresaForm({ inicial, bloqueado = false }) {
     locais: inicial?.locais || "",
   });
   const [estado, setEstado] = useState({ a: "idle", msg: "" });
+  const [gravado, setGravado] = useState(() => JSON.stringify(f));
+  useAvisoSaida(JSON.stringify(f) !== gravado);
   const set = (k) => (e) => setF((p) => ({ ...p, [k]: e.target.value }));
 
   async function guardar(e) {
@@ -21,6 +23,7 @@ export default function EmpresaForm({ inicial, bloqueado = false }) {
     if (bloqueado) return;
     setEstado({ a: "loading", msg: "" });
     const r = await pedidoAdmin("/api/admin/empresa", { body: f });
+    if (r.ok) setGravado(JSON.stringify(f));
     setEstado(r.ok ? { a: "ok", msg: "Guardado. Aparece nas páginas legais e no rodapé." } : { a: "erro", msg: r.erro });
   }
 

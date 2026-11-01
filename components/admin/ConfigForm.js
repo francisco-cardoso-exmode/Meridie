@@ -1,13 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { pedidoAdmin } from "@/lib/adminCliente";
+import { pedidoAdmin, useAvisoSaida } from "@/lib/adminCliente";
 
 // `porDefeito`: para onde vão as mensagens quando a lista fica vazia
 // (variável CONTACT_TO / SMTP_USER). `bloqueado`: a leitura falhou — não gravar.
 export default function ConfigForm({ inicial = [], porDefeito = [], bloqueado = false }) {
   const [texto, setTexto] = useState(inicial.join("\n"));
   const [estado, setEstado] = useState({ a: "idle", msg: "" });
+  const [gravado, setGravado] = useState(texto);
+  useAvisoSaida(texto !== gravado);
 
   const lista = texto
     .split("\n")
@@ -20,7 +22,9 @@ export default function ConfigForm({ inicial = [], porDefeito = [], bloqueado = 
     setEstado({ a: "loading", msg: "" });
     const r = await pedidoAdmin("/api/admin/config", { body: { destinatarios: lista } });
     if (r.ok) {
-      setTexto((r.destinatarios || []).join("\n"));
+      const novo = (r.destinatarios || []).join("\n");
+      setTexto(novo);
+      setGravado(novo);
       setEstado({
         a: "ok",
         msg: r.destinatarios.length

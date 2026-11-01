@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useT } from "@/components/LangProvider";
 import FotosAl from "@/components/al/FotosAl";
 import { pedidoAl } from "@/lib/al/cliente";
+import { useAvisoSaida, MSG_SAIR } from "@/lib/adminCliente";
 import { COMODIDADES, TIPOLOGIAS, DIVISOES_SUGERIDAS, PAISES } from "@/lib/al/regras";
 
 /**
@@ -45,6 +46,8 @@ export default function CasaForm({ casa, modo = "proprietario", urlDepois }) {
   }));
   const [novaDiv, setNovaDiv] = useState("");
   const [estado, setEstado] = useState({ a: "idle", msg: "" });
+  const [gravado, setGravado] = useState(() => JSON.stringify(c));
+  const libertar = useAvisoSaida(JSON.stringify(c) !== gravado, t(MSG_SAIR));
   const set = (k) => (e) => setC((x) => ({ ...x, [k]: e.target.type === "checkbox" ? e.target.checked : e.target.value }));
   const moeda = PAISES[c.pais]?.moeda || "EUR";
 
@@ -75,12 +78,17 @@ export default function CasaForm({ casa, modo = "proprietario", urlDepois }) {
           : `/api/proprietario/casas/${casa.slug}`;
     const r = await pedidoAl(url, { method: nova ? "POST" : "PUT", body });
     if (!r.ok) return setEstado({ a: "erro", msg: t(r.erro) });
+    setGravado(JSON.stringify(c));
     if (nova) {
+      libertar();
       window.location.href = href(`/proprietario/casas/${r.slug}`);
       return;
     }
     setEstado({ a: "ok", msg: t("Guardado.") });
-    if (urlDepois) window.location.href = urlDepois;
+    if (urlDepois) {
+      libertar();
+      window.location.href = urlDepois;
+    }
   }
 
   return (

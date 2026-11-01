@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { pedidoAdmin } from "@/lib/adminCliente";
+import { pedidoAdmin, useAvisoSaida } from "@/lib/adminCliente";
 import { ORIGENS, ROTULO_ORIGEM, TIPOS_TAREFA, ROTULO_TIPO_TAREFA } from "@/lib/al/regras";
 
 /**
@@ -309,6 +309,8 @@ export function NovoMembro() {
 export function DefinicoesAl({ config }) {
   const [c, setC] = useState(config);
   const [estado, setEstado] = useState({ a: "idle", msg: "" });
+  const [gravado, setGravado] = useState(() => JSON.stringify(config));
+  useAvisoSaida(JSON.stringify(c) !== gravado);
   const num = (grupo, k) => (
     <input
       type="number"
@@ -325,6 +327,7 @@ export function DefinicoesAl({ config }) {
       onSubmit={async (e) => {
         e.preventDefault();
         const r = await pedidoAdmin("/api/admin/alojamento/definicoes", { method: "PUT", body: c });
+        if (r.ok) setGravado(JSON.stringify(c));
         setEstado(r.ok ? { a: "ok", msg: "Guardado." } : { a: "erro", msg: r.erro });
       }}
     >

@@ -1875,6 +1875,41 @@ body:has(.admin-page) .site-footer {
   grid-template-columns: repeat(3, 1fr);
   gap: 18px;
 }
+/* Dashboard: "Para tratar hoje" */
+.admin-hoje {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 36px;
+}
+.admin-hoje-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  background: #fff;
+  border-radius: 10px;
+  padding: 14px 18px;
+  color: var(--ink);
+  box-shadow: 0 1px 3px rgba(10, 25, 47, 0.06);
+}
+.admin-hoje-item .admin-link { white-space: nowrap; }
+.admin-hoje-item.urgente {
+  background: #fdf7e8;
+  font-weight: 600;
+}
+.admin-hoje-item:hover { box-shadow: 0 6px 18px rgba(27, 63, 110, 0.1); }
+.admin-hoje-vazio {
+  background: #eef7f0;
+  color: #1f6b3a;
+  border-radius: 10px;
+  padding: 14px 18px;
+  font-weight: 600;
+  margin: 0;
+}
+.admin-h2 {
+  font-size: 1.15rem;
+  margin-bottom: 14px;
+}
 .admin-card {
   background: #fff;
   border: 1px solid var(--border);
@@ -2596,9 +2631,116 @@ body:has(.admin-page) .site-footer {
   overflow: auto;
 }
 
-/* Menu admin com muitos itens: permitir quebra/scroll */
-.admin-nav-inner { height: auto; min-height: 60px; flex-wrap: wrap; gap: 10px 0; }
-.admin-nav nav { flex-wrap: wrap; gap: 8px 16px; }
+/* Menu admin agrupado: dropdowns no computador, painel no telemóvel */
+.admin-nav nav > a,
+.admin-grupo > button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.admin-brand { white-space: nowrap; }
+.admin-grupo { position: relative; }
+.admin-grupo > button {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+}
+.admin-grupo > button:hover,
+.admin-grupo > button.active { color: var(--gold-light); }
+.admin-grupo .seta { font-size: 0.85em; opacity: 0.7; margin-left: -2px; }
+.admin-sub-menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 14px);
+  left: -14px;
+  min-width: 190px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 14px 40px rgba(10, 25, 47, 0.22);
+  padding: 6px;
+  z-index: 50;
+}
+.admin-grupo.aberto .admin-sub-menu { display: block; }
+.admin-nav .admin-sub-menu a {
+  display: block;
+  padding: 9px 12px;
+  border-radius: 7px;
+  color: var(--navy);
+}
+.admin-nav .admin-sub-menu a:hover { background: var(--paper-soft); color: var(--navy); }
+.admin-nav .admin-sub-menu a.active { background: var(--paper-soft); color: var(--gold-texto); font-weight: 600; }
+.admin-conta {
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--gold);
+  color: var(--navy-dark);
+  font-size: 0.7rem;
+  font-weight: 800;
+  line-height: 18px;
+  text-align: center;
+}
+.admin-burger { display: none; }
+
+@media (max-width: 1080px) {
+  .admin-burger {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 0;
+    color: #fff;
+    padding: 8px 14px;
+    border-radius: 7px;
+    font: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .admin-nav-inner { flex-wrap: wrap; height: auto; min-height: 60px; }
+  .admin-nav nav {
+    display: none;
+    flex-basis: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+    padding: 6px 0 18px;
+    max-height: calc(100svh - 60px);
+    overflow-y: auto;
+  }
+  .admin-nav nav.aberto { display: flex; }
+  .admin-nav nav > a { padding: 10px 0; font-size: 1rem; }
+  /* No telemóvel os grupos ficam todos abertos, como títulos. */
+  .admin-grupo > button {
+    pointer-events: none;
+    padding: 14px 0 4px;
+    font-size: 0.72rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.5);
+  }
+  .admin-grupo .seta { display: none; }
+  .admin-sub-menu,
+  .admin-grupo.aberto .admin-sub-menu {
+    display: block;
+    position: static;
+    background: none;
+    box-shadow: none;
+    padding: 0;
+    min-width: 0;
+  }
+  .admin-nav .admin-sub-menu a { padding: 9px 0; color: rgba(255, 255, 255, 0.85); font-size: 1rem; }
+  .admin-nav .admin-sub-menu a:hover,
+  .admin-nav .admin-sub-menu a.active { background: none; color: var(--gold-light); }
+  .admin-logout { align-self: flex-start; margin-top: 12px; }
+}
 
 .tag-oculto {
   background: #6b7280;

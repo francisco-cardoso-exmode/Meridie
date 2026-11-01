@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { pedidoAdmin } from "@/lib/adminCliente";
+import { pedidoAdmin, useAvisoSaida } from "@/lib/adminCliente";
 
 // `bloqueado`: a leitura da base falhou — não gravar valores vazios por cima dos reais.
 export default function RedesForm({ inicial, bloqueado = false }) {
@@ -10,6 +10,8 @@ export default function RedesForm({ inicial, bloqueado = false }) {
     linkedin: inicial?.linkedin || "",
   });
   const [estado, setEstado] = useState({ a: "idle", msg: "" });
+  const [gravado, setGravado] = useState(() => JSON.stringify(f));
+  useAvisoSaida(JSON.stringify(f) !== gravado);
   const set = (k) => (e) => setF((p) => ({ ...p, [k]: e.target.value }));
 
   async function guardar(e) {
@@ -17,6 +19,7 @@ export default function RedesForm({ inicial, bloqueado = false }) {
     if (bloqueado) return;
     setEstado({ a: "loading", msg: "" });
     const r = await pedidoAdmin("/api/admin/redes", { body: f });
+    if (r.ok) setGravado(JSON.stringify(f));
     setEstado(r.ok ? { a: "ok", msg: "Guardado. Aparece no footer de todas as páginas." } : { a: "erro", msg: r.erro });
   }
 
