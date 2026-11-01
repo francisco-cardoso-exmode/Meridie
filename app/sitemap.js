@@ -5,6 +5,7 @@ import { allSolucoes } from "@/lib/solucoes";
 import { hrefCategoria, hrefMarca, hrefProduto, hrefSolucao } from "@/lib/catalogo";
 import { TECNOLOGIA_VISIVEL } from "@/lib/flags";
 import { urlPublica } from "@/lib/seo";
+import { casasPublicadas } from "@/lib/al/casas";
 
 // Data da última alteração de um documento (se existir e for válida). Sem
 // data, o campo é omitido — melhor do que dizer "mudou agora" em cada pedido.
@@ -43,6 +44,8 @@ export default async function sitemap() {
     "/empreendimentos",
     "/representacoes",
     "/representacoes/marcas",
+    "/alojamento",
+    "/inscreve-a-tua-casa",
     ...(TECNOLOGIA_VISIVEL ? ["/tecnologia"] : []),
     "/como-funciona",
     "/quem-somos",
@@ -64,6 +67,7 @@ export default async function sitemap() {
   let regioes = [];
   let marcas = [];
   let catalogo = [];
+  let casas = [];
   try {
     const [emps, regs] = await Promise.all([allEmpreendimentos(), allRegioes()]);
     empreendimentos = emps
@@ -92,9 +96,13 @@ export default async function sitemap() {
         duas(hrefSolucao(s.slug), { lastModified: dataDe(s), changeFrequency: "monthly", priority: 0.6 })
       ),
     ];
+    // Alojamento local: casas publicadas.
+    casas = (await casasPublicadas()).flatMap((c) =>
+      duas(`/alojamento/${c.slug}`, { lastModified: dataDe(c), changeFrequency: "weekly", priority: 0.6 })
+    );
   } catch {
     // Sem DB no build — só as páginas estáticas.
   }
 
-  return [...estaticas, ...empreendimentos, ...regioes, ...marcas, ...catalogo];
+  return [...estaticas, ...empreendimentos, ...regioes, ...marcas, ...catalogo, ...casas];
 }

@@ -84,7 +84,7 @@ export default function MarcaForm({ initial = null, nProdutos = 0 }) {
         {editing ? (
           <p className="admin-sub" style={{ margin: 0 }}>
             {nProdutos} produto(s) desta marca.{" "}
-            <Link href={`/admin/produtos?f_marca=${encodeURIComponent(initial.slug)}`} className="admin-link">Ver os produtos</Link>
+            <Link href={`/admin/produtos?marca=${encodeURIComponent(initial.slug)}`} className="admin-link">Ver os produtos</Link>
             {" · "}
             <Link href={`/admin/produtos/novo?marca=${encodeURIComponent(initial.slug)}`} className="admin-link">+ Novo produto desta marca</Link>
             {initial.produtos?.length > 0 && (

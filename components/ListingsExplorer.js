@@ -6,6 +6,7 @@ import { referenciaDe, PAIS_LABEL, precoEmEuros } from "@/lib/empreendimentos";
 import { useTaxaEurBrl } from "@/components/CambioProvider";
 import { enviarEvento } from "@/components/Track";
 import { useT } from "@/components/LangProvider";
+import L from "@/components/L";
 
 const ORDENACOES = {
   destaque: "Em destaque",
@@ -226,6 +227,19 @@ export default function ListingsExplorer({
     f.estado ||
     f.preco ||
     f.ordenacao !== "destaque";
+
+  // Sem nenhum imóvel publicado (não é um filtro): convite ao contacto em vez
+  // de "nenhum resultado" e de filtros que não filtram nada.
+  if (!empreendimentos.length)
+    return (
+      <div className="empty-state sem-oferta">
+        <h3>{tr("Estamos a selecionar os próximos imóveis")}</h3>
+        <p>{tr("Diz-nos o que procuras — zona, tipologia e orçamento — e enviamos-te as oportunidades antes de serem publicadas.")}</p>
+        <L href="/contactos" className="btn btn-primary">
+          {tr("Dizer o que procuro")}
+        </L>
+      </div>
+    );
 
   return (
     <>

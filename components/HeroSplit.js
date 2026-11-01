@@ -29,7 +29,7 @@ export default function HeroSplit({ c }) {
       <L href="/portugal" className="split-panel panel-pt">
         <Foto
           src="https://images.unsplash.com/photo-1555881400-74d7acaacd8b?auto=format&fit=crop&w=1500&q=72"
-          alt={t("Lisboa, Portugal")}
+          alt={t("Porto, Portugal")}
           fill
           sizes="(max-width: 860px) 100vw, 75vw"
           priority
@@ -40,8 +40,9 @@ export default function HeroSplit({ c }) {
           <p className="sp-teaser">{c.hsPtTeaser}</p>
           <div className="sp-more">
             <p>{c.hsPtTexto}</p>
-            <span className="btn btn-primary">{c.hsPtCta}</span>
           </div>
+          {/* O botão vê-se sempre (no toque não há "passar o rato"). */}
+          <span className="btn btn-primary sp-cta">{c.hsPtCta}</span>
         </div>
       </L>
 
@@ -59,8 +60,9 @@ export default function HeroSplit({ c }) {
           <p className="sp-teaser">{c.hsBrTeaser}</p>
           <div className="sp-more">
             <p>{c.hsBrTexto}</p>
-            <span className="btn btn-primary">{c.hsBrCta}</span>
           </div>
+          {/* O botão vê-se sempre (no toque não há "passar o rato"). */}
+          <span className="btn btn-primary sp-cta">{c.hsBrCta}</span>
         </div>
       </L>
     </section>

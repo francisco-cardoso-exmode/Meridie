@@ -4,6 +4,8 @@
   --navy-light: #2a548a;
   --gold: #c89b3c;
   --gold-light: #ddb968;
+  /* Dourado para TEXTO sobre fundo claro (o --gold dá 2,6:1 em branco; este ~5:1). */
+  --gold-texto: #8a6a1f;
   --ink: #1a2230;
   --muted: #5d6b7e;
   --paper: #ffffff;
@@ -74,7 +76,7 @@ section {
 }
 .btn-primary {
   background: var(--gold);
-  color: var(--navy);
+  color: var(--navy-dark);
 }
 .btn-primary:hover {
   background: var(--gold-light);
@@ -262,7 +264,7 @@ section {
 }
 .eyebrow {
   display: inline-block;
-  color: var(--gold);
+  color: var(--gold-texto);
   font-family: var(--fonte-serif), Georgia, serif;
   font-weight: 600;
   letter-spacing: 0.16em;
@@ -1307,7 +1309,7 @@ body.com-compare-bar {
 .btn-reset {
   background: none;
   border: none;
-  color: var(--gold);
+  color: var(--gold-texto);
   font-weight: 600;
   font-size: 0.88rem;
   cursor: pointer;
@@ -2639,7 +2641,7 @@ body:has(.admin-page) .site-footer {
 .pub-body { padding: 18px 20px; }
 .pub-body .rb-tag { margin-bottom: 8px; }
 .pub-body h3 { color: var(--navy); margin: 0 0 6px; font-size: 1.15rem; }
-.pub-cta { color: var(--gold); font-weight: 700; font-size: 0.9rem; }
+.pub-cta { color: var(--gold-texto); font-weight: 700; font-size: 0.9rem; }
 
 /* Redes sociais no footer */
 .footer-social { display: flex; gap: 12px; margin-top: 18px; }
@@ -4767,5 +4769,59 @@ a.an-calor-cel:focus-visible,
   }
   .nav-drop-menu a {
     padding: 12px 0 12px 14px;
+  }
+}
+
+/* Botão de contorno sobre fundo claro (o normal é branco, para fundos escuros). */
+.btn-outline.escuro {
+  color: var(--navy);
+  border-color: var(--navy);
+}
+.btn-outline.escuro:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+/* Mercado sem imóveis publicados (ListingsExplorer) */
+.empty-state.sem-oferta {
+  border-style: solid;
+  background: #fff;
+}
+.empty-state.sem-oferta h3 {
+  color: var(--navy);
+  font-size: 1.3rem;
+  margin-bottom: 8px;
+}
+.empty-state.sem-oferta p {
+  max-width: 520px;
+  margin: 0 auto 22px;
+}
+
+/* Sobre fundos escuros (capas, faixas azuis) o dourado de texto é o claro. */
+.page-hero .eyebrow,
+.cta-band .eyebrow,
+.growth-band .eyebrow,
+.al-app-demo:not(.claro) .eyebrow,
+.page-hero .btn-reset,
+.page-hero .pub-cta {
+  color: var(--gold-light);
+}
+
+/* Capa da home: botão sempre visível; o texto extra abre com rato, teclado ou,
+   em ecrãs de toque, fica sempre aberto. */
+.sp-cta {
+  margin-top: 18px;
+}
+.split-panel:focus-visible .sp-more,
+.split-panel:focus-within .sp-more {
+  max-height: 260px;
+  opacity: 1;
+  margin-top: 16px;
+}
+@media (hover: none) {
+  .sp-more {
+    max-height: none;
+    opacity: 1;
+    margin-top: 12px;
   }
 }

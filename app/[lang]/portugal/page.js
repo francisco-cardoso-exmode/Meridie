@@ -37,7 +37,7 @@ export default async function PaginaPortugal({ params }) {
     <>
       <MarketHero
         img="https://images.unsplash.com/photo-1555881400-74d7acaacd8b?auto=format&fit=crop&w=1600&q=72"
-        alt={T("Lisboa, Portugal")}
+        alt={T("Porto, Portugal")}
         eyebrow={c.heroEyebrow}
         titulo={c.heroTitulo}
       >

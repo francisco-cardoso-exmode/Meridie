@@ -60,6 +60,7 @@ export default function RegiaoForm({ initial = null, regioesExistentes = [], pre
       : [],
     imagem: initial?.imagem || "",
     tagline: initial?.tagline || "",
+    preposicao: initial?.preposicao || "",
     descricao: initial?.descricao || "",
     sobre: initial?.sobre || "",
     crescimento: initial?.crescimento || "",
@@ -116,6 +117,7 @@ export default function RegiaoForm({ initial = null, regioesExistentes = [], pre
       publicidade: f.publicidade.filter((x) => x.titulo || x.url || x.imagem),
       imagem: f.imagem.trim(),
       tagline: f.tagline.trim(),
+      preposicao: f.preposicao,
       descricao: f.descricao.trim(),
       sobre: f.sobre.trim(),
       crescimento: f.crescimento.trim(),
@@ -203,6 +205,17 @@ export default function RegiaoForm({ initial = null, regioesExistentes = [], pre
             onChange={(urls) => setF((p) => ({ ...p, imagem: urls[0] || "" }))}
           />
         </div>
+        <label>
+          Título &quot;Investir …&quot;
+          <select value={f.preposicao} onChange={set("preposicao")}>
+            <option value="">Automático</option>
+            {["em", "no", "na", "nos", "nas"].map((p) => (
+              <option key={p} value={p}>
+                Investir {p} {f.nome || "…"}
+              </option>
+            ))}
+          </select>
+        </label>
         <label className="full">
           Tagline (frase curta)
           <input value={f.tagline} onChange={set("tagline")} />

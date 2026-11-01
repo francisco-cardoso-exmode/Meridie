@@ -20,7 +20,7 @@ export default function EmpreendimentoCard({ e }) {
     <article className="prop-card">
       <div className="prop-media">
         {e.imagens?.[0] && (
-          <Foto src={e.imagens[0]} alt="" fill sizes="(max-width: 700px) 100vw, (max-width: 1100px) 50vw, 400px" />
+          <Foto src={e.imagens[0]} alt={[e.nome, e.cidade].filter(Boolean).join(" — ")} fill sizes="(max-width: 700px) 100vw, (max-width: 1100px) 50vw, 400px" />
         )}
         <div className="prop-badges">
           <span className="badge gold">{t(e.tipo)}</span>

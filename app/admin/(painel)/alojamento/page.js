@@ -22,11 +22,11 @@ export default async function ResumoAlojamento() {
   }, {});
 
   const cartoes = [
-    ["Casas em análise", n.analise, "/admin/alojamento/casas?f_estado=em_analise"],
-    ["Casas publicadas", n.publicadas, "/admin/alojamento/casas?f_estado=publicada"],
-    ["Pedidos de reserva", n.pedidos, "/admin/alojamento/reservas?f_estado=pedido"],
-    ["Tarefas de hoje", n.tarefasHoje, `/admin/alojamento/tarefas?f_data=${hoje}`],
-    ["Tarefas por atribuir", n.porAtribuir, "/admin/alojamento/tarefas?f_atribuida=nao"],
+    ["Casas em análise", n.analise, "/admin/alojamento/casas?estado=em_analise"],
+    ["Casas publicadas", n.publicadas, "/admin/alojamento/casas?estado=publicada"],
+    ["Pedidos de reserva", n.pedidos, "/admin/alojamento/reservas?estado=pedido"],
+    ["Tarefas de hoje", n.tarefasHoje, `/admin/alojamento/tarefas?data=${hoje}`],
+    ["Tarefas por atribuir", n.porAtribuir, "/admin/alojamento/tarefas?atribuida=nao"],
   ];
 
   return (

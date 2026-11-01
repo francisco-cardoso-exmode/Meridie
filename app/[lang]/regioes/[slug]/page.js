@@ -5,7 +5,7 @@ import Icon from "@/components/Icon";
 import MarketHero from "@/components/MarketHero";
 import EmpreendimentoCard from "@/components/EmpreendimentoCard";
 import RegionBanner from "@/components/RegionBanner";
-import { cartaoRegiao } from "@/lib/regioes";
+import { cartaoRegiao, tituloInvestir } from "@/lib/regioes";
 import { CORES_PONTO, temMapa } from "@/lib/mapa";
 import RegionMap from "@/components/RegionMap";
 import {
@@ -49,7 +49,7 @@ export async function generateMetadata({ params }) {
   const r = traduzDoc(await regiaoBySlug(slug), lang);
   if (!r) return metaNaoEncontrado(lang, t(lang, "Região não encontrada"));
   return metaPagina(lang, `/regioes/${r.slug}`, {
-    titulo: tf(lang, "Investir em {nome}", { nome: r.nome }),
+    titulo: tituloInvestir(lang, r),
     descricao: r.descricao || r.tagline || tf(lang, "Oportunidades de investimento em {nome}.", { nome: r.nome }),
     imagem: r.imagem,
   });
@@ -74,7 +74,7 @@ export default async function PaginaRegiao({ params }) {
         img={regiao.imagem}
         alt={regiao.nome}
         eyebrow={`${regiaoMae ? tf(lang, "{nivel} de {mae}", { nivel: nivelLabel, mae: regiaoMae.nome }) : nivelLabel} · ${paisLabel}`}
-        titulo={regiaoMae ? regiao.nome : tf(lang, "Investir em {nome}", { nome: regiao.nome })}
+        titulo={regiaoMae ? regiao.nome : tituloInvestir(lang, regiao)}
       >
         {regiao.tagline}
       </MarketHero>

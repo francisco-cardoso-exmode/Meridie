@@ -16,6 +16,7 @@ import CookieConsent from "@/components/CookieConsent";
 import { CONSENT_PADRAO } from "@/lib/consentimento";
 import { haCasasPublicadas } from "@/lib/al/casas";
 import { SITE_URL, SITE_NAME } from "@/lib/site";
+import { getEmpresa, getRedes } from "@/lib/config";
 
 // Fonte serif dos títulos (liga ao logo). Igual em todos os dispositivos.
 const spectral = Spectral({
@@ -49,22 +50,44 @@ export async function generateMetadata({ params }) {
   };
 }
 
-const jsonLd = (lang) => ({
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  name: SITE_NAME,
-  url: SITE_URL,
-  logo: `${SITE_URL}/meridie_logo.png`,
-  description: t(lang, DESC),
-  areaServed: ["PT", "BR"],
-  slogan: t(lang, "Capital sem fronteiras. Investimento com precisão."),
-});
+// Organização para o Google: contactos e redes vêm do backoffice (Configurações).
+const jsonLd = (lang, empresa = {}, redes = {}) => {
+  const sameAs = [redes.instagram, redes.linkedin].filter((u) => /^https?:\/\//.test(u || ""));
+  return {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: SITE_NAME,
+    url: SITE_URL,
+    logo: `${SITE_URL}/meridie_logo.png`,
+    image: `${SITE_URL}/og-meridie.jpg`,
+    description: t(lang, DESC),
+    areaServed: ["PT", "BR"],
+    slogan: t(lang, "Capital sem fronteiras. Investimento com precisão."),
+    ...(empresa.denominacao ? { legalName: empresa.denominacao } : {}),
+    ...(empresa.nif ? { vatID: empresa.nif } : {}),
+    ...(empresa.morada ? { address: empresa.morada } : {}),
+    ...(empresa.email ? { email: empresa.email } : {}),
+    ...(empresa.telefone ? { telephone: empresa.telefone } : {}),
+    ...(empresa.email || empresa.telefone
+      ? {
+          contactPoint: {
+            "@type": "ContactPoint",
+            contactType: "customer service",
+            ...(empresa.email ? { email: empresa.email } : {}),
+            ...(empresa.telefone ? { telephone: empresa.telefone } : {}),
+            availableLanguage: ["Portuguese", "English"],
+          },
+        }
+      : {}),
+    ...(sameAs.length ? { sameAs } : {}),
+  };
+};
 
 export default async function RootLayout({ children, params }) {
   const { lang } = await params;
   if (!ehLang(lang)) notFound();
   // Cotação EUR→BRL do momento; no browser é revalidada (ver CambioProvider).
-  const [cambio, temCasas] = await Promise.all([getCambio(), haCasasPublicadas()]);
+  const [cambio, temCasas, empresa, redes] = await Promise.all([getCambio(), haCasasPublicadas(), getEmpresa(), getRedes()]);
 
   return (
     <html lang={LOCALE[lang]} className={spectral.variable}>
@@ -76,7 +99,7 @@ export default async function RootLayout({ children, params }) {
         <TrackVisita />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: ldJson(jsonLd(lang)) }}
+          dangerouslySetInnerHTML={{ __html: ldJson(jsonLd(lang, empresa, redes)) }}
         />
         <CambioProvider
           inicial={{

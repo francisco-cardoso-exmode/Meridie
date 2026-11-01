@@ -125,30 +125,32 @@ export default async function Home({ params }) {
             >
               {T("Ver imóveis no Brasil")}
             </L>
-            <L href="/empreendimentos" className="btn btn-outline">
+            <L href="/empreendimentos" className="btn btn-outline escuro">
               {T("Ver página de toda a oferta")}
             </L>
           </div>
         </div>
       </section>
 
-      {/* Destaques por região (sponsor) */}
-      <section>
-        <div className="container">
-          <Reveal className="section-head">
-            <span className="eyebrow">{c.regioesEyebrow}</span>
-            <h2>{c.regioesTitulo}</h2>
-            <p>{c.regioesTexto}</p>
-          </Reveal>
-          <div className="region-grid">
-            {regioesDestaque.map((r, i) => (
-              <Reveal key={r.slug} delay={(i % 2) * 0.1}>
-                <RegionBanner regiao={cartaoRegiao(r)} />
-              </Reveal>
-            ))}
+      {/* Destaques por região (sponsor) — só com regiões escolhidas */}
+      {regioesDestaque.length > 0 && (
+        <section>
+          <div className="container">
+            <Reveal className="section-head">
+              <span className="eyebrow">{c.regioesEyebrow}</span>
+              <h2>{c.regioesTitulo}</h2>
+              <p>{c.regioesTexto}</p>
+            </Reveal>
+            <div className="region-grid">
+              {regioesDestaque.map((r, i) => (
+                <Reveal key={r.slug} delay={(i % 2) * 0.1}>
+                  <RegionBanner regiao={cartaoRegiao(r)} />
+                </Reveal>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Para quem é */}
       <section className="bg-soft">
