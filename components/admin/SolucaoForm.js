@@ -31,10 +31,12 @@ function useLista(inicial, novo) {
 }
 
 /** Solução tecnológica (Tecnologia): desenvolvemos ou representamos. */
-export default function SolucaoForm({ initial = null }) {
-  const editing = !!initial;
+export default function SolucaoForm({ initial: emEdicao = null, copia = null }) {
+  const editing = !!emEdicao;
+  // `copia`: dados de outro registo para "Duplicar" (cria um novo).
+  const initial = emEdicao || copia;
   const [estado, setEstado] = useState({ a: "idle", msg: "" });
-  const { enEditado, temEnEditado, enMostrado, mudarEn } = useEnEditado(initial?.en);
+  const { enEditado, temEnEditado, enMostrado, mudarEn } = useEnEditado(emEdicao?.en);
   const [f, setF] = useState({
     nome: initial?.nome || "",
     tipo: initial?.tipo || "desenvolvemos",
@@ -228,7 +230,7 @@ export default function SolucaoForm({ initial = null }) {
         Ativa (visível no site)
       </label>
       {estado.a === "erro" && <div className="form-msg erro">{estado.msg}</div>}
-      {initial && <VersaoInglesa colecao="solucoes" doc={initial} en={enMostrado} onChange={mudarEn} />}
+      {editing && <VersaoInglesa colecao="solucoes" doc={initial} en={enMostrado} onChange={mudarEn} />}
       <div className="admin-form-actions">
         <button type="submit" className="btn btn-primary" disabled={estado.a === "loading"}>
           {estado.a === "loading" ? "A guardar..." : editing ? "Guardar" : "Criar solução"}

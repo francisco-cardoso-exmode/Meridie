@@ -112,6 +112,7 @@ export default async function AdminProdutos() {
                 {!p.legado && (
                   <>
                     <Link href={`/admin/produtos/${encodeURIComponent(p.slug)}`} className="admin-link">Editar</Link>
+                    <Link href={`/admin/produtos/novo?de=${encodeURIComponent(p.slug)}`} className="admin-link">Duplicar</Link>
                     <DeleteButton slug={p.slug} nome={p.nome} endpoint="produtos" />
                   </>
                 )}

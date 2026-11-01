@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { pedidoAdmin, useAvisoSaida, useEnEditado } from "@/lib/adminCliente";
-import { slugify } from "@/lib/slug";
+import { slugify, slugAuto } from "@/lib/slug";
 import VersaoInglesa from "@/components/admin/VersaoInglesa";
 import Link from "next/link";
 import ImageUploader from "@/components/admin/ImageUploader";
@@ -36,13 +36,18 @@ const textoParaLinks = (s) =>
     })
     .filter((x) => x.url);
 
-export default function EmpreendimentoForm({ initial = null, regioesExistentes = [] }) {
-  const editing = !!initial;
+// O slug de um novo empreendimento segue o nome (e a cidade, se o nome não a tiver).
+const slugDe = (nome, cidade) => slugAuto(slugify(nome).includes(slugify(cidade)) ? nome : `${nome} ${cidade}`);
+
+// `copia`: dados de outro empreendimento para "Duplicar" (cria um novo).
+export default function EmpreendimentoForm({ initial: emEdicao = null, copia = null, regioesExistentes = [] }) {
+  const editing = !!emEdicao;
+  const initial = emEdicao || copia;
   const [estado, setEstado] = useState({ a: "idle", msg: "" });
-  const { enEditado, temEnEditado, enMostrado, mudarEn } = useEnEditado(initial?.en);
+  const { enEditado, temEnEditado, enMostrado, mudarEn } = useEnEditado(emEdicao?.en);
 
   const [f, setF] = useState({
-    slug: initial?.slug || "",
+    slug: initial?.slug || (copia ? slugDe(copia.nome, copia.cidade || "") : ""),
     referencia: initial?.referencia || "",
     nome: initial?.nome || "",
     pais: initial?.pais || "portugal",
@@ -78,9 +83,16 @@ export default function EmpreendimentoForm({ initial = null, regioesExistentes =
   const [inicialJson] = useState(() => JSON.stringify(f));
   const libertar = useAvisoSaida(JSON.stringify(f) !== inicialJson || temEnEditado);
 
+  // Até se escrever no campo do slug, ele acompanha o nome e a cidade.
+  const [slugManual, setSlugManual] = useState(editing);
   const set = (campo) => (e) => {
     const v = e.target.type === "checkbox" ? e.target.checked : e.target.value;
-    setF((p) => ({ ...p, [campo]: v }));
+    if (campo === "slug") setSlugManual(true);
+    setF((p) => {
+      const n = { ...p, [campo]: v };
+      if (!slugManual && (campo === "nome" || campo === "cidade")) n.slug = slugDe(n.nome, n.cidade);
+      return n;
+    });
   };
 
   async function onSubmit(e) {
@@ -156,7 +168,7 @@ export default function EmpreendimentoForm({ initial = null, regioesExistentes =
       <form className="admin-form" onSubmit={onSubmit}>
       <div className="admin-form-grid">
         <label>
-          Slug (URL) {editing && <small>— não editável</small>}
+          Endereço (URL) {editing ? <small>— não editável</small> : !slugManual && <small>— segue o nome</small>}
           <input value={f.slug} onChange={set("slug")} required readOnly={editing} placeholder="ex: vibe-meireles-fortaleza" />
           {!editing && f.slug && slugFinal !== f.slug && <small>Vai ficar: {slugFinal || "—"}</small>}
         </label>
@@ -331,7 +343,7 @@ export default function EmpreendimentoForm({ initial = null, regioesExistentes =
 
       {estado.a === "erro" && <div className="form-msg erro">{estado.msg}</div>}
 
-      {initial && <VersaoInglesa colecao="empreendimentos" doc={initial} en={enMostrado} onChange={mudarEn} />}
+      {editing && <VersaoInglesa colecao="empreendimentos" doc={initial} en={enMostrado} onChange={mudarEn} />}
       <div className="admin-form-actions">
         <button type="submit" className="btn btn-primary" disabled={estado.a === "loading"}>
           {estado.a === "loading" ? "A guardar..." : editing ? "Guardar alterações" : "Criar empreendimento"}

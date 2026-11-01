@@ -94,6 +94,9 @@ export default async function AdminEmpreendimentos() {
               <Link href={`/admin/empreendimentos/${encodeURIComponent(e.slug)}`} className="admin-link">
                 Editar
               </Link>
+              <Link href={`/admin/empreendimentos/novo?de=${encodeURIComponent(e.slug)}`} className="admin-link">
+                Duplicar
+              </Link>
               <DeleteButton slug={e.slug} nome={e.nome} />
             </div>
           </div>

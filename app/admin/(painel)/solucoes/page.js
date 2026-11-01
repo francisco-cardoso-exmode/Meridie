@@ -71,6 +71,7 @@ export default async function AdminSolucoes() {
                   {s.ativo === false ? "Pré-visualizar" : "Ver"}
                 </a>
                 <Link href={`/admin/solucoes/${encodeURIComponent(s.slug)}`} className="admin-link">Editar</Link>
+                <Link href={`/admin/solucoes/novo?de=${encodeURIComponent(s.slug)}`} className="admin-link">Duplicar</Link>
                 <DeleteButton slug={s.slug} nome={s.nome} endpoint="solucoes" />
               </div>
             </div>

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { pedidoAdmin, useAvisoSaida, useEnEditado, novoId } from "@/lib/adminCliente";
-import { slugify } from "@/lib/slug";
+import { slugify, slugAuto } from "@/lib/slug";
 import VersaoInglesa from "@/components/admin/VersaoInglesa";
 import Link from "next/link";
 import ImageUploader from "@/components/admin/ImageUploader";
@@ -86,8 +86,13 @@ export default function RegiaoForm({ initial = null, regioesExistentes = [], pre
   const [inicialJson] = useState(() => JSON.stringify(f));
   const libertar = useAvisoSaida(JSON.stringify(f) !== inicialJson || temEnEditado);
 
-  const set = (c) => (e) =>
-    setF((p) => ({ ...p, [c]: e.target.type === "checkbox" ? e.target.checked : e.target.value }));
+  // Numa região nova, o slug acompanha o nome até se escrever nele.
+  const [slugManual, setSlugManual] = useState(editing);
+  const set = (c) => (e) => {
+    const v = e.target.type === "checkbox" ? e.target.checked : e.target.value;
+    if (c === "slug") setSlugManual(true);
+    setF((p) => ({ ...p, [c]: v, ...(c === "nome" && !slugManual ? { slug: slugAuto(v) } : {}) }));
+  };
 
   // Editor de cards de publicidade (com upload de imagem) — pelo id, não pela
   // posição (um upload que termina depois de apagar um card não vai parar ao errado).

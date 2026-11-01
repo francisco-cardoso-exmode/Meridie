@@ -19,10 +19,12 @@ export const textoParaPares = (t) =>
  * Produto das Representações comerciais.
  * `categorias`: lista plana [{ slug, nome, parent }]; `marcas`: [{ slug, nome }].
  */
-export default function ProdutoForm({ initial = null, categorias = [], marcas = [], marcaInicial = "" }) {
-  const editing = !!initial;
+export default function ProdutoForm({ initial: emEdicao = null, copia = null, categorias = [], marcas = [], marcaInicial = "" }) {
+  const editing = !!emEdicao;
+  // `copia`: dados de outro registo para "Duplicar" (cria um novo).
+  const initial = emEdicao || copia;
   const [estado, setEstado] = useState({ a: "idle", msg: "" });
-  const { enEditado, temEnEditado, enMostrado, mudarEn } = useEnEditado(initial?.en);
+  const { enEditado, temEnEditado, enMostrado, mudarEn } = useEnEditado(emEdicao?.en);
   const topo = categorias.filter((c) => !c.parent);
   const [f, setF] = useState({
     nome: initial?.nome || "",
@@ -180,7 +182,7 @@ export default function ProdutoForm({ initial = null, categorias = [], marcas = 
         Ativo (visível no site)
       </label>
       {estado.a === "erro" && <div className="form-msg erro">{estado.msg}</div>}
-      {initial && <VersaoInglesa colecao="produtos" doc={initial} en={enMostrado} onChange={mudarEn} />}
+      {editing && <VersaoInglesa colecao="produtos" doc={initial} en={enMostrado} onChange={mudarEn} />}
       <div className="admin-form-actions">
         <button type="submit" className="btn btn-primary" disabled={estado.a === "loading"}>
           {estado.a === "loading" ? "A guardar..." : editing ? "Guardar" : "Criar produto"}
