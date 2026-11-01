@@ -5,8 +5,15 @@ import L from "@/components/L";
 import { enviarEvento } from "@/components/Track";
 import { useT } from "@/components/LangProvider";
 import { resolverDesafio } from "@/lib/resolverDesafio";
+import { OBJETIVOS, ORCAMENTOS, PRAZOS } from "@/lib/qualificacao";
 
-export default function ContactForm({ assuntoInicial = "", origem = "contacto" }) {
+/**
+ * `qualificar`: perguntas opcionais sobre o imóvel procurado (objetivo,
+ * orçamento, prazo) — "imovel" mostra-as abertas (página de um imóvel),
+ * "opcional" dentro de "Procuras imóvel?" (contactos), false esconde-as.
+ * `moeda`: escalões do orçamento (EUR ou BRL).
+ */
+export default function ContactForm({ assuntoInicial = "", origem = "contacto", qualificar = false, moeda = "EUR" }) {
   const { t, lang } = useT();
   const [estado, setEstado] = useState({ a: "idle", msg: "" });
   const interesseFeito = useRef(false);
@@ -43,6 +50,9 @@ export default function ContactForm({ assuntoInicial = "", origem = "contacto" }
       email: form.email.value,
       assunto: form.assunto.value,
       mensagem: form.mensagem.value,
+      ...(qualificar
+        ? { objetivo: form.objetivo.value, orcamento: form.orcamento.value, prazo: form.prazo.value, moeda }
+        : {}),
       lang,
       ref: origem,
       website: form.website.value,
@@ -103,6 +113,14 @@ export default function ContactForm({ assuntoInicial = "", origem = "contacto" }
         <textarea id="mensagem" name="mensagem" rows={6} required placeholder={t("Escreve a tua mensagem...")} />
       </div>
 
+      {qualificar === "imovel" && <Qualificacao t={t} moeda={moeda} />}
+      {qualificar === "opcional" && (
+        <details className="field full qualificacao-caixa">
+          <summary>{t("Procuras imóvel? Ajuda-nos a preparar a resposta (opcional)")}</summary>
+          <Qualificacao t={t} moeda={moeda} />
+        </details>
+      )}
+
       {/* Campo-armadilha para bots: invisível e fora da navegação por teclado. */}
       <div className="campo-armadilha" aria-hidden="true">
         <label htmlFor={`website-${origem}`}>Website</label>
@@ -124,5 +142,29 @@ export default function ContactForm({ assuntoInicial = "", origem = "contacto" }
         </p>
       </div>
     </form>
+  );
+}
+
+// Três escolhas rápidas, todas opcionais.
+function Qualificacao({ t, moeda }) {
+  const campo = (nome, rotulo, opcoes) => (
+    <div className="field">
+      <label htmlFor={`q-${nome}`}>{t(rotulo)}</label>
+      <select id={`q-${nome}`} name={nome} defaultValue="">
+        <option value="">—</option>
+        {Object.entries(opcoes).map(([k, v]) => (
+          <option key={k} value={k}>
+            {t(v)}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+  return (
+    <div className="qualificacao">
+      {campo("objetivo", "Objetivo", OBJETIVOS)}
+      {campo("orcamento", "Orçamento", ORCAMENTOS[moeda === "BRL" ? "BRL" : "EUR"])}
+      {campo("prazo", "Prazo", PRAZOS)}
+    </div>
   );
 }

@@ -84,7 +84,7 @@ export default async function Contactos({ params }) {
             </Reveal>
 
             <Reveal delay={0.1}>
-              <ContactForm />
+              <ContactForm qualificar="opcional" />
             </Reveal>
           </div>
         </div>

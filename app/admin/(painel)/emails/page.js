@@ -26,6 +26,7 @@ export default async function AdminEmails() {
     assunto: "Interesse: VIBE Meireles (Fortaleza)",
     mensagem:
       "Olá, gostava de saber mais sobre este empreendimento e as condições de pagamento.",
+    qualificacao: { objetivo: "arrendar", orcamento: "o2", prazo: "meses", moeda: "BRL" },
     logoSrc,
   });
   const assinatura = assinaturaHTML({

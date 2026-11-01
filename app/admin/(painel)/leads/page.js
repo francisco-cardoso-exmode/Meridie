@@ -5,6 +5,7 @@ import ListaFiltravel from "@/components/admin/ListaFiltravel";
 import { allEmpreendimentos } from "@/lib/store";
 import LeadAcoes from "@/components/admin/LeadAcoes";
 import { ESTADOS_LEAD, estadoLead } from "@/lib/lead";
+import { OBJETIVOS, PRAZOS, linhasQualificacao } from "@/lib/qualificacao";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Leads" };
@@ -64,6 +65,8 @@ export default async function AdminLeads() {
           facetas={[
             { k: "estado", label: "Estado", opcoes: Object.entries(ESTADOS_LEAD).map(([v, label]) => ({ v, label })) },
             { k: "origem", label: "Origem" },
+            { k: "objetivo", label: "Objetivo", opcoes: Object.entries(OBJETIVOS).map(([v, label]) => ({ v, label })) },
+            { k: "prazo", label: "Prazo", opcoes: Object.entries(PRAZOS).map(([v, label]) => ({ v, label })) },
             { k: "lang", label: "Idioma", opcoes: [{ v: "pt", label: "Português" }, { v: "en", label: "Inglês" }] },
             { k: "email", label: "Email", opcoes: [{ v: "falhou", label: "Envio falhou" }, { v: "ok", label: "Enviado" }] },
           ]}
@@ -75,7 +78,7 @@ export default async function AdminLeads() {
           itens={leads.map((l) => ({
             id: String(l._id),
             busca: [l.nome, l.email, l.assunto, l.mensagem, origemDe(l), ...(l.notas || []).map((n) => n.texto)].filter(Boolean).join(" "),
-            facetas: { estado: estadoLead(l), origem: origemDe(l), lang: idiomaDe(l), email: l.emailFalhou ? "falhou" : "ok" },
+            facetas: { estado: estadoLead(l), objetivo: l.qualificacao?.objetivo || "", prazo: l.qualificacao?.prazo || "", origem: origemDe(l), lang: idiomaDe(l), email: l.emailFalhou ? "falhou" : "ok" },
             ordem: {
               data: l.criadoEm ? new Date(l.criadoEm).getTime() : 0,
               dataAsc: l.criadoEm ? new Date(l.criadoEm).getTime() : 0,
@@ -91,6 +94,15 @@ export default async function AdminLeads() {
                 <span className="lead-date">{dataPt(l.criadoEm)}</span>
               </div>
               {l.assunto && <div className="lead-assunto">{l.assunto}</div>}
+              {l.qualificacao && (
+                <div className="lead-qualificacao">
+                  {linhasQualificacao(l.qualificacao).map(([k, v]) => (
+                    <span key={k}>
+                      {k}: <strong>{v}</strong>
+                    </span>
+                  ))}
+                </div>
+              )}
               <p className="lead-msg">{l.mensagem}</p>
               <div className="lead-meta">
                 Origem: {origemDe(l)}

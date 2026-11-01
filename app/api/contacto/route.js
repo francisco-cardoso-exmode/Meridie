@@ -4,6 +4,7 @@ import { enviarEmailContacto, enviarConfirmacaoCliente } from "@/lib/mailer";
 import { dentroDoLimite, ipDe } from "@/lib/rateLimit";
 import { empreendimentoBySlug } from "@/lib/store";
 import { provaValida } from "@/lib/provaTrabalho";
+import { limpaQualificacao } from "@/lib/qualificacao";
 
 // O endpoint depende de serviços externos (MongoDB/SMTP) — nunca é pré-renderizado.
 export const dynamic = "force-dynamic";
@@ -60,6 +61,8 @@ export async function POST(request) {
     const mensagem = texto(dados.mensagem);
     const refBruto = texto(dados.ref);
     const lang = dados.lang === "en" ? "en" : "pt";
+    // Objetivo, orçamento e prazo (opcionais; só chaves conhecidas).
+    const qualificacao = limpaQualificacao(dados);
 
     // Validação no servidor
     if ([nome, email, assunto, mensagem, refBruto].some((v) => v === null)) {
@@ -120,6 +123,7 @@ export async function POST(request) {
         mensagem,
         idioma: lang,
         ref: ref || null,
+        ...(qualificacao ? { qualificacao } : {}),
         estado: "nova",
         criadoEm: new Date(),
       });
@@ -131,7 +135,7 @@ export async function POST(request) {
 
     // 2. Notificar a equipa
     try {
-      await enviarEmailContacto({ nome, email, assunto, mensagem, ref, refUrl });
+      await enviarEmailContacto({ nome, email, assunto, mensagem, ref, refUrl, qualificacao });
     } catch (mailErro) {
       console.error("Erro a enviar o email de contacto:", mailErro);
       // Se a mensagem ficou guardada, não se perde: marca-se e responde-se ok

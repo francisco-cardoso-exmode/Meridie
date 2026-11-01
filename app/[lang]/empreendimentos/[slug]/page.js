@@ -304,6 +304,8 @@ export default async function PaginaEmpreendimento({ params }) {
               <ContactForm
                 assuntoInicial={`[${referenciaDe(e)}] ${e.nome} — ${e.cidade}, ${paisLabel}`}
                 origem={e.slug}
+                qualificar="imovel"
+                moeda={e.moeda === "BRL" ? "BRL" : "EUR"}
               />
               <ContactosDiretos
                 empresa={empresa}
