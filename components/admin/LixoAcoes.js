@@ -2,13 +2,14 @@
 
 import { useState } from "react";
 import { pedidoAdmin } from "@/lib/adminCliente";
+import { confirmar } from "@/lib/dialogo";
 
 // Recuperar ou apagar de vez um item do lixo.
 export default function LixoAcoes({ id, nome, editar }) {
   const [a, setA] = useState({ estado: "idle", msg: "" });
 
   async function fazer(acao) {
-    if (acao === "apagar" && !confirm(`Apagar "${nome}" de vez? Já não se pode recuperar.`)) return;
+    if (acao === "apagar" && !(await confirmar(`Apagar "${nome}" de vez? Já não se pode recuperar.`, { ok: "Apagar de vez", perigo: true }))) return;
     setA({ estado: "loading", msg: "" });
     const r = await pedidoAdmin("/api/admin/lixo", { body: { id, acao } });
     if (!r.ok) return setA({ estado: "erro", msg: r.erro });

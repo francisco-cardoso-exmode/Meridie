@@ -1,5 +1,6 @@
 "use client";
 
+import { avisar, confirmar } from "@/lib/dialogo";
 import { useState } from "react";
 import ListaFiltravel from "@/components/admin/ListaFiltravel";
 
@@ -175,7 +176,7 @@ function NovoUtilizador() {
 function ApagarUtilizador({ email, nome }) {
   const [a, setA] = useState("idle");
   async function apagar() {
-    if (!confirm(`Remover o acesso de "${nome}"?`)) return;
+    if (!(await confirmar(`Remover o acesso de "${nome}"?`, { ok: "Remover", perigo: true }))) return;
     setA("loading");
     const res = await fetch("/api/admin/utilizadores", {
       method: "DELETE",
@@ -185,7 +186,7 @@ function ApagarUtilizador({ email, nome }) {
     const json = res ? await res.json().catch(() => ({})) : {};
     if (res?.ok && json.ok) window.location.reload();
     else {
-      alert(json.erro || "Não foi possível apagar.");
+      await avisar(json.erro || "Não foi possível apagar.");
       setA("idle");
     }
   }

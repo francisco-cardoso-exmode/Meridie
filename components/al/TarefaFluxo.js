@@ -1,5 +1,6 @@
 "use client";
 
+import { confirmar } from "@/lib/dialogo";
 import { useState } from "react";
 import FotosAl from "@/components/al/FotosAl";
 import { pedidoAl } from "@/lib/al/cliente";
@@ -166,7 +167,7 @@ export default function TarefaFluxo({ tarefa, divisoes }) {
           className="al-btn al-btn-enorme"
           disabled={estado.a === "loading" || nFeitas === 0}
           onClick={async () => {
-            if (nFeitas < todas.length && !window.confirm(`Faltam ${todas.length - nFeitas} divisões. Concluir mesmo assim?`)) return;
+            if (nFeitas < todas.length && !(await confirmar(`Faltam ${todas.length - nFeitas} divisões. Concluir mesmo assim?`, { ok: "Concluir" }))) return;
             if (await acao({ acao: "concluir", observacoes: obs })) setT((x) => ({ ...x, estado: "concluida" }));
           }}
         >

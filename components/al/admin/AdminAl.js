@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { pedidoAdmin, useAvisoSaida } from "@/lib/adminCliente";
+import { avisar, confirmar as perguntar, pedirTexto } from "@/lib/dialogo";
 import { ORIGENS, ROTULO_ORIGEM, TIPOS_TAREFA, ROTULO_TIPO_TAREFA } from "@/lib/al/regras";
 
 /**
@@ -12,11 +13,11 @@ import { ORIGENS, ROTULO_ORIGEM, TIPOS_TAREFA, ROTULO_TIPO_TAREFA } from "@/lib/
 export function BotaoAcao({ url, body, rotulo, confirmar, classe = "admin-link", recarregar = true }) {
   const [estado, setEstado] = useState({ a: "idle", msg: "", link: "" });
   async function clicar() {
-    if (confirmar && !window.confirm(confirmar)) return;
+    if (confirmar && !(await perguntar(confirmar))) return;
     setEstado({ a: "loading", msg: "", link: "" });
     const r = await pedidoAdmin(url, { body });
     if (!r.ok) return setEstado({ a: "erro", msg: r.erro, link: "" });
-    if (r.aviso) window.alert(r.aviso);
+    if (r.aviso) await avisar(r.aviso);
     if (r.link) {
       setEstado({ a: "ok", msg: r.emailEnviado ? "Link enviado ao hóspede por email." : "Copia o link e envia ao hóspede:", link: r.link });
       return;
@@ -236,9 +237,9 @@ async function pedirEquipa(body, setEstado) {
   setEstado({ a: "loading", msg: "" });
   const r = await pedidoAdmin("/api/admin/alojamento/equipa", { body });
   if (!r.ok) return setEstado({ a: "erro", msg: r.erro });
-  if (r.aviso) window.alert(r.aviso);
-  else if (body.acao === "convite") window.alert("Convite reenviado.");
-  else if (body.acao === "criar") window.alert("Pessoa criada. Enviámos-lhe o convite por email para definir a password e instalar a app.");
+  if (r.aviso) await avisar(r.aviso);
+  else if (body.acao === "convite") await avisar("Convite reenviado.");
+  else if (body.acao === "criar") await avisar("Pessoa criada. Enviámos-lhe o convite por email para definir a password e instalar a app.");
   window.location.reload();
 }
 
@@ -258,8 +259,8 @@ export function AcoesMembro({ m }) {
       <button
         type="button"
         className="admin-link"
-        onClick={() => {
-          const p = window.prompt(`Nova password para ${m.nome} (mín. 8 caracteres):`);
+        onClick={async () => {
+          const p = await pedirTexto(`Nova password para ${m.nome} (mín. 8 caracteres):`, { tipo: "password", minimo: 8, ok: "Mudar" });
           if (p) pedirEquipa({ acao: "password", email: m.email, password: p }, setEstado);
         }}
       >

@@ -207,6 +207,8 @@ body.al-equipa { background: var(--paper-soft); }
 /* Backoffice */
 .al-subnav { display: flex; flex-wrap: wrap; gap: 6px; padding-top: 16px; padding-bottom: 0; }
 .al-subnav a { padding: 8px 12px; border-radius: 8px; background: var(--paper-soft); color: var(--navy); font-weight: 600; font-size: 0.88rem; }
+.al-subnav a:hover { background: #e3e8ef; }
+.al-subnav a.ativo { background: var(--navy); color: #fff; }
 .al-acoes-admin { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
 .al-acao { display: inline-flex; flex-direction: column; gap: 4px; }
 .al-acao-msg { font-size: 0.8rem; color: var(--muted); }

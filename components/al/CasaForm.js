@@ -47,7 +47,10 @@ export default function CasaForm({ casa, modo = "proprietario", urlDepois }) {
   const [novaDiv, setNovaDiv] = useState("");
   const [estado, setEstado] = useState({ a: "idle", msg: "" });
   const [gravado, setGravado] = useState(() => JSON.stringify(c));
-  const libertar = useAvisoSaida(JSON.stringify(c) !== gravado, t(MSG_SAIR));
+  const libertar = useAvisoSaida(JSON.stringify(c) !== gravado, t(MSG_SAIR), {
+    ok: t("Sair sem gravar"),
+    cancelar: t("Ficar"),
+  });
   const set = (k) => (e) => setC((x) => ({ ...x, [k]: e.target.type === "checkbox" ? e.target.checked : e.target.value }));
   const moeda = PAISES[c.pais]?.moeda || "EUR";
 

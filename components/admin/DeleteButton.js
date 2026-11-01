@@ -2,12 +2,18 @@
 
 import { useState } from "react";
 import { pedidoAdmin } from "@/lib/adminCliente";
+import { avisar, confirmar } from "@/lib/dialogo";
 
 export default function DeleteButton({ slug, nome, endpoint = "empreendimentos" }) {
   const [a, setA] = useState("idle");
 
   async function apagar() {
-    if (!confirm(`Apagar "${nome}"? Fica 30 dias no lixo (Conta → Atividade e lixo), de onde se pode recuperar.`)) return;
+    const sim = await confirmar(`Fica 30 dias no lixo (Conta → Atividade e lixo), de onde se pode recuperar.`, {
+      titulo: `Apagar «${nome}»?`,
+      ok: "Apagar",
+      perigo: true,
+    });
+    if (!sim) return;
     setA("loading");
     const r = await pedidoAdmin(`/api/admin/${endpoint}/${encodeURIComponent(slug)}`, {
       method: "DELETE",
@@ -18,7 +24,7 @@ export default function DeleteButton({ slug, nome, endpoint = "empreendimentos" 
       window.location.reload();
       return;
     }
-    alert(r.erro || "Não foi possível apagar. Tenta novamente.");
+    await avisar(r.erro || "Não foi possível apagar. Tenta novamente.");
     setA("idle");
   }
 

@@ -2120,6 +2120,9 @@ body:has(.admin-page) .site-footer {
   .admin-row {
     flex-wrap: wrap;
   }
+  /* O nome fica ao lado da miniatura; referência e ações passam para baixo. */
+  .admin-row-main { flex-basis: calc(100% - 100px); }
+  .admin-row-actions { flex-wrap: wrap; gap: 10px 16px; }
 }
 
 /* Ajuda */
@@ -5049,3 +5052,30 @@ a.an-calor-cel:focus-visible,
   .gthumb:hover .gthumb-mover,
   .gthumb:focus-within .gthumb-mover { opacity: 1; }
 }
+
+/* Janelas próprias (lib/dialogo.js) em vez de alert/confirm/prompt */
+.dialogo {
+  /* O reset global tira a margem automática que centra o <dialog>. */
+  margin: auto;
+  border: 0;
+  border-radius: 14px;
+  padding: 24px 24px 20px;
+  width: min(440px, calc(100vw - 32px));
+  box-shadow: 0 24px 60px rgba(10, 25, 47, 0.3);
+  color: var(--ink);
+}
+.dialogo::backdrop { background: rgba(10, 25, 47, 0.45); }
+.dialogo h3 { color: var(--navy); font-size: 1.1rem; margin-bottom: 8px; }
+.dialogo p { margin: 0 0 18px; white-space: pre-line; line-height: 1.5; }
+.dialogo input {
+  width: 100%;
+  font: inherit;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 18px;
+}
+.dialogo-botoes { display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }
+.dialogo-botoes .btn { padding: 10px 18px; font-size: 0.9rem; }
+.btn-perigo { background: #b3261e; color: #fff; border: 0; }
+.btn-perigo:hover { background: #8f1d17; }
