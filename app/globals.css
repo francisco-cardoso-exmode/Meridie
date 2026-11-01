@@ -2253,7 +2253,7 @@ body:has(.admin-page) .site-footer {
   margin-top: 4px;
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--gold);
+  color: var(--gold-texto);
 }
 .lead-msg {
   margin-top: 8px;
@@ -4967,3 +4967,32 @@ a.an-calor-cel:focus-visible,
     margin-top: 12px;
   }
 }
+
+/* Leads: estado e notas internas */
+.lead-acoes { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+.lead-acoes-linha { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.lead-acoes .admin-link { background: none; border: 0; padding: 0; font: inherit; font-size: 0.85rem; cursor: pointer; }
+.lead-estado {
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 5px 10px;
+  border-radius: 7px;
+  border: 0;
+  background: var(--paper-soft);
+  color: var(--navy);
+  cursor: pointer;
+}
+.lead-estado.e-nova { background: var(--gold); color: var(--navy-dark); }
+.lead-estado.e-em_contacto { background: #dbe8f7; }
+.lead-estado.e-negociacao { background: #e9e2f7; }
+.lead-estado.e-cliente { background: #dcefe1; color: #2f7a4b; }
+.lead-estado.e-sem_interesse,
+.lead-estado.e-arquivada { background: #eceef1; color: var(--muted); }
+.lead-ok { color: #2f7a4b; font-size: 0.8rem; }
+.lead-notas { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 6px; }
+.lead-notas li { background: var(--paper-soft); border-radius: 8px; padding: 8px 12px; font-size: 0.88rem; white-space: pre-wrap; }
+.lead-notas li span { color: var(--muted); font-size: 0.78rem; margin-right: 6px; }
+.lead-nota-nova { margin-top: 10px; display: grid; gap: 8px; }
+.lead-nota-nova textarea { width: 100%; font: inherit; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; }
+.lead-nota-nova .btn { padding: 8px 16px; font-size: 0.85rem; }

@@ -3,6 +3,8 @@ import { leAdmin } from "@/lib/leituraAdmin";
 import AvisoSemBase from "@/components/admin/AvisoSemBase";
 import ListaFiltravel from "@/components/admin/ListaFiltravel";
 import { allEmpreendimentos } from "@/lib/store";
+import LeadAcoes from "@/components/admin/LeadAcoes";
+import { ESTADOS_LEAD, estadoLead } from "@/lib/lead";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Leads" };
@@ -39,6 +41,7 @@ export default async function AdminLeads() {
   // Nome do imóvel de onde veio cada lead (o formulário guarda o slug em `ref`).
   const { dados: emps } = await leAdmin(() => allEmpreendimentos({ todos: true }), []);
   const nomeImovel = Object.fromEntries(emps.map((e) => [e.slug, e.nome]));
+  const idiomaDe = (l) => l.idioma || l.lang || "pt";
   const origemDe = (l) => (!l.ref || l.ref === "contacto" ? "Página de contactos" : nomeImovel[l.ref] || l.ref);
 
   return (
@@ -59,6 +62,7 @@ export default async function AdminLeads() {
           placeholder="Pesquisar por nome, email, assunto, mensagem…"
           periodo="data"
           facetas={[
+            { k: "estado", label: "Estado", opcoes: Object.entries(ESTADOS_LEAD).map(([v, label]) => ({ v, label })) },
             { k: "origem", label: "Origem" },
             { k: "lang", label: "Idioma", opcoes: [{ v: "pt", label: "Português" }, { v: "en", label: "Inglês" }] },
             { k: "email", label: "Email", opcoes: [{ v: "falhou", label: "Envio falhou" }, { v: "ok", label: "Enviado" }] },
@@ -70,8 +74,8 @@ export default async function AdminLeads() {
           ]}
           itens={leads.map((l) => ({
             id: String(l._id),
-            busca: [l.nome, l.email, l.assunto, l.mensagem, origemDe(l)].filter(Boolean).join(" "),
-            facetas: { origem: origemDe(l), lang: l.lang || "pt", email: l.emailFalhou ? "falhou" : "ok" },
+            busca: [l.nome, l.email, l.assunto, l.mensagem, origemDe(l), ...(l.notas || []).map((n) => n.texto)].filter(Boolean).join(" "),
+            facetas: { estado: estadoLead(l), origem: origemDe(l), lang: idiomaDe(l), email: l.emailFalhou ? "falhou" : "ok" },
             ordem: {
               data: l.criadoEm ? new Date(l.criadoEm).getTime() : 0,
               dataAsc: l.criadoEm ? new Date(l.criadoEm).getTime() : 0,
@@ -90,9 +94,14 @@ export default async function AdminLeads() {
               <p className="lead-msg">{l.mensagem}</p>
               <div className="lead-meta">
                 Origem: {origemDe(l)}
-                {l.lang === "en" && " · EN"}
+                {idiomaDe(l) === "en" && " · EN"}
                 {l.emailFalhou && <span className="tag-oculto">EMAIL FALHOU</span>}
               </div>
+              <LeadAcoes
+                id={String(l._id)}
+                estado={estadoLead(l)}
+                notas={(l.notas || []).map((n) => ({ em: new Date(n.em).toISOString(), por: n.por || "", texto: n.texto }))}
+              />
             </div>
             ),
           }))}

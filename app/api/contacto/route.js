@@ -120,6 +120,7 @@ export async function POST(request) {
         mensagem,
         idioma: lang,
         ref: ref || null,
+        estado: "nova",
         criadoEm: new Date(),
       });
       leadId = r.insertedId;

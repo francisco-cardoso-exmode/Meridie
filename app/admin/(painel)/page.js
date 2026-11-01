@@ -35,11 +35,11 @@ export default async function AdminDashboard() {
     ? [
         [p.reservasPedido, plural(p.reservasPedido, "pedido de reserva por responder", "pedidos de reserva por responder"), "/admin/alojamento/reservas?estado=pedido", true],
         [p.pedidosNovos, plural(p.pedidosNovos, "pedido novo (encomenda, proposta ou demonstração)", "pedidos novos (encomendas, propostas ou demonstrações)"), "/admin/pedidos?estado=novo", true],
+        [p.leadsNovas, plural(p.leadsNovas, "lead nova por responder", "leads novas por responder"), "/admin/leads?estado=nova", true],
         [p.emailsFalhados, plural(p.emailsFalhados, "mensagem cujo email de aviso falhou — responde a partir daqui", "mensagens cujo email de aviso falhou — responde a partir daqui"), "/admin/leads?email=falhou&dias=7", true],
         [p.casasAnalise, plural(p.casasAnalise, "casa à espera de aprovação", "casas à espera de aprovação"), "/admin/alojamento/casas?estado=em_analise", true],
         [p.tarefasPorAtribuir, plural(p.tarefasPorAtribuir, "tarefa da equipa sem ninguém atribuído", "tarefas da equipa sem ninguém atribuído"), "/admin/alojamento/tarefas?atribuida=nao", true],
         [p.tarefasHoje, plural(p.tarefasHoje, "tarefa marcada para hoje por concluir", "tarefas marcadas para hoje por concluir"), `/admin/alojamento/tarefas?data=${p.hoje}`, false],
-        [p.leadsSemana, plural(p.leadsSemana, "mensagem recebida nos últimos 7 dias", "mensagens recebidas nos últimos 7 dias"), "/admin/leads?dias=7", false],
       ].filter(([q]) => q > 0)
     : [];
 
