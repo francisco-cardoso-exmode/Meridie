@@ -105,6 +105,10 @@ export default async function InscreveCasa({ params }) {
                 </li>
               ))}
             </ul>
+            <p className="al-app-como">
+              <strong>{T("Como entras:")}</strong>{" "}
+              {T("crias a conta em «Inscrever a minha casa» com o teu email e uma password, e recebes um email de boas-vindas. Nada para descarregar: no telemóvel, instalas a tua área a partir do site (iPhone: Partilhar → «Adicionar ao ecrã principal»; Android: menu ⋮ → «Instalar app»). Para voltares a entrar, usa «Área do proprietário», no fundo de qualquer página.")}
+            </p>
             <p className="al-app-nota">{T("Ecrãs ilustrativos, com dados de exemplo.")}</p>
           </div>
           <DemoProprietario lang={lang} />

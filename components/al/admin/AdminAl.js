@@ -236,14 +236,22 @@ async function pedirEquipa(body, setEstado) {
   setEstado({ a: "loading", msg: "" });
   const r = await pedidoAdmin("/api/admin/alojamento/equipa", { body });
   if (!r.ok) return setEstado({ a: "erro", msg: r.erro });
+  if (r.aviso) window.alert(r.aviso);
+  else if (body.acao === "convite") window.alert("Convite reenviado.");
+  else if (body.acao === "criar") window.alert("Pessoa criada. Enviámos-lhe o convite por email para definir a password e instalar a app.");
   window.location.reload();
 }
 
-/** Ações de uma pessoa da equipa: ativar/desativar, mudar password. */
+/** Ações de uma pessoa da equipa: reenviar convite, ativar/desativar, mudar password. */
 export function AcoesMembro({ m }) {
   const [estado, setEstado] = useState({ a: "idle", msg: "" });
   return (
     <div className="admin-row-actions">
+      {m.ativo !== false && (
+        <button type="button" className="admin-link" onClick={() => pedirEquipa({ acao: "convite", email: m.email }, setEstado)}>
+          Reenviar convite
+        </button>
+      )}
       <button type="button" className="admin-link" onClick={() => pedirEquipa({ acao: "ativo", email: m.email, ativo: m.ativo === false }, setEstado)}>
         {m.ativo === false ? "Reativar" : "Desativar"}
       </button>
@@ -264,7 +272,7 @@ export function AcoesMembro({ m }) {
 
 /** Acrescentar uma pessoa à equipa. */
 export function NovoMembro() {
-  const [f, setF] = useState({ nome: "", email: "", password: "" });
+  const [f, setF] = useState({ nome: "", email: "" });
   const [estado, setEstado] = useState({ a: "idle", msg: "" });
   return (
     <form
@@ -283,15 +291,14 @@ export function NovoMembro() {
           Email
           <input type="email" value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} required />
         </label>
-        <label>
-          Password inicial
-          <input value={f.password} onChange={(e) => setF({ ...f, password: e.target.value })} minLength={8} required />
-        </label>
       </div>
+      <p className="admin-sub">
+        A pessoa recebe um convite por email: define a própria password (link válido 7 dias) e tem as instruções para instalar a app no telemóvel.
+      </p>
       {estado.msg && <div className="form-msg erro">{estado.msg}</div>}
       <div className="admin-form-actions">
         <button type="submit" className="btn btn-primary" disabled={estado.a === "loading"}>
-          Criar
+          Criar e enviar convite
         </button>
       </div>
     </form>

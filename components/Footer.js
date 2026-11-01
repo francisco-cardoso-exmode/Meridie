@@ -79,6 +79,9 @@ export default async function Footer({ lang = "pt" }) {
               <li>
                 <L href="/inscreve-a-tua-casa">{T("Inscreve a tua casa")}</L>
               </li>
+              <li>
+                <L href="/proprietario/entrar">{T("Área do proprietário")}</L>
+              </li>
             </ul>
           </div>
           <div>

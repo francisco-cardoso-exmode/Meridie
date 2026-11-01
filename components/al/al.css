@@ -108,7 +108,12 @@
 /* Landing + calculadora */
 .al-plano-pct { font-size: 2rem; font-weight: 700; color: var(--navy); margin: 6px 0 10px; }
 .al-plano-pct small { font-size: 0.85rem; color: var(--muted); font-weight: 500; }
-.al-plano.destaque { border: 2px solid var(--gold); }
+/* Plano em destaque: cartão azul (sem contorno). */
+.al-plano.destaque { background: linear-gradient(135deg, var(--navy), var(--navy-light)); border-color: transparent; color: #fff; }
+.al-plano.destaque h3 { color: #fff; }
+.al-plano.destaque .al-plano-pct { color: var(--gold-light); }
+.al-plano.destaque .al-plano-pct small { color: rgba(255, 255, 255, 0.7); }
+.al-plano.destaque p { color: rgba(255, 255, 255, 0.82); }
 .al-condicoes { margin-top: 28px; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 32px; }
 @media (max-width: 760px) { .al-condicoes { grid-template-columns: 1fr; } }
 .al-calc { display: grid; grid-template-columns: 1fr; gap: 24px; background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
@@ -326,3 +331,11 @@ li.al-ok { display: flex; }
 }
 .al-pagina .al-app-demo.claro { margin-top: 72px; }
 .al-pagina .al-app-demo h2 { font-size: 1.8rem; margin: 8px 0 10px; }
+.al-aviso-email { border-color: var(--gold); background: #fffaf0; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
+.al-aviso-email p { margin: 0; flex: 1 1 320px; }
+.al-para-quem { text-align: center; color: var(--muted); margin: 8px auto 4px; max-width: 460px; font-size: 0.95rem; }
+.al-para-quem strong { color: var(--navy); }
+.al-app-como { margin-top: 22px; padding: 14px 16px; border-radius: 10px; background: rgba(255, 255, 255, 0.08); font-size: 0.9rem; line-height: 1.55; color: rgba(255, 255, 255, 0.85); }
+.al-app-como strong { color: var(--gold-light); }
+.al-app-demo.claro .al-app-como { background: var(--paper-soft, #f5f6f8); color: var(--muted); }
+.al-app-demo.claro .al-app-como strong { color: var(--navy); }

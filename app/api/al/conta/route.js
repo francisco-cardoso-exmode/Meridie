@@ -5,12 +5,16 @@ import {
   criarTokenRecuperacao,
   consumirTokenRecuperacao,
   definirPasswordAl,
+  criarTokenAcesso,
+  marcarEmailConfirmado,
+  VALIDADE_CONVITE_MS,
   normalizaEmail,
   PASSWORD_MAX,
 } from "@/lib/al/contas";
 import { validaPassword } from "@/lib/utilizadores";
 import { criarSessaoAl, porCookieAl, tirarCookieAl, apagarSessaoAl, tokenDoCookie } from "@/lib/al/sessoes";
-import { emailRecuperacao, avisarEquipa } from "@/lib/al/emails";
+import { emailRecuperacao, avisarEquipa, emailBoasVindasProprietario } from "@/lib/al/emails";
+import { getProprietario } from "@/lib/al/auth";
 import { dentroDoLimite, ipDe } from "@/lib/rateLimit";
 import { SITE_URL } from "@/lib/site";
 import { caminho } from "@/lib/i18n";
@@ -23,7 +27,9 @@ export const dynamic = "force-dynamic";
  * - registo: só proprietários (a equipa é criada no backoffice);
  * - login: 10 tentativas / 15 min por IP e por email;
  * - recuperar: resposta sempre igual (não revela se o email existe);
- * - repor: gasta o link de uso único, define a password e abre a sessão.
+ * - repor: gasta o link de uso único, define a password e abre a sessão
+ *   (no proprietário, conta também como email confirmado);
+ * - confirmacao: reenvia o email de boas-vindas/confirmação (com sessão).
  */
 
 const erro = (msg, status = 400) => NextResponse.json({ ok: false, erro: msg }, { status });
@@ -32,6 +38,18 @@ const MUITAS = "Demasiadas tentativas. Tenta de novo daqui a 15 minutos.";
 
 // Página de entrada/reposição de cada app.
 const appDe = (papel, lang) => (papel === "equipa" ? "/equipa" : caminho(lang, "/proprietario"));
+
+async function enviarBoasVindas({ email, nome, lang }) {
+  const t = await criarTokenAcesso("proprietario", email, { tipo: "confirmar", validadeMs: VALIDADE_CONVITE_MS, limitar: false });
+  if (!t) return;
+  await emailBoasVindasProprietario({
+    para: email,
+    nome,
+    lang,
+    linkConfirmar: `${SITE_URL}${caminho(lang, "/proprietario/confirmar")}?t=${t}`,
+    linkEntrar: `${SITE_URL}${caminho(lang, "/proprietario/entrar")}`,
+  });
+}
 
 export async function POST(request) {
   const b = (await request.json().catch(() => null)) || {};
@@ -60,6 +78,7 @@ export async function POST(request) {
         plano: b.plano,
       });
       const token = await criarSessaoAl("proprietario", e);
+      await enviarBoasVindas({ email: e, nome: b.nome, lang }).catch((x) => console.error("boas-vindas:", x?.message || x));
       avisarEquipa({
         assunto: `Novo proprietário: ${String(b.nome || "").slice(0, 80)}`,
         titulo: "Novo proprietário registado",
@@ -105,7 +124,18 @@ export async function POST(request) {
       const e = await consumirTokenRecuperacao(papel, b.t);
       if (!e) return erro("Este link já foi usado ou expirou. Pede um novo.");
       await definirPasswordAl(papel, e, b.password);
+      // O link chegou ao email: fica confirmado.
+      if (papel === "proprietario") await marcarEmailConfirmado(e);
       return porCookieAl(NextResponse.json({ ok: true }), papel, await criarSessaoAl(papel, e));
+    }
+
+    if (b.acao === "confirmacao") {
+      const p = papel === "proprietario" ? await getProprietario() : null;
+      if (!p) return erro("A tua sessão expirou. Entra outra vez.", 401);
+      if (p.emailConfirmado !== false) return NextResponse.json({ ok: true, msg: "O teu email já está confirmado." });
+      if (!(await dentroDoLimite(`al-confirmacao:${p.email}`, 3, 60 * 60))) return erro(MUITAS, 429);
+      await enviarBoasVindas({ email: p.email, nome: p.nome, lang });
+      return NextResponse.json({ ok: true, msg: "Enviámos-te um novo email. Abre-o e carrega em «Confirmar o meu email»." });
     }
 
     return erro("Pedido inválido.");

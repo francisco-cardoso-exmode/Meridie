@@ -19,6 +19,7 @@ export default async function EquipaAdminPagina() {
         <div className="admin-row-main">
           <div className="admin-row-title">
             {m.nome} {m.ativo === false && <span className="tag-oculto">INATIVO</span>}
+            {m.ativo !== false && !m.temPassword && <span className="tag-oculto">CONVITE POR ACEITAR</span>}
           </div>
           <div className="admin-row-sub">{m.email}</div>
         </div>
@@ -30,8 +31,8 @@ export default async function EquipaAdminPagina() {
     <div className="admin-container">
       <h1>Equipa de terreno</h1>
       <p className="admin-sub">
-        Quem faz inspeções e limpezas. Entram em <a href="/equipa">/equipa</a> com email e password (contas separadas do backoffice — não têm acesso
-        aqui). Desativar termina as sessões abertas.
+        Quem faz inspeções e limpezas. Ao acrescentar uma pessoa, ela recebe um convite por email para definir a password e instalar a app;
+        depois entra em <a href="/equipa">/equipa</a> (contas separadas do backoffice — não têm acesso aqui). Desativar termina as sessões abertas.
       </p>
       <AvisoSemBase mostrar={semBase} />
       <ListaFiltravel

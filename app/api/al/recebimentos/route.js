@@ -17,6 +17,7 @@ export async function POST(request) {
   const p = await getProprietario();
   if (!p) return erro("A tua sessão expirou. Entra outra vez.", 401);
   if (!recebimentosDisponiveis()) return erro("Os pagamentos online ainda não estão ligados. Fala connosco.", 503);
+  if (p.emailConfirmado === false) return erro("Confirma primeiro o teu email (enviámos-te um link quando criaste a conta).", 403);
   const b = (await request.json().catch(() => null)) || {};
   try {
     return NextResponse.json({ ok: true, url: await linkRecebimentos(p, b.lang === "en" ? "en" : "pt") });
@@ -30,7 +31,7 @@ export async function GET(request) {
   const lang = new URL(request.url).searchParams.get("lang") === "en" ? "en" : "pt";
   const painel = `${SITE_URL}${caminho(lang, "/proprietario")}`;
   const p = await getProprietario();
-  if (!p || !recebimentosDisponiveis()) return NextResponse.redirect(painel);
+  if (!p || !recebimentosDisponiveis() || p.emailConfirmado === false) return NextResponse.redirect(painel);
   try {
     return NextResponse.redirect(await linkRecebimentos(p, lang));
   } catch (e) {

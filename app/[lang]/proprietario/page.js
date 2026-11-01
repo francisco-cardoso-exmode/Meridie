@@ -11,6 +11,7 @@ import { listarReservas } from "@/lib/al/reservas";
 import { ROTULO_ESTADO_CASA, ROTULO_PLANO, hojeLisboa, formatarValor, moedaDe } from "@/lib/al/regras";
 import Icon from "@/components/Icon";
 import InstalarApp from "@/components/al/InstalarApp";
+import ConfirmarEmail from "@/components/al/ConfirmarEmail";
 
 export const dynamic = "force-dynamic";
 
@@ -42,6 +43,8 @@ export default async function PainelProprietario({ params }) {
   return (
     <div className="container al-pagina">
       <NavProprietario lang={lang} nome={p.nome} ativo="painel" />
+
+      {p.emailConfirmado === false && <ConfirmarEmail email={p.email} />}
 
       <div className="al-cab">
         <h1>{T("As tuas casas")}</h1>
@@ -116,7 +119,9 @@ export default async function PainelProprietario({ params }) {
         <>
           <h2>{T("Recebimentos")}</h2>
           <div className="al-cartao">
-            {receb.ativa ? (
+            {p.emailConfirmado === false ? (
+              <p>{T("Confirma primeiro o teu email (aviso no topo desta página) para ligares a conta bancária onde recebes os pagamentos.")}</p>
+            ) : receb.ativa ? (
               <>
                 <p className="al-ok"><Icon name="check" size={18} /> {T("A tua conta para recebimentos está ativa. Depois de cada estadia transferimos a tua parte para o IBAN que indicaste no Stripe.")}</p>
                 <LigarRecebimentos rotulo={T("Ver transferências e IBAN")} secundario />

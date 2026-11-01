@@ -167,6 +167,10 @@ export default async function Alojamento({ params, searchParams }) {
                 </li>
               ))}
             </ul>
+            <p className="al-app-como">
+              <strong>{T("Sem conta nem password:")}</strong>{" "}
+              {T("o link pessoal chega no email de confirmação. Para o teres como app: iPhone — Partilhar → «Adicionar ao ecrã principal»; Android — menu ⋮ → «Instalar app».")}
+            </p>
             <p className="al-app-nota">{T("Ecrãs ilustrativos, com dados de exemplo.")}</p>
           </div>
           <DemoHospede lang={lang} />
