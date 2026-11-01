@@ -67,14 +67,17 @@ export default function Header({ temCasas = false }) {
         </button>
 
         <nav className={`nav${open ? " open" : ""}`}>
-          {LINKS.map((l) =>
-            l.sub ? (
+          {LINKS.map((l) => {
+            const sub = l.sub?.filter((s) => temCasas || !s.soComCasas);
+            // Submenu com um só destino vira link direto (sem ▾).
+            if (sub?.length === 1) l = { href: sub[0].href, label: l.label };
+            return l.sub ? (
               <div className="nav-drop" key={l.label}>
                 <button type="button" className="nav-drop-btn" aria-haspopup="true">
                   {t(l.label)} <span aria-hidden="true">▾</span>
                 </button>
                 <div className="nav-drop-menu">
-                  {l.sub.filter((s) => temCasas || !s.soComCasas).map((s) => (
+                  {sub.map((s) => (
                     <L key={s.href} href={s.href} onClick={() => setOpen(false)}>
                       {t(s.label)}
                     </L>
@@ -90,8 +93,8 @@ export default function Header({ temCasas = false }) {
               >
                 {t(l.label)}
               </L>
-            )
-          )}
+            );
+          })}
           <PedidoBadge onClick={() => setOpen(false)} />
           <TrocaIdioma onClick={() => setOpen(false)} />
         </nav>

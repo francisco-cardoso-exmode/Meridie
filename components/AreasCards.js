@@ -12,12 +12,13 @@ const AREAS = {
   imobiliario: { icon: "buildings", href: "/empreendimentos" },
   marcas: { icon: "wine", href: "/representacoes" },
   tecnologia: { icon: "monitor", href: "/tecnologia" },
+  alojamento: { icon: "key", href: "/inscreve-a-tua-casa" },
 };
 
-export default function AreasCards({ areas: pedidas = ["imobiliario", "marcas", "tecnologia"], textos }) {
+export default function AreasCards({ areas: pedidas = ["imobiliario", "marcas", "tecnologia", "alojamento"], textos }) {
   const areas = pedidas.filter((k) => k !== "tecnologia" || TECNOLOGIA_VISIVEL);
   return (
-    <div className={`grid ${areas.length === 2 ? "grid-2" : "grid-3"}`}>
+    <div className={`grid ${areas.length % 2 === 0 ? "grid-2" : "grid-3"}`}>
       {areas.map((k, i) => {
         const a = AREAS[k];
         return (

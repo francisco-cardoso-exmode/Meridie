@@ -12,6 +12,7 @@ import { whatsappHref, telHref } from "@/lib/contactoLinks";
 import { formatarValor, totalHospede, podePagarOnline } from "@/lib/al/regras";
 import { pagamentoDisponivel } from "@/lib/pagamentos";
 import { traduzDoc } from "@/lib/i18n/conteudo";
+import Icon from "@/components/Icon";
 
 export const dynamic = "force-dynamic";
 
@@ -88,7 +89,7 @@ export default async function Estadia({ params, searchParams }) {
               {estadoPag === "pago" && (
                 <>
                   <dt>{T("Pagamento")}</dt>
-                  <dd>✓ {T("Pago")}</dd>
+                  <dd className="al-ok"><Icon name="check" size={16} /> {T("Pago")}</dd>
                 </>
               )}
               {estadoPag === "reembolsado" && (

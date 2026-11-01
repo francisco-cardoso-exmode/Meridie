@@ -3,6 +3,7 @@
 import { useState } from "react";
 import FotosAl from "@/components/al/FotosAl";
 import { pedidoAl } from "@/lib/al/cliente";
+import Icon from "@/components/Icon";
 
 // Verificações rápidas (opcionais) em cada divisão.
 const CHECKLIST = {
@@ -134,7 +135,7 @@ export default function TarefaFluxo({ tarefa, divisoes }) {
         {estado.msg && <p className="al-msg erro">{estado.msg}</p>}
         <div className="al-acoes-fixas">
           <button type="button" className="al-btn al-btn-enorme" disabled={estado.a === "loading"} onClick={guardarDivisao}>
-            ✓ Guardar {aberta}
+            <Icon name="check" size={16} /> Guardar {aberta}
           </button>
         </div>
       </div>
@@ -169,7 +170,7 @@ export default function TarefaFluxo({ tarefa, divisoes }) {
             if (await acao({ acao: "concluir", observacoes: obs })) setT((x) => ({ ...x, estado: "concluida" }));
           }}
         >
-          ✔ Concluir tarefa
+          <Icon name="check" size={16} /> Concluir tarefa
         </button>
       </div>
     </div>

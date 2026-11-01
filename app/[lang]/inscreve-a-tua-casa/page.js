@@ -1,5 +1,6 @@
 import "@/components/al/al.css";
 import L from "@/components/L";
+import Icon from "@/components/Icon";
 import Calculadora from "@/components/al/Calculadora";
 import { t } from "@/lib/i18n";
 import { metaPagina } from "@/lib/seo";
@@ -23,10 +24,10 @@ export default async function InscreveCasa({ params }) {
   const [{ planos }, c] = await Promise.all([getConfigAl(), getConteudo("alojamento", lang)]);
 
   const vantagens = [
-    ["📸", "Inspeção fotográfica a cada estadia", "Antes de cada entrada e depois de cada saída, a nossa equipa fotografa todas as divisões. Vês tudo na tua área — e o hóspede vê o estado em que recebeu a casa."],
-    ["🔑", "Reservas diretas, menos comissões", "Além do Airbnb e do Booking, a tua casa aparece no nosso site, onde o hóspede reserva diretamente — sem a comissão da plataforma."],
-    ["📊", "Ganhos claros, mês a mês", "Vês as reservas, o calendário e quanto recebes em cada mês, com cada comissão separada."],
-    ["🤝", "Sem custos de entrada nem fidelização", "0 € de adesão. Sais quando quiseres, com 30 dias de aviso."],
+    ["camera", "Inspeção fotográfica a cada estadia", "Antes de cada entrada e depois de cada saída, a nossa equipa fotografa todas as divisões. Vês tudo na tua área — e o hóspede vê o estado em que recebeu a casa."],
+    ["key", "Reservas diretas, menos comissões", "Além do Airbnb e do Booking, a tua casa aparece no nosso site, onde o hóspede reserva diretamente — sem a comissão da plataforma."],
+    ["bar-chart", "Ganhos claros, mês a mês", "Vês as reservas, o calendário e quanto recebes em cada mês, com cada comissão separada."],
+    ["handshake", "Sem custos de entrada nem fidelização", "0 € de adesão. Sais quando quiseres, com 30 dias de aviso."],
   ];
 
   const linhasComparacao = [
@@ -53,16 +54,27 @@ export default async function InscreveCasa({ params }) {
               {T("Calcular quanto posso ganhar")}
             </a>
           </div>
+          <ul className="al-garantias">
+            {["0 € de adesão", "Sem fidelização", "Portugal e Brasil"].map((g) => (
+              <li key={g}>
+                <Icon name="check" size={16} /> {T(g)}
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
       <section>
         <div className="container">
-          <div className="grid grid-2 al-vantagens">
+          <div className="section-head">
+            <span className="eyebrow">{T("Porquê a Meridie")}</span>
+            <h2>{T("Tudo o que a tua casa precisa, num só sítio")}</h2>
+          </div>
+          <div className="grid grid-4 al-vantagens">
             {vantagens.map(([ic, tit, txt]) => (
               <div className="card" key={tit}>
-                <div className="al-icone" aria-hidden="true">
-                  {ic}
+                <div className="icon">
+                  <Icon name={ic} />
                 </div>
                 <h3>{T(tit)}</h3>
                 <p>{T(txt)}</p>
@@ -93,10 +105,19 @@ export default async function InscreveCasa({ params }) {
             </div>
           </div>
           <ul className="value-list al-condicoes">
-            <li>✓ {T("0 € de adesão")}</li>
-            <li>✓ {T("Sem fidelização — 30 dias de aviso para sair")}</li>
-            <li>✓ {T("Comissão sobre o valor da estadia depois da comissão da plataforma, sem limpeza nem taxa turística")}</li>
-            <li>✓ {T("Limpeza paga pelo hóspede, ao custo")}</li>
+            {[
+              "0 € de adesão",
+              "Sem fidelização — 30 dias de aviso para sair",
+              "Comissão sobre o valor da estadia depois da comissão da plataforma, sem limpeza nem taxa turística",
+              "Limpeza paga pelo hóspede, ao custo",
+            ].map((x) => (
+              <li key={x}>
+                <span className="check">
+                  <Icon name="check" size={18} />
+                </span>
+                {T(x)}
+              </li>
+            ))}
           </ul>
         </div>
       </section>

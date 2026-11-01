@@ -9,6 +9,7 @@ import { exigirProprietario, metaPrivada, dataCurta } from "@/lib/al/paginas";
 import { casasDoProprietario } from "@/lib/al/casas";
 import { listarReservas } from "@/lib/al/reservas";
 import { ROTULO_ESTADO_CASA, ROTULO_PLANO, hojeLisboa, formatarValor, moedaDe } from "@/lib/al/regras";
+import Icon from "@/components/Icon";
 
 export const dynamic = "force-dynamic";
 
@@ -56,7 +57,7 @@ export default async function PainelProprietario({ params }) {
         <div className="al-casas">
           {casas.map((c) => (
             <L key={c.slug} href={`/proprietario/casas/${c.slug}`} className="al-casa-card">
-              <div className="al-casa-foto">{c.fotos?.[0] ? <Foto src={c.fotos[0]} alt="" fill sizes="160px" /> : <span>🏠</span>}</div>
+              <div className="al-casa-foto">{c.fotos?.[0] ? <Foto src={c.fotos[0]} alt="" fill sizes="160px" /> : <Icon name="home" size={32} />}</div>
               <div>
                 <strong>{c.titulo}</strong>
                 <div className="al-sub">
@@ -116,7 +117,7 @@ export default async function PainelProprietario({ params }) {
           <div className="al-cartao">
             {receb.ativa ? (
               <>
-                <p>✓ {T("A tua conta para recebimentos está ativa. Depois de cada estadia transferimos a tua parte para o IBAN que indicaste no Stripe.")}</p>
+                <p className="al-ok"><Icon name="check" size={18} /> {T("A tua conta para recebimentos está ativa. Depois de cada estadia transferimos a tua parte para o IBAN que indicaste no Stripe.")}</p>
                 <LigarRecebimentos rotulo={T("Ver transferências e IBAN")} secundario />
               </>
             ) : (

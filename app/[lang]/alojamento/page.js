@@ -1,5 +1,6 @@
 import L from "@/components/L";
 import Foto from "@/components/Foto";
+import Icon from "@/components/Icon";
 import PrecoDual from "@/components/PrecoDual";
 import { t, tf, caminho } from "@/lib/i18n";
 import { metaPagina } from "@/lib/seo";
@@ -38,6 +39,7 @@ export default async function Alojamento({ params, searchParams }) {
   const [casas, cidades, c] = await Promise.all([casasPublicadas(f), cidadesComCasas(), getConteudo("alojamento", lang)]);
   const lista = traduzLista(casas, lang);
   const hoje = hojeLisboa();
+  const semFiltros = !Object.values(f).some(Boolean);
   const qs = f.entrada && f.saida ? `?entrada=${f.entrada}&saida=${f.saida}${f.hospedes ? `&hospedes=${f.hospedes}` : ""}` : "";
 
   return (
@@ -90,7 +92,20 @@ export default async function Alojamento({ params, searchParams }) {
         </button>
       </form>
 
-      {lista.length === 0 ? (
+      {lista.length === 0 && semFiltros ? (
+        <div className="al-vazio">
+          <div className="icon">
+            <Icon name="home" />
+          </div>
+          <div>
+            <h2>{T("As primeiras casas estão a chegar")}</h2>
+            <p>{T("Estamos a preparar e a inspecionar as primeiras casas. Se procuras uma estadia em Portugal ou no Brasil, fala connosco e ajudamos-te a encontrar.")}</p>
+          </div>
+          <L href="/contactos" className="btn btn-primary">
+            {T("Falar connosco")}
+          </L>
+        </div>
+      ) : lista.length === 0 ? (
         <div className="empty-state">
           <p>{T("Não encontrámos casas com estes critérios. Experimenta outras datas ou outra cidade.")}</p>
         </div>

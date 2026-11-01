@@ -39,7 +39,7 @@ export default async function Home({ params }) {
   const { lang } = await params;
   const T = (x) => t(lang, x);
   const c = await getConteudo("home", lang);
-  const areas = TECNOLOGIA_VISIVEL ? await getConteudo("areas", lang) : null;
+  const areas = await getConteudo("areas", lang);
   // Só os campos que os cards e o explorador usam (ver cartaoEmpreendimento).
   const destaques = traduzLista(await empreendimentosDestaque(6), lang).map(cartaoEmpreendimento);
   const todos = traduzLista(await allEmpreendimentos(), lang).map(cartaoEmpreendimento);
@@ -66,7 +66,7 @@ export default async function Home({ params }) {
             <h2>{c.areasTitulo}</h2>
             <p>{c.areasTexto}</p>
           </Reveal>
-          {TECNOLOGIA_VISIVEL && <AreasCards areas={["marcas", "tecnologia"]} textos={areas} />}
+          <AreasCards areas={["marcas", "tecnologia", "alojamento"]} textos={areas} />
           {marcas.length > 0 && (
             <Reveal>
               <p className="marcas-faixa-titulo">{c.marcasFaixaTitulo}</p>
@@ -190,27 +190,6 @@ export default async function Home({ params }) {
               {T("Ver o processo completo")}
             </L>
           </div>
-        </div>
-      </section>
-
-      {/* Alojamento local — para proprietários */}
-      <section className="bg-soft">
-        <div className="container">
-          <Reveal className="al-home">
-            <div>
-              <span className="eyebrow">{c.alEyebrow}</span>
-              <h2>{c.alTitulo}</h2>
-              <p>{c.alTexto}</p>
-            </div>
-            <div className="al-home-botoes">
-              <L href="/inscreve-a-tua-casa" className="btn btn-primary">
-                {c.alBotao}
-              </L>
-              <L href="/inscreve-a-tua-casa#calculadora" className="btn btn-outline">
-                {c.alBotao2}
-              </L>
-            </div>
-          </Reveal>
         </div>
       </section>
 

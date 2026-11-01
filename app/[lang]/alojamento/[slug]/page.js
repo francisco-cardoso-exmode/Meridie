@@ -12,6 +12,7 @@ import { casaPublica } from "@/lib/al/casas";
 import { COMODIDADES, PAISES, hojeLisboa, moedaDe, formatarValor, percentagemTaxaServico } from "@/lib/al/regras";
 import { getConfigAl } from "@/lib/al/config";
 import { pagamentoDisponivel } from "@/lib/pagamentos";
+import Icon from "@/components/Icon";
 
 export const revalidate = 60;
 
@@ -88,7 +89,7 @@ export default async function CasaPagina({ params }) {
               <h2>{T("Comodidades")}</h2>
               <ul className="feature-list al-comodidades">
                 {c.comodidades.map((k) => (
-                  <li key={k}>✓ {T(COMODIDADES[k] || k)}</li>
+                  <li key={k} className="al-ok"><Icon name="check" size={16} /> {T(COMODIDADES[k] || k)}</li>
                 ))}
               </ul>
             </>

@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { useT } from "@/components/LangProvider";
 import { enviarFotoAl } from "@/lib/al/uploadCliente";
+import Icon from "@/components/Icon";
 
 /**
  * Fotos no telemóvel: "Tirar foto" abre a câmara traseira
@@ -43,11 +44,11 @@ export default function FotosAl({ value = [], onChange, rota, pasta, payload, ma
       <div className="al-fotos-botoes">
         {camara && (
           <button type="button" className="al-btn al-btn-grande" disabled={aEnviar} onClick={() => camRef.current?.click()}>
-            📷 {t("Tirar foto")}
+            <Icon name="camera" size={18} /> {t("Tirar foto")}
           </button>
         )}
         <button type="button" className="al-btn al-btn-sec al-btn-grande" disabled={aEnviar} onClick={() => galRef.current?.click()}>
-          🖼 {t("Escolher da galeria")}
+          <Icon name="image" size={18} /> {t("Escolher da galeria")}
         </button>
       </div>
       <input ref={camRef} type="file" accept="image/*" capture="environment" multiple hidden onChange={(e) => enviar(e.target.files)} />

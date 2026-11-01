@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useT } from "@/components/LangProvider";
 import FotosAl from "@/components/al/FotosAl";
 import { pedidoAl } from "@/lib/al/cliente";
+import Icon from "@/components/Icon";
 
 /** "Reportar um problema" na página da estadia (com fotos). */
 export default function ProblemaHospede({ token }) {
@@ -17,7 +18,7 @@ export default function ProblemaHospede({ token }) {
   if (!aberto)
     return (
       <button type="button" className="al-btn al-btn-sec al-btn-grande" onClick={() => setAberto(true)}>
-        ⚠ {t("Reportar um problema")}
+        <Icon name="alert" size={18} /> {t("Reportar um problema")}
       </button>
     );
 
