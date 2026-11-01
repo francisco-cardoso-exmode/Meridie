@@ -266,7 +266,7 @@ export default function CasaForm({ casa, modo = "proprietario", urlDepois }) {
 
       <fieldset>
         <legend>{t("Fotografias")}</legend>
-        <p className="al-nota">{t("A primeira é a foto principal do anúncio.")}</p>
+        <p className="al-nota">{t("A primeira é a foto principal do anúncio. Usa as setas ‹ › para mudar a ordem.")}</p>
         <FotosAl
           value={c.fotos}
           onChange={(fotos) => setC((x) => ({ ...x, fotos }))}
@@ -274,6 +274,7 @@ export default function CasaForm({ casa, modo = "proprietario", urlDepois }) {
           pasta="casas"
           max={40}
           camara={modo !== "admin"}
+          ordenar
         />
       </fieldset>
 

@@ -10,7 +10,8 @@ import Icon from "@/components/Icon";
  * (capture="environment"), "Galeria" escolhe ficheiros. Reduz no browser e
  * envia direto para o Blob. Controlado: value (URLs) + onChange.
  */
-export default function FotosAl({ value = [], onChange, rota, pasta, payload, max = 30, camara = true }) {
+// `ordenar`: setas para mudar a ordem (a 1.ª é a principal, nas fotos da casa).
+export default function FotosAl({ value = [], onChange, rota, pasta, payload, max = 30, camara = true, ordenar = false }) {
   const { t, tf } = useT();
   const camRef = useRef(null);
   const galRef = useRef(null);
@@ -18,6 +19,13 @@ export default function FotosAl({ value = [], onChange, rota, pasta, payload, ma
   atual.current = value;
   const [estado, setEstado] = useState({ a: "idle", msg: "" });
   const aEnviar = estado.a === "loading";
+
+  function mover(de, para) {
+    const l = [...value];
+    const [x] = l.splice(de, 1);
+    l.splice(para, 0, x);
+    onChange?.(l);
+  }
 
   async function enviar(lista) {
     const files = Array.from(lista || []).filter((f) => f.type.startsWith("image/") || !f.type);
@@ -67,6 +75,17 @@ export default function FotosAl({ value = [], onChange, rota, pasta, payload, ma
               <button type="button" aria-label={t("Remover foto")} onClick={() => onChange?.(value.filter((_, j) => j !== i))}>
                 ×
               </button>
+              {ordenar && i === 0 && <span className="al-thumb-principal">{t("Principal")}</span>}
+              {ordenar && value.length > 1 && (
+                <span className="al-thumb-mover">
+                  <button type="button" aria-label={t("Mover para trás")} disabled={i === 0} onClick={() => mover(i, i - 1)}>
+                    ‹
+                  </button>
+                  <button type="button" aria-label={t("Mover para a frente")} disabled={i === value.length - 1} onClick={() => mover(i, i + 1)}>
+                    ›
+                  </button>
+                </span>
+              )}
             </div>
           ))}
         </div>

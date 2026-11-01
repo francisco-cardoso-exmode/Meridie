@@ -137,7 +137,7 @@ export default function ImageUploader({ value = [], onChange, multiple = true })
       {value.length > 0 && (
         <>
           {multiple && value.length > 1 && (
-            <p className="uploader-hint">Arrasta para reordenar · a 1.ª é a principal</p>
+            <p className="uploader-hint">Arrasta ou usa as setas ‹ › para reordenar · a 1.ª é a principal</p>
           )}
           <div className="gallery-thumbs">
             {value.map((url, i) => (
@@ -164,6 +164,23 @@ export default function ImageUploader({ value = [], onChange, multiple = true })
                   >
                     ★
                   </button>
+                )}
+                {/* Setas: reordenar no telemóvel (o arrastar do browser não funciona ao toque). */}
+                {multiple && value.length > 1 && (
+                  <span className="gthumb-mover">
+                    <button type="button" title="Mover para trás" aria-label="Mover para trás" disabled={i === 0} onClick={() => reordenar(i, i - 1)}>
+                      ‹
+                    </button>
+                    <button
+                      type="button"
+                      title="Mover para a frente"
+                      aria-label="Mover para a frente"
+                      disabled={i === value.length - 1}
+                      onClick={() => reordenar(i, i + 1)}
+                    >
+                      ›
+                    </button>
+                  </span>
                 )}
                 <button
                   type="button"

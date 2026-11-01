@@ -339,3 +339,9 @@ li.al-ok { display: flex; }
 .al-app-como strong { color: var(--gold-light); }
 .al-app-demo.claro .al-app-como { background: var(--paper-soft, #f5f6f8); color: var(--muted); }
 .al-app-demo.claro .al-app-como strong { color: var(--navy); }
+
+/* Ordem das fotos da casa: setas grandes para o dedo */
+.al-thumb-principal { position: absolute; left: 4px; top: 6px; background: var(--gold); color: var(--navy-dark); font-size: 0.65rem; font-weight: 700; padding: 2px 6px; border-radius: 4px; }
+.al-thumb .al-thumb-mover { position: absolute; left: 4px; right: 4px; bottom: 4px; display: flex; justify-content: space-between; }
+.al-thumb .al-thumb-mover button { position: static; width: 32px; height: 32px; font-size: 1.3rem; line-height: 1; }
+.al-thumb .al-thumb-mover button:disabled { visibility: hidden; }

@@ -2336,7 +2336,7 @@ body:has(.admin-page) .site-footer {
 }
 .gthumb-main {
   position: absolute;
-  bottom: 4px;
+  top: 4px;
   left: 4px;
   background: var(--gold);
   color: var(--navy-dark);
@@ -5028,3 +5028,24 @@ a.an-calor-cel:focus-visible,
 .atividade-quando { color: var(--muted); font-size: 0.82rem; min-width: 140px; }
 .lixo-feito { color: #2f7a4b; font-size: 0.88rem; font-weight: 600; }
 .admin-row-actions button.admin-link { background: none; border: 0; padding: 0; font: inherit; cursor: pointer; }
+
+/* Reordenar fotos ao toque (ImageUploader) */
+.gthumb-mover { position: absolute; right: 4px; bottom: 4px; display: flex; gap: 3px; }
+.gthumb-mover button {
+  width: 24px;
+  height: 22px;
+  border: none;
+  border-radius: 5px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 0.95rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.gthumb-mover button:hover { background: var(--gold); color: var(--navy-dark); }
+.gthumb-mover button:disabled { opacity: 0.25; cursor: default; }
+@media (hover: hover) {
+  .gthumb .gthumb-mover { opacity: 0; transition: opacity 0.15s; }
+  .gthumb:hover .gthumb-mover,
+  .gthumb:focus-within .gthumb-mover { opacity: 1; }
+}
