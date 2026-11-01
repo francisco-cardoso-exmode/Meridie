@@ -2,6 +2,7 @@
 
 import Script from "next/script";
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import {
   lerConsentimento,
   revogarAnalytics,
@@ -17,8 +18,13 @@ import {
 // O "default: denied" é escrito no HTML pelo layout (CONSENT_PADRAO, em
 // lib/consentimento.js), antes de qualquer script do GA.
 
+// Páginas privadas (link da estadia e áreas com login): o GA não carrega,
+// para os tokens dos links (/estadia/<token>, ?t=<token>) não irem no page_view.
+const PRIVADAS = /^(\/en)?\/(estadia|stay|proprietario|owner)(\/|$)/;
+
 export default function Analytics() {
   const id = process.env.NEXT_PUBLIC_GA_ID;
+  const privada = PRIVADAS.test(usePathname() || "");
   const [consentido, setConsentido] = useState(false);
 
   useEffect(() => {
@@ -38,7 +44,7 @@ export default function Analytics() {
     return () => window.removeEventListener(EVENTO_CONSENTIMENTO, ver);
   }, [id]);
 
-  if (!id || !consentido) return null;
+  if (!id || !consentido || privada) return null;
 
   return (
     <>

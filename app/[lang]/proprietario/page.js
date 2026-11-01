@@ -10,6 +10,7 @@ import { casasDoProprietario } from "@/lib/al/casas";
 import { listarReservas } from "@/lib/al/reservas";
 import { ROTULO_ESTADO_CASA, ROTULO_PLANO, hojeLisboa, formatarValor, moedaDe } from "@/lib/al/regras";
 import Icon from "@/components/Icon";
+import InstalarApp from "@/components/al/InstalarApp";
 
 export const dynamic = "force-dynamic";
 
@@ -143,12 +144,7 @@ export default async function PainelProprietario({ params }) {
         </p>
       </div>
 
-      <h2>{T("Instalar a app")}</h2>
-      <div className="al-cartao">
-        <p className="al-nota">
-          {T("No telemóvel, abre este endereço e escolhe «Adicionar ao ecrã principal» (Safari: botão Partilhar; Chrome: menu ⋮). Fica como uma app, sem lojas.")}
-        </p>
-      </div>
+      <InstalarApp texto={T("Reservas, ganhos e inspeções da tua casa no ecrã principal do telemóvel, como uma app — sem lojas.")} />
     </div>
   );
 }

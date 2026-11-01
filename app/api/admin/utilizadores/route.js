@@ -9,8 +9,14 @@ export async function GET() {
   return NextResponse.json({ ok: true, lista: await listarUtilizadores() });
 }
 
+// Gerir utilizadores exige sessão pessoal (com email): quem entrou com a
+// password global (ADMIN_PASSWORD) não cria nem apaga contas.
+const SO_PESSOAL = "Entra com o teu email e password para gerir utilizadores.";
+
 export async function POST(request) {
-  if (!(await isAdmin())) return NextResponse.json({ ok: false }, { status: 401 });
+  const sessao = await getSessao();
+  if (!sessao) return NextResponse.json({ ok: false }, { status: 401 });
+  if (!sessao.email) return NextResponse.json({ ok: false, erro: SO_PESSOAL }, { status: 403 });
   const body = await request.json().catch(() => ({}));
   try {
     await criarUtilizador(body || {});
@@ -24,6 +30,7 @@ export async function DELETE(request) {
   // O email de quem está a apagar vem da sessão no servidor.
   const sessao = await getSessao();
   if (!sessao) return NextResponse.json({ ok: false }, { status: 401 });
+  if (!sessao.email) return NextResponse.json({ ok: false, erro: SO_PESSOAL }, { status: 403 });
   const { email } = (await request.json().catch(() => null)) || {};
   if (sessao.email && normalizaEmail(email) === sessao.email)
     return NextResponse.json({ ok: false, erro: "Não podes apagar o teu próprio utilizador." }, { status: 400 });

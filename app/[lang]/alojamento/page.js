@@ -8,6 +8,7 @@ import { traduzLista } from "@/lib/i18n/conteudo";
 import { casasPublicadas, cidadesComCasas } from "@/lib/al/casas";
 import { PAISES, paisValido, dataValida, hojeLisboa, moedaDe } from "@/lib/al/regras";
 import PassosAl, { passosDaReserva } from "@/components/al/PassosAl";
+import { DemoHospede } from "@/components/al/DemoApp";
 import { getConteudo } from "@/lib/conteudo";
 import { pagamentoDisponivel } from "@/lib/pagamentos";
 
@@ -145,6 +146,32 @@ export default async function Alojamento({ params, searchParams }) {
         passos={passosDaReserva(c, pagamentoDisponivel("PT"))}
         nota={c.reservaNota}
       />
+
+      <div className="al-app-demo claro">
+        <div className="al-app-grid">
+          <div>
+            <div className="section-head" style={{ marginBottom: 0 }}>
+              <span className="eyebrow">{T("Durante a estadia")}</span>
+              <h2>{T("A tua estadia no telemóvel")}</h2>
+              <p>{T("Com a confirmação recebes um link pessoal que podes guardar no ecrã principal, como uma app.")}</p>
+            </div>
+            <ul className="al-app-lista">
+              {[
+                "Datas, valores e pagamento num só sítio",
+                "Morada e instruções de entrada quando a reserva fica confirmada",
+                "As fotografias da casa tiradas antes da tua chegada",
+                "WhatsApp da equipa e reporte de problemas com foto",
+              ].map((x) => (
+                <li key={x}>
+                  <Icon name="check" size={18} /> {T(x)}
+                </li>
+              ))}
+            </ul>
+            <p className="al-app-nota">{T("Ecrãs ilustrativos, com dados de exemplo.")}</p>
+          </div>
+          <DemoHospede lang={lang} />
+        </div>
+      </div>
 
       <div className="cta-band al-cta">
         <h2>{T("Tens uma casa?")}</h2>

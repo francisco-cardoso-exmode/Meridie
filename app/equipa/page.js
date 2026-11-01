@@ -4,17 +4,19 @@ import { tarefasDaEquipa } from "@/lib/al/tarefas";
 import { ROTULO_TIPO_TAREFA } from "@/lib/al/regras";
 import { SairAl } from "@/components/al/ContaAl";
 import ListaFiltravel from "@/components/admin/ListaFiltravel";
+import Icon from "@/components/Icon";
+import InstalarApp from "@/components/al/InstalarApp";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Hoje" };
 
-const ICONE = { inspecao_entrada: "🔑", inspecao_saida: "🧳", limpeza: "🧽" };
+const ICONE = { inspecao_entrada: "key", inspecao_saida: "camera", limpeza: "sparkles" };
 const ESTADO = { pendente: "Por fazer", em_curso: "Em curso", concluida: "Feita" };
 
 const cartao = (x) => (
   <Link href={`/equipa/tarefa/${x.id}`} className={`al-tarefa ${x.estado}`}>
     <span className="al-tarefa-ic" aria-hidden="true">
-      {ICONE[x.tipo]}
+      <Icon name={ICONE[x.tipo]} />
     </span>
     <span className="al-tarefa-txt">
       <strong>{ROTULO_TIPO_TAREFA[x.tipo]}</strong>
@@ -45,7 +47,7 @@ export default async function Hoje() {
         <SairAl papel="equipa" destino="/equipa/entrar" />
       </div>
       <p className="al-nota">{dataCurta(hoje)}</p>
-      {grupos.length === 0 && <p className="al-cartao">Sem tarefas para hoje. 🎉</p>}
+      {grupos.length === 0 && <p className="al-cartao">Sem tarefas para hoje.</p>}
       {tarefas.length > 10 && (
         <ListaFiltravel
           itens={tarefas.map((x) => ({
@@ -68,6 +70,7 @@ export default async function Hoje() {
           </div>
         </section>
       ))}
+      <InstalarApp texto="As tarefas do dia no ecrã principal do telemóvel, como uma app." />
     </div>
   );
 }

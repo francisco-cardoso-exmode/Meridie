@@ -6,6 +6,7 @@ import { t } from "@/lib/i18n";
 import { metaPagina } from "@/lib/seo";
 import { getConfigAl } from "@/lib/al/config";
 import PassosAl from "@/components/al/PassosAl";
+import { DemoProprietario } from "@/components/al/DemoApp";
 import { getConteudo } from "@/lib/conteudo";
 
 export const revalidate = 300;
@@ -81,6 +82,32 @@ export default async function InscreveCasa({ params }) {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section className="al-app-demo">
+        <div className="container al-app-grid">
+          <div>
+            <div className="section-head" style={{ marginBottom: 0 }}>
+              <span className="eyebrow">{T("A app do proprietário")}</span>
+              <h2>{T("A tua casa no bolso")}</h2>
+              <p>{T("Tudo o que se passa na tua casa, no telemóvel — instala-se a partir do site, sem lojas de apps.")}</p>
+            </div>
+            <ul className="al-app-lista">
+              {[
+                "Quanto vais receber este mês, com cada comissão separada",
+                "Calendário com todas as reservas — do site, Airbnb e Booking",
+                "Fotografias de cada divisão antes e depois de cada estadia",
+                "Bloqueias datas para uso próprio com um toque",
+              ].map((x) => (
+                <li key={x}>
+                  <Icon name="check" size={18} /> {T(x)}
+                </li>
+              ))}
+            </ul>
+            <p className="al-app-nota">{T("Ecrãs ilustrativos, com dados de exemplo.")}</p>
+          </div>
+          <DemoProprietario lang={lang} />
         </div>
       </section>
 
@@ -171,13 +198,16 @@ export default async function InscreveCasa({ params }) {
         </div>
       </section>
 
-      <section className="cta-band">
+      {/* A faixa fica dentro do container: cantos redondos com espaço até ao rodapé. */}
+      <section style={{ paddingTop: 0 }}>
         <div className="container">
-          <h2>{T("Pronto para começar?")}</h2>
-          <p>{T("Cria a tua conta, regista a casa e a nossa equipa entra em contacto.")}</p>
-          <L href="/proprietario/entrar?registo=1" className="btn btn-primary">
-            {T("Inscrever a minha casa")}
-          </L>
+          <div className="cta-band">
+            <h2>{T("Pronto para começar?")}</h2>
+            <p>{T("Cria a tua conta, regista a casa e a nossa equipa entra em contacto.")}</p>
+            <L href="/proprietario/entrar?registo=1" className="btn btn-primary">
+              {T("Inscrever a minha casa")}
+            </L>
+          </div>
         </div>
       </section>
     </div>

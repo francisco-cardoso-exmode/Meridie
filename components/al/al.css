@@ -180,7 +180,7 @@ body.al-equipa { background: var(--paper-soft); }
   border-radius: 12px; padding: 14px; min-height: 72px; color: var(--ink); }
 .al-tarefa.concluida { border-left-color: #2e9b57; opacity: 0.7; }
 .al-tarefa.em_curso { border-left-color: var(--navy); }
-.al-tarefa-ic { font-size: 1.8rem; }
+.al-tarefa-ic { width: 44px; height: 44px; flex: none; border-radius: 10px; background: linear-gradient(135deg, var(--navy), var(--navy-light)); color: var(--gold); display: grid; place-items: center; }
 .al-tarefa-txt { flex: 1; display: flex; flex-direction: column; }
 .al-tarefa-txt small { color: var(--muted); }
 .al-fluxo { margin-top: 14px; }
@@ -252,3 +252,77 @@ body.al-equipa { background: var(--paper-soft); }
 .al-ok svg { color: var(--gold); flex: none; }
 li.al-ok { display: flex; }
 .al-hero .actions { display: flex; flex-wrap: wrap; gap: 12px; }
+
+/* Cartão "Instalar a app" (proprietário e hóspede) */
+.al-instalar { display: grid; grid-template-columns: auto 1fr auto; gap: 16px; align-items: center; margin-top: 28px; }
+.al-instalar .icon { width: 44px; height: 44px; border-radius: 10px; background: linear-gradient(135deg, var(--navy), var(--navy-light)); color: var(--gold); display: grid; place-items: center; }
+.al-instalar .al-nota { margin: 4px 0 0; }
+@media (max-width: 520px) { .al-instalar { grid-template-columns: auto 1fr; } .al-instalar .al-btn { grid-column: 1 / -1; } }
+
+/* Ecrãs de demonstração das apps (components/al/DemoApp.js) */
+.al-app-demo { background: linear-gradient(160deg, var(--navy) 0%, #12305a 100%); color: #fff; overflow: hidden; }
+.al-app-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 48px; align-items: center; }
+.al-app-demo h2 { color: #fff; }
+.al-app-demo .section-head p, .al-app-demo .al-app-lista { color: rgba(255, 255, 255, 0.78); }
+.al-app-lista { list-style: none; padding: 0; margin: 22px 0 0; display: grid; gap: 12px; }
+.al-app-lista li { display: flex; gap: 10px; align-items: flex-start; }
+.al-app-lista svg { color: var(--gold-light); flex: none; margin-top: 2px; }
+.al-app-nota { margin-top: 22px; font-size: 0.88rem; color: rgba(255, 255, 255, 0.6); }
+
+.demo-tlms { display: flex; justify-content: center; align-items: center; gap: 0; }
+.demo-tlm { width: 210px; flex: none; border-radius: 34px; padding: 8px; background: #0b1527; box-shadow: 0 30px 60px rgba(0, 0, 0, 0.35), inset 0 0 0 1.5px rgba(255, 255, 255, 0.12); }
+.demo-tlm.lado { transform: scale(0.9); opacity: 0.92; }
+.demo-tlm.lado:first-child { margin-right: -26px; }
+.demo-tlm.lado:last-child { margin-left: -26px; }
+.demo-tlm.meio { position: relative; z-index: 1; }
+.demo-tlms.dois .demo-tlm.lado { margin-right: -20px; }
+.demo-ecra { background: #f5f6f8; border-radius: 27px; overflow: hidden; aspect-ratio: 9 / 18.5; color: var(--navy); font-size: 11px; line-height: 1.4; display: flex; flex-direction: column; }
+.demo-topo { background: var(--navy); color: #fff; padding: 22px 14px 10px; display: flex; flex-direction: column; gap: 2px; }
+.demo-marca { font-size: 8px; letter-spacing: 0.18em; color: var(--gold-light); }
+.demo-titulo { font-size: 15px; font-weight: 700; }
+.demo-corpo { padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+.demo-sub { color: var(--muted); font-size: 10px; margin: 0; display: block; }
+.demo-valor { font-size: 26px; font-weight: 800; color: var(--navy); line-height: 1.1; }
+.demo-barras { display: flex; align-items: flex-end; gap: 6px; height: 60px; padding: 4px 2px 0; }
+.demo-barras span { flex: 1; background: #d9dee8; border-radius: 4px 4px 0 0; }
+.demo-barras span.on { background: var(--gold); }
+.demo-cartao { background: #fff; border: 1px solid #e3e7ee; border-radius: 10px; padding: 9px 10px; display: flex; flex-direction: column; gap: 4px; }
+.demo-linha { display: flex; justify-content: space-between; align-items: baseline; gap: 6px; font-size: 10px; }
+.demo-linha span:last-child { white-space: nowrap; }
+.demo-linha.forte { border-top: 1px solid #e3e7ee; padding-top: 5px; margin-top: 2px; font-weight: 700; }
+.demo-badge { align-self: flex-start; background: #e6f4ea; color: #1e7a3c; border-radius: 999px; padding: 1px 8px; font-size: 9px; font-weight: 700; }
+.demo-pago { display: inline-flex; align-items: center; gap: 4px; color: #1e7a3c; font-weight: 700; font-size: 10px; }
+.demo-cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; text-align: center; font-size: 9px; }
+.demo-cal b { color: var(--muted); font-weight: 600; }
+.demo-cal span { padding: 3px 0; border-radius: 5px; }
+.demo-cal span.ocupado { background: var(--navy); color: #fff; }
+.demo-fotos { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+.demo-foto { aspect-ratio: 4 / 3; border-radius: 8px; display: flex; flex-direction: column; justify-content: space-between; padding: 6px; color: #fff; font-size: 9px; font-weight: 600; }
+.demo-foto.f0 { background: linear-gradient(135deg, #c9a46a, #8a6b3e); }
+.demo-foto.f1 { background: linear-gradient(135deg, #9fb4c7, #5d7790); }
+.demo-foto.f2 { background: linear-gradient(135deg, #d8c3a5, #a08463); }
+.demo-foto.f3 { background: linear-gradient(135deg, #a9c7c5, #5f8f8b); }
+.demo-foto.f4 { background: linear-gradient(135deg, #8fb3d9, #3f6c9c); }
+.demo-foto.f5 { background: linear-gradient(135deg, #b9b2a6, #7b7366); }
+.demo-ok { flex-direction: row; align-items: center; gap: 6px; color: #1e7a3c; font-weight: 700; }
+.demo-codigo { font-size: 22px; font-weight: 800; letter-spacing: 0.1em; }
+.demo-botao { background: var(--gold); color: var(--navy); text-align: center; border-radius: 10px; padding: 9px; font-weight: 700; }
+.demo-botao.sec { background: #fff; border: 1.5px solid var(--navy); }
+
+/* Versão clara (página das casas) */
+.al-app-demo.claro { background: none; color: inherit; overflow: visible; }
+.al-app-demo.claro h2 { color: var(--navy); }
+.al-app-demo.claro .section-head p, .al-app-demo.claro .al-app-lista { color: var(--muted); }
+.al-app-demo.claro .al-app-lista svg { color: var(--gold); }
+
+@media (max-width: 960px) {
+  .al-app-grid { grid-template-columns: 1fr; gap: 36px; }
+  .demo-tlm { width: 180px; }
+}
+@media (max-width: 560px) {
+  /* No telemóvel só o ecrã do meio (os laterais ficavam cortados). */
+  .demo-tlm.lado { display: none; }
+  .demo-tlm.meio { width: 230px; }
+}
+.al-pagina .al-app-demo.claro { margin-top: 72px; }
+.al-pagina .al-app-demo h2 { font-size: 1.8rem; margin: 8px 0 10px; }

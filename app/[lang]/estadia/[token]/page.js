@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Relatorio from "@/components/al/Relatorio";
 import ProblemaHospede from "@/components/al/ProblemaHospede";
 import PagarEstadia from "@/components/al/PagarEstadia";
+import InstalarApp from "@/components/al/InstalarApp";
 import { t, tf } from "@/lib/i18n";
 import { metaPrivada, dataCurta } from "@/lib/al/paginas";
 import { reservaPorToken } from "@/lib/al/reservas";
@@ -9,7 +10,7 @@ import { casaPorSlug } from "@/lib/al/casas";
 import { relatorioEntrada } from "@/lib/al/tarefas";
 import { getEmpresa } from "@/lib/config";
 import { whatsappHref, telHref } from "@/lib/contactoLinks";
-import { formatarValor, totalHospede, podePagarOnline } from "@/lib/al/regras";
+import { formatarValor, totalHospede, podePagarOnline, hojeLisboa } from "@/lib/al/regras";
 import { pagamentoDisponivel } from "@/lib/pagamentos";
 import { traduzDoc } from "@/lib/i18n/conteudo";
 import Icon from "@/components/Icon";
@@ -17,9 +18,17 @@ import Icon from "@/components/Icon";
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }) {
-  const { lang } = await params;
-  return metaPrivada(lang, "A tua estadia");
+  const { lang, token } = await params;
+  return {
+    ...metaPrivada(lang, "A tua estadia"),
+    // App do hóspede: manifest próprio desta reserva (abre no link pessoal).
+    manifest: `/api/estadia/manifest/${encodeURIComponent(token)}${lang === "en" ? "?lang=en" : ""}`,
+    appleWebApp: { capable: true, title: t(lang, "A minha estadia"), statusBarStyle: "default" },
+    icons: { apple: "/pwa/apple-touch-icon.png" },
+  };
 }
+
+export const viewport = { themeColor: "#1b3f6e" };
 
 /**
  * Página do hóspede: entra pelo link pessoal (token) enviado na confirmação.
@@ -39,6 +48,8 @@ export default async function Estadia({ params, searchParams }) {
   ]);
   const casa = traduzDoc(casaPt, lang);
   const confirmada = r.estado === "confirmada";
+  // Morada e instruções de entrada (códigos de porta) só até ao dia da saída.
+  const mostrarEntrada = confirmada && hojeLisboa() <= r.saida;
   const wa = whatsappHref(empresa.telefone, tf(lang, "Olá! Tenho uma reserva em {casa} ({e} → {s}).", { casa: r.casaTitulo, e: r.entrada, s: r.saida }));
   const tel = telHref(empresa.telefone);
   const moeda = r.moeda || "EUR";
@@ -123,7 +134,7 @@ export default async function Estadia({ params, searchParams }) {
         </div>
       )}
 
-      {confirmada && casa && (casa.morada || casa.checkinInfo) && (
+      {mostrarEntrada && casa && (casa.morada || casa.checkinInfo) && (
         <>
           <h2>{T("Como entrar")}</h2>
           <div className="al-cartao">
@@ -158,6 +169,7 @@ export default async function Estadia({ params, searchParams }) {
         )}
       </div>
       {confirmada && <ProblemaHospede token={token} />}
+      {confirmada && <InstalarApp texto={T("Guarda esta página no telemóvel: a reserva, as instruções de entrada e o nosso contacto ficam a um toque durante toda a estadia.")} />}
       {casa?.regras && (
         <>
           <h2>{T("Regras da casa")}</h2>
