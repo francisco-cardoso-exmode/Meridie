@@ -62,10 +62,16 @@ export default function ImageUploader({ value = [], onChange, multiple = true })
   // se um falhar, os anteriores já ficaram no formulário.
   async function enviar(fileList) {
     if (aEnviar) return;
-    let files = Array.from(fileList || []).filter((f) => f.type.startsWith("image/"));
+    const todos = Array.from(fileList || []);
+    let files = todos.filter((f) => f.type.startsWith("image/"));
     if (!multiple) files = files.slice(-1);
     if (inputRef.current) inputRef.current.value = "";
-    if (!files.length) return;
+    if (!files.length) {
+      // Nunca falhar em silêncio: dizer porque é que nada aconteceu.
+      if (todos.length)
+        setEstado({ a: "erro", msg: "Esse ficheiro não é uma imagem. Usa JPG, PNG ou WebP." });
+      return;
+    }
     const erros = [];
     for (let i = 0; i < files.length; i++) {
       setEstado({
@@ -110,6 +116,17 @@ export default function ImageUploader({ value = [], onChange, multiple = true })
         onDrop={(e) => {
           e.preventDefault();
           setDrag(false);
+          // Imagem arrastada de outra página web: o browser só entrega o link, não o ficheiro.
+          if (!e.dataTransfer.files?.length) {
+            const link = e.dataTransfer.getData("text/uri-list") || e.dataTransfer.getData("text/plain");
+            setEstado({
+              a: "erro",
+              msg: link
+                ? "Arrastaste a imagem de outra página — assim o browser só envia o link. Guarda-a primeiro no computador (botão direito → Guardar imagem como…) e depois arrasta o ficheiro ou clica para o escolher."
+                : "Não chegou nenhum ficheiro. Clica para escolher a imagem no computador.",
+            });
+            return;
+          }
           enviar(e.dataTransfer.files);
         }}
         onClick={() => !aEnviar && inputRef.current?.click()}

@@ -64,7 +64,7 @@ export default async function Home({ params }) {
               {TECNOLOGIA_VISIVEL ? c.areasEyebrowTec : c.areasEyebrow}
             </span>
             <h2>{c.areasTitulo}</h2>
-            <p>{c.areasTexto}</p>
+            <p>{TECNOLOGIA_VISIVEL ? c.areasTextoTec : c.areasTexto}</p>
           </Reveal>
           <AreasCards areas={["marcas", "tecnologia", "alojamento"]} textos={areas} />
           {marcas.length > 0 && (

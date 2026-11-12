@@ -1,5 +1,6 @@
 "use client";
 
+import { TECNOLOGIA_VISIVEL } from "@/lib/flags";
 import { useEffect, useRef, useState } from "react";
 import L from "@/components/L";
 import Foto from "@/components/Foto";
@@ -146,7 +147,7 @@ export default function PedidoPagina() {
         <p>{t("Enviámos-te um email de confirmação. A nossa equipa responde em breve com a disponibilidade e as condições.")}</p>
         <div className="pedido-ok-acoes">
           <L href="/representacoes" className="btn btn-primary">{t("Continuar a ver produtos")}</L>
-          <L href="/tecnologia" className="btn btn-ghost-escuro">{t("Ver soluções tecnológicas")}</L>
+          {TECNOLOGIA_VISIVEL && <L href="/tecnologia" className="btn btn-ghost-escuro">{t("Ver soluções tecnológicas")}</L>}
         </div>
       </div>
     );
@@ -158,10 +159,14 @@ export default function PedidoPagina() {
     return (
       <div className="empty-state pedido-vazio">
         <p>{unico ? t("Este item já não está disponível.") : t("O teu pedido está vazio.")}</p>
-        <p>{t("Escolhe produtos nas Representações comerciais ou uma solução em Tecnologia e acrescenta-os ao pedido.")}</p>
+        <p>
+          {TECNOLOGIA_VISIVEL
+            ? t("Escolhe produtos nas Representações comerciais ou uma solução em Tecnologia e acrescenta-os ao pedido.")
+            : t("Escolhe produtos nas Representações comerciais e acrescenta-os ao pedido.")}
+        </p>
         <div className="pedido-ok-acoes">
           <L href="/representacoes" className="btn btn-primary">{t("Representações comerciais")}</L>
-          <L href="/tecnologia" className="btn btn-ghost-escuro">{t("Tecnologia")}</L>
+          {TECNOLOGIA_VISIVEL && <L href="/tecnologia" className="btn btn-ghost-escuro">{t("Tecnologia")}</L>}
         </div>
       </div>
     );
