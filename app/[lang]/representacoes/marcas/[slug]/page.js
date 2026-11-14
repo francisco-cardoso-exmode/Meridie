@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Reveal from "@/components/Reveal";
 import MarcaGaleria from "@/components/MarcaGaleria";
 import ProdutoCard from "@/components/ProdutoCard";
+import CatalogoProdutos from "@/components/CatalogoProdutos";
 import Foto from "@/components/Foto";
 import { allMarcas, marcaBySlug } from "@/lib/marcas";
 import { allCategorias, allProdutos, cartoesProdutos } from "@/lib/representacoes";
@@ -12,6 +13,14 @@ import { metaPagina, metaNaoEncontrado } from "@/lib/seo";
 import { traduzDoc, traduzLista } from "@/lib/i18n/conteudo";
 import { emPrevisualizacao } from "@/lib/previsualizacao";
 import AvisoPrevisualizacao from "@/components/AvisoPrevisualizacao";
+
+// Há por onde filtrar os produtos deste grupo? (mais de uma subcategoria, ou
+// produtos com características — Tipo, Região…)
+function temFiltros(cat, lista) {
+  const subs = new Set(lista.map((p) => p.subcategoria).filter(Boolean));
+  const comAtributos = lista.some((p) => Object.values(p.atributos || {}).some(Boolean));
+  return lista.length > 1 && (subs.size > 1 || comAtributos);
+}
 
 const podeVer = async (m) => !!m && (m.ativo !== false || (await emPrevisualizacao()));
 
@@ -93,11 +102,21 @@ export default async function PaginaMarca({ params }) {
               </span>
               <h2>{gi === 0 ? tf(lang, "A gama {nome}", { nome: m.nome }) : c.nome}</h2>
             </Reveal>
-            <div className="produto-grid">
-              {lista.map((p) => (
-                <ProdutoCard key={p.slug} p={{ ...p, marcaNome: "" }} />
-              ))}
-            </div>
+            {temFiltros(c, lista) ? (
+              <CatalogoProdutos
+                produtos={lista.map((p) => ({ ...p, marcaNome: "" }))}
+                subcategorias={c.filhos.map((f) => ({ slug: f.slug, nome: f.nome, caracteristicas: f.caracteristicas || [] }))}
+                caracteristicas={c.caracteristicas || []}
+                sincronizarUrl={grupos.length === 1}
+                soChips
+              />
+            ) : (
+              <div className="produto-grid">
+                {lista.map((p) => (
+                  <ProdutoCard key={p.slug} p={{ ...p, marcaNome: "" }} />
+                ))}
+              </div>
+            )}
           </div>
         </section>
       ))}

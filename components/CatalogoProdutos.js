@@ -11,17 +11,38 @@ import { filtrarProdutos, ordenarProdutos } from "@/lib/catalogo";
  * filtros por marca, disponibilidade, preço e pesquisa. A subcategoria e as
  * características escolhidas ficam no URL (?sub=vinho&tipo=tinto&regiao=douro)
  * para se poder partilhar a ligação.
+ * Na página da marca (vários catálogos na mesma página): `sincronizarUrl`
+ * false (não lê nem escreve o URL) e `soChips` (sem a barra de pesquisa,
+ * disponibilidade, preço e ordem).
  */
-export default function CatalogoProdutos({ produtos, subcategorias = [], caracteristicas = [], marcas = [] }) {
+export default function CatalogoProdutos({
+  produtos,
+  subcategorias = [],
+  caracteristicas = [],
+  marcas = [],
+  sincronizarUrl = true,
+  soChips = false,
+}) {
   const { t, tf } = useT();
   const [f, setF] = useState({ sub: "", marca: "", disp: "", preco: "", q: "", ordem: "", attrs: {} });
 
-  // Características visíveis: as da categoria e as da subcategoria escolhida.
-  const caracsDe = (sub) => [...caracteristicas, ...(subcategorias.find((s) => s.slug === sub)?.caracteristicas || [])];
+  // Se todos os produtos são da mesma subcategoria (ex.: uma marca só de
+  // vinhos), as características dela aparecem logo, sem a escolher.
+  const subUnica = useMemo(() => {
+    const subs = new Set(produtos.map((p) => p.subcategoria || ""));
+    const [so] = subs;
+    return subs.size === 1 && so ? so : "";
+  }, [produtos]);
+  // Características visíveis: as da categoria e as da subcategoria escolhida (ou única).
+  const caracsDe = (sub) => [
+    ...caracteristicas,
+    ...(subcategorias.find((s) => s.slug === (sub || subUnica))?.caracteristicas || []),
+  ];
   const caracs = caracsDe(f.sub);
 
   // Escolhas iniciais vindas do URL (?sub=vinho&tipo=tinto).
   useEffect(() => {
+    if (!sincronizarUrl) return;
     const q = new URLSearchParams(window.location.search);
     const sub = subcategorias.some((s) => s.slug === q.get("sub")) ? q.get("sub") : "";
     const attrs = {};
@@ -34,6 +55,7 @@ export default function CatalogoProdutos({ produtos, subcategorias = [], caracte
   }, [subcategorias, caracteristicas]);
 
   function poeNoUrl(sub, attrs) {
+    if (!sincronizarUrl) return;
     const url = new URL(window.location.href);
     if (sub) url.searchParams.set("sub", sub);
     else url.searchParams.delete("sub");
@@ -77,10 +99,11 @@ export default function CatalogoProdutos({ produtos, subcategorias = [], caracte
   // Contagem por subcategoria com os outros filtros aplicados (marca, pesquisa…);
   // as características só contam quando valem para todas (as da categoria).
   const comOutros = useMemo(() => {
-    const daCategoria = new Set(caracteristicas.map((c) => c.id));
+    const daCategoria = new Set(caracsDe("").map((c) => c.id));
     const attrs = Object.fromEntries(Object.entries(f.attrs).filter(([k]) => daCategoria.has(k)));
     return filtrarProdutos(produtos, { ...f, sub: "", attrs });
-  }, [produtos, f, caracteristicas]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [produtos, f, caracteristicas, subUnica]);
   const contagem = useMemo(() => {
     const m = new Map();
     for (const p of comOutros) m.set(p.subcategoria, (m.get(p.subcategoria) || 0) + 1);
@@ -99,7 +122,7 @@ export default function CatalogoProdutos({ produtos, subcategorias = [], caracte
 
   return (
     <div className="rep-catalogo">
-      {subcategorias.length > 0 && (
+      {(f.sub || subcategorias.filter((x) => contagem.get(x.slug)).length > 1) && (
         <div className="rep-chips" role="group" aria-label={t("Subcategorias")}>
           <button type="button" className={!f.sub ? "on" : undefined} aria-pressed={!f.sub} onClick={() => escolheSub("")}>
             {t("Todos")} <span>{comOutros.length}</span>
@@ -150,7 +173,7 @@ export default function CatalogoProdutos({ produtos, subcategorias = [], caracte
         );
       })}
 
-      <div className="rep-filtros">
+      {!soChips && <div className="rep-filtros">
         <input
           type="search"
           value={f.q}
@@ -193,7 +216,7 @@ export default function CatalogoProdutos({ produtos, subcategorias = [], caracte
             {t("Limpar filtros")}
           </button>
         )}
-      </div>
+      </div>}
 
       <p className="rep-contagem" aria-live="polite">
         {lista.length === 1 ? t("1 produto") : tf("{n} produtos", { n: lista.length })}
