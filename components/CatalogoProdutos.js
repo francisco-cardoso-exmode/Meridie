@@ -74,11 +74,26 @@ export default function CatalogoProdutos({ produtos, subcategorias = [], caracte
     return out;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [produtos, f, caracteristicas, subcategorias]);
+  // Contagem por subcategoria com os outros filtros aplicados (marca, pesquisa…);
+  // as características só contam quando valem para todas (as da categoria).
+  const comOutros = useMemo(() => {
+    const daCategoria = new Set(caracteristicas.map((c) => c.id));
+    const attrs = Object.fromEntries(Object.entries(f.attrs).filter(([k]) => daCategoria.has(k)));
+    return filtrarProdutos(produtos, { ...f, sub: "", attrs });
+  }, [produtos, f, caracteristicas]);
   const contagem = useMemo(() => {
     const m = new Map();
-    for (const p of produtos) m.set(p.subcategoria, (m.get(p.subcategoria) || 0) + 1);
+    for (const p of comOutros) m.set(p.subcategoria, (m.get(p.subcategoria) || 0) + 1);
     return m;
-  }, [produtos]);
+  }, [comOutros]);
+  // Marcas com produtos nos outros filtros escolhidos (subcategoria, Tipo…), com contagem.
+  const marcasVisiveis = useMemo(() => {
+    const conta = new Map();
+    for (const p of filtrarProdutos(produtos, { ...f, marca: "" })) conta.set(p.marca, (conta.get(p.marca) || 0) + 1);
+    return marcas
+      .filter((m) => conta.get(m.slug) || f.marca === m.slug)
+      .map((m) => ({ ...m, n: conta.get(m.slug) || 0 }));
+  }, [produtos, marcas, f]);
   const set = (k) => (e) => setF((x) => ({ ...x, [k]: e.target.value }));
   const temFiltros = f.marca || f.disp || f.preco || f.q || f.ordem || Object.keys(f.attrs).length > 0;
 
@@ -87,10 +102,10 @@ export default function CatalogoProdutos({ produtos, subcategorias = [], caracte
       {subcategorias.length > 0 && (
         <div className="rep-chips" role="group" aria-label={t("Subcategorias")}>
           <button type="button" className={!f.sub ? "on" : undefined} aria-pressed={!f.sub} onClick={() => escolheSub("")}>
-            {t("Todos")} <span>{produtos.length}</span>
+            {t("Todos")} <span>{comOutros.length}</span>
           </button>
           {subcategorias
-            .filter((s) => contagem.get(s.slug))
+            .filter((s) => contagem.get(s.slug) || f.sub === s.slug)
             .map((s) => (
               <button
                 type="button"
@@ -99,7 +114,7 @@ export default function CatalogoProdutos({ produtos, subcategorias = [], caracte
                 aria-pressed={f.sub === s.slug}
                 onClick={() => escolheSub(s.slug)}
               >
-                {s.nome} <span>{contagem.get(s.slug)}</span>
+                {s.nome} <span>{contagem.get(s.slug) || 0}</span>
               </button>
             ))}
         </div>
@@ -143,11 +158,11 @@ export default function CatalogoProdutos({ produtos, subcategorias = [], caracte
           placeholder={t("Pesquisar por nome, referência ou marca…")}
           aria-label={t("Pesquisar")}
         />
-        {marcas.length > 1 && (
+        {(marcasVisiveis.length > 1 || f.marca) && (
           <select value={f.marca} onChange={set("marca")} aria-label={t("Marca")}>
             <option value="">{t("Todas as marcas")}</option>
-            {marcas.map((m) => (
-              <option key={m.slug} value={m.slug}>{m.nome}</option>
+            {marcasVisiveis.map((m) => (
+              <option key={m.slug} value={m.slug}>{m.nome} ({m.n})</option>
             ))}
           </select>
         )}

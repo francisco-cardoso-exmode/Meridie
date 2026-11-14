@@ -77,37 +77,44 @@ export default function ListaFiltravel({
     } catch {}
   }, [q, filtros, ordem, dias, facetas, ordens, ordemPadrao, periodo]);
 
-  // Opções de cada filtro: as dadas, ou as que existem nos itens (com contagem).
-  const opcoes = useMemo(() => {
-    const out = {};
-    for (const f of facetas) {
-      if (f.opcoes?.length) {
-        out[f.k] = f.opcoes;
-        continue;
-      }
-      const vistos = new Map();
-      for (const it of itens) {
-        const v = it.facetas?.[f.k];
-        if (v !== undefined && v !== null && v !== "") vistos.set(String(v), (vistos.get(String(v)) || 0) + 1);
-      }
-      out[f.k] = [...vistos.entries()]
-        .sort((a, b) => a[0].localeCompare(b[0], "pt"))
-        .map(([v, n]) => ({ v, label: `${v} (${n})` }));
-    }
-    return out;
-  }, [facetas, itens]);
-
-  const visiveis = useMemo(() => {
+  // Um item passa nos filtros? `menos`: faceta a ignorar (para contar as opções dela).
+  const passa = useMemo(() => {
     const termos = normaliza(q).split(/\s+/).filter(Boolean);
     const limite = periodo && dias ? Date.now() - Number(dias) * 864e5 : null;
-    const lista = itens.filter((it) => {
+    return (it, menos) => {
       if (termos.length && !termos.every((t) => normaliza(it.busca).includes(t))) return false;
       for (const [k, v] of Object.entries(filtros)) {
-        if (v && String(it.facetas?.[k] ?? "") !== v) return false;
+        if (k !== menos && v && String(it.facetas?.[k] ?? "") !== v) return false;
       }
       if (limite && !((it.ordem?.[periodo] || 0) >= limite)) return false;
       return true;
-    });
+    };
+  }, [q, filtros, dias, periodo]);
+
+  // Opções de cada filtro: só as que existem com os OUTROS filtros aplicados
+  // (escolhida a categoria, a marca mostra só as marcas dessa categoria), com
+  // a contagem. A opção escolhida fica sempre, mesmo a zero.
+  const opcoes = useMemo(() => {
+    const out = {};
+    for (const f of facetas) {
+      const conta = new Map();
+      for (const it of itens) {
+        if (!passa(it, f.k)) continue;
+        const v = it.facetas?.[f.k];
+        if (v !== undefined && v !== null && v !== "") conta.set(String(v), (conta.get(String(v)) || 0) + 1);
+      }
+      const base = f.opcoes?.length
+        ? f.opcoes
+        : [...conta.keys()].sort((a, b) => a.localeCompare(b, "pt")).map((v) => ({ v, label: v }));
+      out[f.k] = base
+        .filter((o) => conta.get(String(o.v)) || filtros[f.k] === String(o.v))
+        .map((o) => ({ v: o.v, label: `${o.label} (${conta.get(String(o.v)) || 0})` }));
+    }
+    return out;
+  }, [facetas, itens, passa, filtros]);
+
+  const visiveis = useMemo(() => {
+    const lista = itens.filter((it) => passa(it));
     const o = ordens.find((x) => x.k === ordem);
     if (o) {
       const dir = o.desc ? -1 : 1;
@@ -122,7 +129,7 @@ export default function ListaFiltravel({
       });
     }
     return lista;
-  }, [itens, q, filtros, ordem, ordens, dias, periodo]);
+  }, [itens, passa, ordem, ordens]);
 
   const ativos = !!q || Object.values(filtros).some(Boolean) || !!dias;
 
