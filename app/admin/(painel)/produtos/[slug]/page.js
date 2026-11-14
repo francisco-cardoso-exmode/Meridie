@@ -37,7 +37,7 @@ export default async function EditarProduto({ params }) {
       <h1>Editar — {p.nome}</h1>
       <ProdutoForm
         initial={p}
-        categorias={cats.map(({ slug: s, nome, parent }) => ({ slug: s, nome, parent: parent || null }))}
+        categorias={cats.map(({ slug: s, nome, parent, caracteristicas }) => ({ slug: s, nome, parent: parent || null, caracteristicas: caracteristicas || [] }))}
         marcas={marcas.map(({ slug: s, nome }) => ({ slug: s, nome }))}
       />
     </div>

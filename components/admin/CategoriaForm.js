@@ -3,6 +3,7 @@
 import { useState } from "react";
 import VersaoInglesa from "@/components/admin/VersaoInglesa";
 import ImageUploader from "@/components/admin/ImageUploader";
+import CaracteristicasEditor, { opcoesPendentes } from "@/components/admin/CaracteristicasEditor";
 import { pedidoAdmin, useAvisoSaida, useEnEditado } from "@/lib/adminCliente";
 import { slugify } from "@/lib/slug";
 
@@ -19,6 +20,7 @@ export default function CategoriaForm({ initial = null, topo = [], parentInicial
     imagem: initial?.imagem || "",
     ordem: initial?.ordem ?? "",
     ativo: initial?.ativo !== false,
+    caracteristicas: initial?.caracteristicas || [],
   });
   const [inicialJson] = useState(() => JSON.stringify(f));
   const libertar = useAvisoSaida(JSON.stringify(f) !== inicialJson || temEnEditado);
@@ -36,6 +38,9 @@ export default function CategoriaForm({ initial = null, topo = [], parentInicial
       imagem: f.imagem,
       ordem: f.ordem === "" ? 99 : Number(f.ordem),
       ativo: !!f.ativo,
+      caracteristicas: opcoesPendentes(e.currentTarget, f.caracteristicas)
+        .map((c) => ({ ...c, nome: c.nome.trim(), opcoes: c.opcoes.filter((o) => o.nome.trim()) }))
+        .filter((c) => c.nome),
     };
     const url = editing ? `/api/admin/categorias/${encodeURIComponent(initial.slug)}` : "/api/admin/categorias";
     const r = await pedidoAdmin(url, { method: editing ? "PUT" : "POST", body: temEnEditado ? { ...doc, enEditado } : doc });
@@ -47,7 +52,7 @@ export default function CategoriaForm({ initial = null, topo = [], parentInicial
 
   const maes = topo.filter((c) => !initial || c.slug !== initial.slug);
   return (
-    <form className="admin-form" onSubmit={onSubmit} style={{ maxWidth: 640 }}>
+    <form className="admin-form" onSubmit={onSubmit} style={{ maxWidth: 720 }}>
       <label className="full">
         Nome
         <input value={f.nome} onChange={set("nome")} required placeholder="Vinho" />
@@ -77,6 +82,18 @@ export default function CategoriaForm({ initial = null, topo = [], parentInicial
           />
         </div>
       )}
+      <fieldset className="admin-fieldset full">
+        <legend>Características (filtros no site)</legend>
+        <p className="admin-ajuda">
+          Ex.: no Vinho, «Tipo» com Branco, Tinto, Rosé e «Região» com Douro, Porto, Gaia… Em cada produto
+          escolhe-se uma opção de cada, e no site aparecem como filtros.
+          {f.parent ? " As da categoria-mãe também valem aqui." : " Valem também para todas as subcategorias desta."}
+        </p>
+        <CaracteristicasEditor
+          value={f.caracteristicas}
+          onChange={(caracteristicas) => setF((p) => ({ ...p, caracteristicas }))}
+        />
+      </fieldset>
       <label className="full">
         Ordem (1 aparece primeiro — também se muda com ↑ ↓ na lista)
         <input type="number" value={f.ordem} onChange={set("ordem")} placeholder="1" />

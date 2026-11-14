@@ -30,7 +30,7 @@ export default async function NovoProduto({ searchParams }) {
       <ProdutoForm
         key={de || "novo"}
         copia={copiaDe(original, "ativo")}
-        categorias={cats.map(({ slug, nome, parent }) => ({ slug, nome, parent: parent || null }))}
+        categorias={cats.map(({ slug, nome, parent, caracteristicas }) => ({ slug, nome, parent: parent || null, caracteristicas: caracteristicas || [] }))}
         marcas={marcas.map(({ slug, nome }) => ({ slug, nome }))}
         marcaInicial={marcas.some((m) => m.slug === marca) ? marca : ""}
       />

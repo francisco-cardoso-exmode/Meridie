@@ -9,7 +9,7 @@ import { allMarcas } from "@/lib/marcas";
 import { allCategorias, allProdutos, cartoesProdutos, produtoBySlug } from "@/lib/representacoes";
 import { emPrevisualizacao } from "@/lib/previsualizacao";
 import AvisoPrevisualizacao from "@/components/AvisoPrevisualizacao";
-import { hrefCategoria, hrefMarca, hrefProduto, temPreco } from "@/lib/catalogo";
+import { hrefCategoria, hrefMarca, hrefProduto, temPreco, caracteristicasDe } from "@/lib/catalogo";
 import { caminho, t, tf } from "@/lib/i18n";
 import { metaPagina, metaNaoEncontrado, urlPublica, jsonLd } from "@/lib/seo";
 import { SITE_URL } from "@/lib/site";
@@ -66,6 +66,13 @@ export default async function PaginaProduto({ params }) {
   const marca = marcas.find((m) => m.slug === p.marca && m.ativo !== false);
   const cat = cats.find((c) => c.slug === p.categoria);
   const sub = cats.find((c) => c.slug === p.subcategoria);
+  // «Tipo: Tinto», «Região: Douro» — cada um liga ao catálogo já filtrado.
+  const atributos = caracteristicasDe(cats, p.categoria, p.subcategoria)
+    .map((c) => {
+      const o = c.opcoes.find((x) => x.id === p.atributos?.[c.id]);
+      return o ? { nome: c.nome, valor: o.nome, href: `${hrefCategoria(p.categoria, p.subcategoria)}${p.subcategoria ? "&" : "?"}${c.id}=${o.id}` } : null;
+    })
+    .filter(Boolean);
   // Relacionados: primeiro os da mesma subcategoria, depois o resto da categoria.
   const outros = irmaos.filter((x) => x.slug !== p.slug);
   const relacionados = cartoesProdutos(
@@ -165,6 +172,15 @@ export default async function PaginaProduto({ params }) {
               )}
               <h1>{p.nome}</h1>
               {p.resumo && <p className="rep-resumo">{p.resumo}</p>}
+              {atributos.length > 0 && (
+                <ul className="rep-atributos">
+                  {atributos.map((a) => (
+                    <li key={a.nome}>
+                      <span>{a.nome}</span> <L href={a.href}>{a.valor}</L>
+                    </li>
+                  ))}
+                </ul>
+              )}
               <PrecoProduto p={p} grande />
               <p className={`rep-disp${disponivel ? "" : " nao"}`}>
                 {disponivel ? T("Disponível") : T("Indisponível de momento")}

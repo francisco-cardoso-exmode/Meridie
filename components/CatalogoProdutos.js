@@ -6,36 +6,81 @@ import { useT } from "@/components/LangProvider";
 import { filtrarProdutos, ordenarProdutos } from "@/lib/catalogo";
 
 /**
- * Catálogo de uma categoria: subcategorias em "chips" e filtros por marca,
- * disponibilidade, preço e pesquisa. A subcategoria escolhida fica no URL
- * (?sub=…) para se poder partilhar a ligação.
+ * Catálogo de uma categoria: subcategorias em "chips", características da
+ * categoria e da subcategoria escolhida (Tipo, Região…) também em chips, e
+ * filtros por marca, disponibilidade, preço e pesquisa. A subcategoria e as
+ * características escolhidas ficam no URL (?sub=vinho&tipo=tinto&regiao=douro)
+ * para se poder partilhar a ligação.
  */
-export default function CatalogoProdutos({ produtos, subcategorias = [], marcas = [] }) {
+export default function CatalogoProdutos({ produtos, subcategorias = [], caracteristicas = [], marcas = [] }) {
   const { t, tf } = useT();
-  const [f, setF] = useState({ sub: "", marca: "", disp: "", preco: "", q: "", ordem: "" });
+  const [f, setF] = useState({ sub: "", marca: "", disp: "", preco: "", q: "", ordem: "", attrs: {} });
 
-  // Subcategoria inicial vinda do URL (?sub=vinho).
+  // Características visíveis: as da categoria e as da subcategoria escolhida.
+  const caracsDe = (sub) => [...caracteristicas, ...(subcategorias.find((s) => s.slug === sub)?.caracteristicas || [])];
+  const caracs = caracsDe(f.sub);
+
+  // Escolhas iniciais vindas do URL (?sub=vinho&tipo=tinto).
   useEffect(() => {
-    const sub = new URLSearchParams(window.location.search).get("sub") || "";
-    if (sub && subcategorias.some((s) => s.slug === sub)) setF((x) => ({ ...x, sub }));
-  }, [subcategorias]);
+    const q = new URLSearchParams(window.location.search);
+    const sub = subcategorias.some((s) => s.slug === q.get("sub")) ? q.get("sub") : "";
+    const attrs = {};
+    for (const c of caracsDe(sub)) {
+      const v = q.get(c.id);
+      if (v && c.opcoes.some((o) => o.id === v)) attrs[c.id] = v;
+    }
+    if (sub || Object.keys(attrs).length) setF((x) => ({ ...x, sub, attrs }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subcategorias, caracteristicas]);
 
-  function escolheSub(sub) {
-    setF((x) => ({ ...x, sub }));
+  function poeNoUrl(sub, attrs) {
     const url = new URL(window.location.href);
     if (sub) url.searchParams.set("sub", sub);
     else url.searchParams.delete("sub");
+    for (const c of [...caracteristicas, ...subcategorias.flatMap((s) => s.caracteristicas || [])])
+      url.searchParams.delete(c.id);
+    for (const [k, v] of Object.entries(attrs)) if (v) url.searchParams.set(k, v);
     window.history.replaceState(null, "", url);
   }
 
+  function escolheSub(sub) {
+    // Ao mudar de subcategoria ficam só as escolhas das características que continuam visíveis.
+    const visiveis = new Set(caracsDe(sub).map((c) => c.id));
+    const attrs = Object.fromEntries(Object.entries(f.attrs).filter(([k]) => visiveis.has(k)));
+    setF((x) => ({ ...x, sub, attrs }));
+    poeNoUrl(sub, attrs);
+  }
+
+  function escolheAttr(id, valor) {
+    const attrs = { ...f.attrs, [id]: valor };
+    if (!valor) delete attrs[id];
+    setF((x) => ({ ...x, attrs }));
+    poeNoUrl(f.sub, attrs);
+  }
+
   const lista = useMemo(() => ordenarProdutos(filtrarProdutos(produtos, f), f.ordem), [produtos, f]);
+  // Contagem de cada opção com os outros filtros aplicados (menos o da própria característica).
+  const contagemAttrs = useMemo(() => {
+    const out = {};
+    for (const c of caracs) {
+      const { [c.id]: _, ...outros } = f.attrs;
+      const m = new Map();
+      for (const p of filtrarProdutos(produtos, { ...f, attrs: outros })) {
+        const v = p.atributos?.[c.id];
+        if (v) m.set(v, (m.get(v) || 0) + 1);
+      }
+      out[c.id] = m;
+    }
+    return out;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [produtos, f, caracteristicas, subcategorias]);
   const contagem = useMemo(() => {
     const m = new Map();
     for (const p of produtos) m.set(p.subcategoria, (m.get(p.subcategoria) || 0) + 1);
     return m;
   }, [produtos]);
   const set = (k) => (e) => setF((x) => ({ ...x, [k]: e.target.value }));
-  const temFiltros = f.marca || f.disp || f.preco || f.q || f.ordem;
+  const temFiltros = f.marca || f.disp || f.preco || f.q || f.ordem || Object.keys(f.attrs).length > 0;
 
   return (
     <div className="rep-catalogo">
@@ -59,6 +104,36 @@ export default function CatalogoProdutos({ produtos, subcategorias = [], marcas 
             ))}
         </div>
       )}
+
+      {caracs.map((c) => {
+        const conta = contagemAttrs[c.id] || new Map();
+        const opcoes = c.opcoes.filter((o) => conta.get(o.id) || f.attrs[c.id] === o.id);
+        if (!opcoes.length) return null;
+        return (
+          <div key={c.id} className="rep-chips rep-chips-carac" role="group" aria-label={c.nome}>
+            <span className="rep-chips-rotulo">{c.nome}:</span>
+            <button
+              type="button"
+              className={!f.attrs[c.id] ? "on" : undefined}
+              aria-pressed={!f.attrs[c.id]}
+              onClick={() => escolheAttr(c.id, "")}
+            >
+              {t("Todos")}
+            </button>
+            {opcoes.map((o) => (
+              <button
+                type="button"
+                key={o.id}
+                className={f.attrs[c.id] === o.id ? "on" : undefined}
+                aria-pressed={f.attrs[c.id] === o.id}
+                onClick={() => escolheAttr(c.id, f.attrs[c.id] === o.id ? "" : o.id)}
+              >
+                {o.nome} <span>{conta.get(o.id) || 0}</span>
+              </button>
+            ))}
+          </div>
+        );
+      })}
 
       <div className="rep-filtros">
         <input
@@ -95,7 +170,10 @@ export default function CatalogoProdutos({ produtos, subcategorias = [], marcas 
           <button
             type="button"
             className="btn-ghost"
-            onClick={() => setF((x) => ({ ...x, marca: "", disp: "", preco: "", q: "", ordem: "" }))}
+            onClick={() => {
+              setF((x) => ({ ...x, marca: "", disp: "", preco: "", q: "", ordem: "", attrs: {} }));
+              poeNoUrl(f.sub, {});
+            }}
           >
             {t("Limpar filtros")}
           </button>

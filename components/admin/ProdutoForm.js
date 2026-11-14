@@ -5,6 +5,7 @@ import VersaoInglesa from "@/components/admin/VersaoInglesa";
 import ImageUploader from "@/components/admin/ImageUploader";
 import { pedidoAdmin, useAvisoSaida, useEnEditado } from "@/lib/adminCliente";
 import { slugify } from "@/lib/slug";
+import { caracteristicasDe } from "@/lib/catalogo";
 
 // Ficha técnica: uma linha por característica, "Etiqueta | valor".
 export const paresParaTexto = (c) => (Array.isArray(c) ? c.map(([k, v]) => `${k} | ${v}`).join("\n") : "");
@@ -43,12 +44,14 @@ export default function ProdutoForm({ initial: emEdicao = null, copia = null, ca
     destaque: !!initial?.destaque,
     ativo: initial?.ativo !== false,
     ordem: initial?.ordem ?? "",
+    atributos: initial?.atributos || {},
   });
   const [inicialJson] = useState(() => JSON.stringify(f));
   const libertar = useAvisoSaida(JSON.stringify(f) !== inicialJson || temEnEditado);
   const set = (k) => (e) =>
     setF((p) => ({ ...p, [k]: e.target.type === "checkbox" ? e.target.checked : e.target.value }));
   const subs = categorias.filter((c) => c.parent === f.categoria);
+  const caracs = caracteristicasDe(categorias, f.categoria, f.subcategoria);
 
   async function onSubmit(e) {
     e.preventDefault();
@@ -71,6 +74,8 @@ export default function ProdutoForm({ initial: emEdicao = null, copia = null, ca
       destaque: !!f.destaque,
       ativo: !!f.ativo,
       ordem: f.ordem === "" ? 99 : Number(f.ordem),
+      // Só as características da categoria/subcategoria escolhidas.
+      atributos: Object.fromEntries(caracs.map((c) => [c.id, f.atributos[c.id]]).filter(([, v]) => v)),
     };
     const url = editing ? `/api/admin/produtos/${encodeURIComponent(initial.slug)}` : "/api/admin/produtos";
     const r = await pedidoAdmin(url, { method: editing ? "PUT" : "POST", body: temEnEditado ? { ...doc, enEditado } : doc });
@@ -115,6 +120,25 @@ export default function ProdutoForm({ initial: emEdicao = null, copia = null, ca
           </select>
         </label>
       </div>
+
+      {caracs.length > 0 && (
+        <div className="admin-form-grid">
+          {caracs.map((c) => (
+            <label key={c.id}>
+              {c.nome}
+              <select
+                value={f.atributos[c.id] || ""}
+                onChange={(e) => setF((p) => ({ ...p, atributos: { ...p.atributos, [c.id]: e.target.value } }))}
+              >
+                <option value="">—</option>
+                {c.opcoes.map((o) => (
+                  <option key={o.id} value={o.id}>{o.nome}</option>
+                ))}
+              </select>
+            </label>
+          ))}
+        </div>
+      )}
 
       <div className="uploader-field">
         <span className="uf-label">Fotografias (a primeira é a principal — fundo branco fica melhor)</span>

@@ -45,7 +45,7 @@ export default async function PaginaCategoria({ params }) {
   const subcategorias = cats
     .filter((c) => c.parent === cat.slug)
     .sort(porOrdem)
-    .map((c) => ({ slug: c.slug, nome: c.nome }));
+    .map((c) => ({ slug: c.slug, nome: c.nome, caracteristicas: c.caracteristicas || [] }));
   const comProdutos = new Set(produtos.map((p) => p.marca));
   const marcasFiltro = marcas
     .filter((m) => comProdutos.has(m.slug) && m.ativo !== false)
@@ -68,7 +68,12 @@ export default async function PaginaCategoria({ params }) {
       <section>
         <div className="container">
           {produtos.length ? (
-            <CatalogoProdutos produtos={produtos} subcategorias={subcategorias} marcas={marcasFiltro} />
+            <CatalogoProdutos
+              produtos={produtos}
+              subcategorias={subcategorias}
+              caracteristicas={cat.caracteristicas || []}
+              marcas={marcasFiltro}
+            />
           ) : (
             <div className="empty-state">
               <p>{T("Ainda não há produtos nesta categoria. Fala connosco — podemos ter o que procuras.")}</p>
