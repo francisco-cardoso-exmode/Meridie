@@ -7,22 +7,41 @@ import { enviarParaBlob } from "@/lib/uploadCliente";
 // WebP/AVIF passam a WebP (também com transparência), o resto JPEG.
 const SAIDA = { "image/png": "image/png", "image/webp": "image/webp", "image/avif": "image/webp" };
 
-// Redimensiona a imagem no browser (máx. 1920px) para ficar leve. GIF não se
-// mexe (pode ser animado). Devolve um Blob (ou o ficheiro original se falhar).
-async function redimensionar(file, maxW = 1920, q = 0.82) {
+// Reduz a imagem no browser: lado maior até 1920 px e, se ainda passar de
+// ALVO, baixa a qualidade e depois o tamanho até caber (as fotos ficam leves
+// para o site e o envio nunca bate no limite da Vercel). GIF não se mexe (pode
+// ser animado). Devolve um Blob (ou o ficheiro original se não der).
+const ALVO = 3.5 * 1024 * 1024;
+const LEVE = 1024 * 1024; // abaixo disto e já pequena, fica como está
+
+async function redimensionar(file) {
   if (!file.type.startsWith("image/") || file.type === "image/gif") return file;
   try {
-    const bitmap = await createImageBitmap(file);
-    const escala = Math.min(1, maxW / bitmap.width);
-    if (escala >= 1) return file;
+    const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
+    const lado = Math.max(bitmap.width, bitmap.height);
+    if (lado <= 1920 && file.size <= LEVE) return file;
+    let tipo = SAIDA[file.type] || "image/jpeg";
     const canvas = document.createElement("canvas");
-    canvas.width = Math.round(bitmap.width * escala);
-    canvas.height = Math.round(bitmap.height * escala);
-    canvas.getContext("2d").drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-    const tipo = SAIDA[file.type] || "image/jpeg";
-    const blob = await new Promise((res) => canvas.toBlob(res, tipo, q));
-    // Se o browser não souber gerar o formato pedido (devolve PNG), fica o original.
-    return blob && blob.type === tipo ? blob : file;
+    const gerar = (maxLado, q) => {
+      const escala = Math.min(1, maxLado / lado);
+      canvas.width = Math.round(bitmap.width * escala);
+      canvas.height = Math.round(bitmap.height * escala);
+      canvas.getContext("2d").drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+      return new Promise((res) => canvas.toBlob(res, tipo, q));
+    };
+    let melhor = null;
+    for (const [maxLado, q] of [[1920, 0.85], [1920, 0.75], [1600, 0.72], [1280, 0.7], [1024, 0.65]]) {
+      let blob = await gerar(maxLado, q);
+      // Se o browser não souber gerar o formato pedido, tenta em JPEG.
+      if (!blob || blob.type !== tipo) {
+        tipo = "image/jpeg";
+        blob = await gerar(maxLado, q);
+      }
+      if (!blob) break;
+      melhor = blob;
+      if (blob.size <= ALVO) break;
+    }
+    return melhor && melhor.size < file.size ? melhor : file;
   } catch {
     return file;
   }
